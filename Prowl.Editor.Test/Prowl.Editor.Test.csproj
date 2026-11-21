@@ -21,4 +21,12 @@
     <ProjectReference Include="..\Prowl.Editor\Prowl.Editor.csproj" />
   </ItemGroup>
 
+  <!-- These two test the player build system: stages, build requests, asset variants, platform targets. That system
+       is not part of this source tree, so they cannot compile. Restore them together with it. -->
+  <ItemGroup>
+    <Compile Remove="BuildSystemTests.cs" />
+    <Compile Remove="BuildSystemProjectTests.cs" />
+    <Compile Remove="GameResourcesMapTests.cs" />
+  </ItemGroup>
+
 </Project>

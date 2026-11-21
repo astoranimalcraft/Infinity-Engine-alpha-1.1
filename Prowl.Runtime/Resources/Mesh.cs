@@ -1855,25 +1855,25 @@ public static class MeshGeometry
                 }
                 GeometryData.Face? face = geometry.AddFace(corners);
                 if (face == null) continue;
-                face.SetAttribute(SubMesh, new GeometryData.IntAttributeValue(s));
+                face.Attributes[SubMesh] = new GeometryData.IntAttributeValue(s);
 
                 for (int k = 0; k < 3; k++)
                 {
                     int source = (int)indices[i + k];
                     GeometryData.Loop element = face.GetLoop(corners[k])!;
-                    if (normals.Length > 0) Set(element, Normal, normals[source]);
-                    if (tangents.Length > 0) Set(element, Tangent, tangents[source]);
-                    if (uv.Length > 0) Set(element, UV, uv[source]);
-                    if (uv2.Length > 0) Set(element, UV2, uv2[source]);
-                    if (colors.Length > 0) Set(element, VertexColor, colors[source]);
-                    if (colors32.Length > 0) Set(element, VertexColor, colors32[source]);
+                    if (normals.Length > 0) Set(element.Attributes, Normal, normals[source]);
+                    if (tangents.Length > 0) Set(element.Attributes, Tangent, tangents[source]);
+                    if (uv.Length > 0) Set(element.Attributes, UV, uv[source]);
+                    if (uv2.Length > 0) Set(element.Attributes, UV2, uv2[source]);
+                    if (colors.Length > 0) Set(element.Attributes, VertexColor, colors[source]);
+                    if (colors32.Length > 0) Set(element.Attributes, VertexColor, colors32[source]);
                     if (hasSkin)
-                        SetSkin(Ints(element, BoneIndices), Floats(element, BoneWeights), boneIndices[source], boneWeights[source]);
+                        SetSkin(Ints(element.Attributes, BoneIndices), Floats(element.Attributes, BoneWeights), boneIndices[source], boneWeights[source]);
                     foreach ((BlendShapeFrame? frame, FrameNames names, bool hasNormals, bool hasTangents) in frames)
                     {
-                        Set(element, names.Position, frame.DeltaVertices.Length == count ? frame.DeltaVertices[source] : Float3.Zero);
-                        if (hasNormals) Set(element, names.Normal, frame.DeltaNormals![source]);
-                        if (hasTangents) Set(element, names.Tangent, frame.DeltaTangents![source]);
+                        Set(element.Attributes, names.Position, frame.DeltaVertices.Length == count ? frame.DeltaVertices[source] : Float3.Zero);
+                        if (hasNormals) Set(element.Attributes, names.Normal, frame.DeltaNormals![source]);
+                        if (hasTangents) Set(element.Attributes, names.Tangent, frame.DeltaTangents![source]);
                     }
                 }
             }
@@ -1955,26 +1955,26 @@ public static class MeshGeometry
             list.Add((loop, created));
 
             positions.Add(vertex.Point);
-            if (hasNormals) normals.Add(Float3Of(loop, Normal));
-            if (hasTangents) tangents.Add(Float4Of(loop, Tangent));
-            if (hasUV) uv.Add(Float2Of(loop, UV));
-            if (hasUV2) uv2.Add(Float2Of(loop, UV2));
+            if (hasNormals) normals.Add(Float3Of(loop.Attributes, Normal));
+            if (hasTangents) tangents.Add(Float4Of(loop.Attributes, Tangent));
+            if (hasUV) uv.Add(Float2Of(loop.Attributes, UV));
+            if (hasUV2) uv2.Add(Float2Of(loop.Attributes, UV2));
             if (hasColor)
             {
-                Float4 c = Float4Of(loop, VertexColor);
+                Float4 c = Float4Of(loop.Attributes, VertexColor);
                 colors.Add(new Color(c.X, c.Y, c.Z, c.W));
             }
             if (hasSkin)
             {
-                int[] ids = loop.TryGetAttribute(BoneIndices, out GeometryData.AttributeValue? value) && value is GeometryData.IntAttributeValue n ? n.Data : new int[4];
+                int[] ids = loop.Attributes.TryGetValue(BoneIndices, out GeometryData.AttributeValue? value) && value is GeometryData.IntAttributeValue n ? n.Data : new int[4];
                 boneIndices.Add(new Float4(ids[0], ids[1], ids[2], ids[3]));
-                boneWeights.Add(Float4Of(loop, BoneWeights));
+                boneWeights.Add(Float4Of(loop.Attributes, BoneWeights));
             }
             for (int layer = 0; layer < frameNames.Count; layer++)
             {
-                deltaPositions[layer].Add(Float3Of(loop, frameNames[layer].Position));
-                deltaNormals[layer]?.Add(Float3Of(loop, frameNames[layer].Normal));
-                deltaTangents[layer]?.Add(Float3Of(loop, frameNames[layer].Tangent));
+                deltaPositions[layer].Add(Float3Of(loop.Attributes, frameNames[layer].Position));
+                deltaNormals[layer]?.Add(Float3Of(loop.Attributes, frameNames[layer].Normal));
+                deltaTangents[layer]?.Add(Float3Of(loop.Attributes, frameNames[layer].Tangent));
             }
             return created;
         }
@@ -2117,7 +2117,7 @@ public static class MeshGeometry
     }
 
     private static int SubMeshOf(GeometryData.Face face)
-        => face.TryGetAttribute(SubMesh, out GeometryData.AttributeValue? value) && value is GeometryData.IntAttributeValue n && n.Data.Length > 0 ? n.Data[0] : 0;
+        => face.Attributes.TryGetValue(SubMesh, out GeometryData.AttributeValue? value) && value is GeometryData.IntAttributeValue n && n.Data.Length > 0 ? n.Data[0] : 0;
 
     private static byte ToByte(float value) => (byte)Math.Clamp(MathF.Round(value * 255f), 0f, 255f);
 
@@ -2125,8 +2125,8 @@ public static class MeshGeometry
     {
         foreach (string name in names)
         {
-            a.TryGetAttribute(name, out GeometryData.AttributeValue? va);
-            b.TryGetAttribute(name, out GeometryData.AttributeValue? vb);
+            a.Attributes.TryGetValue(name, out GeometryData.AttributeValue? va);
+            b.Attributes.TryGetValue(name, out GeometryData.AttributeValue? vb);
             if (va is GeometryData.FloatAttributeValue fa && vb is GeometryData.FloatAttributeValue fb)
             {
                 if (!fa.Data.AsSpan().SequenceEqual(fb.Data)) return false;
@@ -2143,51 +2143,51 @@ public static class MeshGeometry
         return true;
     }
 
-    private static float[]? Read(GeometryData.Element element, string name)
-        => element.TryGetAttribute(name, out GeometryData.AttributeValue? value) && value is GeometryData.FloatAttributeValue f ? f.Data : null;
+    private static float[]? Read(Dictionary<string, GeometryData.AttributeValue> attributes, string name)
+        => attributes.TryGetValue(name, out GeometryData.AttributeValue? value) && value is GeometryData.FloatAttributeValue f ? f.Data : null;
 
-    private static Float2 Float2Of(GeometryData.Element element, string name)
-        => Read(element, name) is { Length: >= 2 } d ? new Float2(d[0], d[1]) : Float2.Zero;
+    private static Float2 Float2Of(Dictionary<string, GeometryData.AttributeValue> attributes, string name)
+        => Read(attributes, name) is { Length: >= 2 } d ? new Float2(d[0], d[1]) : Float2.Zero;
 
-    private static Float3 Float3Of(GeometryData.Element element, string name)
-        => Read(element, name) is { Length: >= 3 } d ? new Float3(d[0], d[1], d[2]) : Float3.Zero;
+    private static Float3 Float3Of(Dictionary<string, GeometryData.AttributeValue> attributes, string name)
+        => Read(attributes, name) is { Length: >= 3 } d ? new Float3(d[0], d[1], d[2]) : Float3.Zero;
 
-    private static Float4 Float4Of(GeometryData.Element element, string name)
-        => Read(element, name) is { Length: >= 4 } d ? new Float4(d[0], d[1], d[2], d[3]) : Float4.Zero;
+    private static Float4 Float4Of(Dictionary<string, GeometryData.AttributeValue> attributes, string name)
+        => Read(attributes, name) is { Length: >= 4 } d ? new Float4(d[0], d[1], d[2], d[3]) : Float4.Zero;
 
-    private static float[] Floats(GeometryData.Element element, string name)
-        => element.TryGetAttribute(name, out GeometryData.AttributeValue? value) ? ((GeometryData.FloatAttributeValue)value).Data : throw new KeyNotFoundException(name);
+    private static float[] Floats(Dictionary<string, GeometryData.AttributeValue> attributes, string name)
+        => attributes.TryGetValue(name, out GeometryData.AttributeValue? value) ? ((GeometryData.FloatAttributeValue)value).Data : throw new KeyNotFoundException(name);
 
-    private static int[] Ints(GeometryData.Element element, string name)
-        => element.TryGetAttribute(name, out GeometryData.AttributeValue? value) ? ((GeometryData.IntAttributeValue)value).Data : throw new KeyNotFoundException(name);
+    private static int[] Ints(Dictionary<string, GeometryData.AttributeValue> attributes, string name)
+        => attributes.TryGetValue(name, out GeometryData.AttributeValue? value) ? ((GeometryData.IntAttributeValue)value).Data : throw new KeyNotFoundException(name);
 
-    private static void Set(GeometryData.Element element, string name, Float2 v)
+    private static void Set(Dictionary<string, GeometryData.AttributeValue> attributes, string name, Float2 v)
     {
-        float[] d = Floats(element, name);
+        float[] d = Floats(attributes, name);
         d[0] = v.X; d[1] = v.Y;
     }
 
-    private static void Set(GeometryData.Element element, string name, Float3 v)
+    private static void Set(Dictionary<string, GeometryData.AttributeValue> attributes, string name, Float3 v)
     {
-        float[] d = Floats(element, name);
+        float[] d = Floats(attributes, name);
         d[0] = v.X; d[1] = v.Y; d[2] = v.Z;
     }
 
-    private static void Set(GeometryData.Element element, string name, Float4 v)
+    private static void Set(Dictionary<string, GeometryData.AttributeValue> attributes, string name, Float4 v)
     {
-        float[] d = Floats(element, name);
+        float[] d = Floats(attributes, name);
         d[0] = v.X; d[1] = v.Y; d[2] = v.Z; d[3] = v.W;
     }
 
-    private static void Set(GeometryData.Element element, string name, Color v)
+    private static void Set(Dictionary<string, GeometryData.AttributeValue> attributes, string name, Color v)
     {
-        float[] d = Floats(element, name);
+        float[] d = Floats(attributes, name);
         d[0] = v.R; d[1] = v.G; d[2] = v.B; d[3] = v.A;
     }
 
-    private static void Set(GeometryData.Element element, string name, Color32 v)
+    private static void Set(Dictionary<string, GeometryData.AttributeValue> attributes, string name, Color32 v)
     {
-        float[] d = Floats(element, name);
+        float[] d = Floats(attributes, name);
         d[0] = v.R / 255f; d[1] = v.G / 255f; d[2] = v.B / 255f; d[3] = v.A / 255f;
     }
 

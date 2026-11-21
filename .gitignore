@@ -23,6 +23,8 @@ bld/
 [Oo]bj/
 [Ll]og/
 Build/
+# The editor's build system is source, not output: the rule above is for build folders.
+!Prowl.Editor/Build/
 
 # Visual Studio 2015 cache/options directory
 .vs/
