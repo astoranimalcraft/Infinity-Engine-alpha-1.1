@@ -41,10 +41,9 @@ public sealed class InfinityRenderPipeline : IDisposable
 
     private void InitializeShaders()
     {
+        // Load throws when the shader directory is missing or holds no SPIR-V, so a broken install fails here
+        // instead of at the first draw
         Shaders.Load();
-
-        // Os 12 shaders SPIR-V são carregados aqui.
-        // Os dados ficam disponíveis através de Shaders.Get().
     }
 
     private void InitializeRenderingSystems()
@@ -84,7 +83,8 @@ public sealed class InfinityRenderPipeline : IDisposable
         }
         finally
         {
-            Shaders.Dispose();
+            // Unload rather than dispose: a shutdown pipeline must be able to initialize again
+            Shaders.Unload();
             IsInitialized = false;
         }
     }
@@ -101,6 +101,7 @@ public sealed class InfinityRenderPipeline : IDisposable
             return;
 
         Shutdown();
+        Shaders.Dispose();
 
         IsDisposed = true;
 

@@ -106,17 +106,18 @@ public sealed class InfinityShaderLibrary : IDisposable
         var loaded = new Dictionary<string, InfinityShader>(
             StringComparer.OrdinalIgnoreCase);
 
-        foreach (string file in files.OrderBy(
-            x => x,
-            StringComparer.OrdinalIgnoreCase))
+        // A build can carry the same shader in more than one folder, for instance a staged copy next to the
+        // canonical one. The copy closest to the shader root wins, so a stray duplicate cannot stop the load.
+        IEnumerable<string> ordered = files
+            .OrderBy(x => Path.GetRelativePath(directory, x).Count(c => c == Path.DirectorySeparatorChar))
+            .ThenBy(x => x, StringComparer.OrdinalIgnoreCase);
+
+        foreach (string file in ordered)
         {
             InfinityShader shader = ReadShader(file);
 
             if (loaded.ContainsKey(shader.Name))
-            {
-                throw new InvalidOperationException(
-                    $"Duplicate Infinity shader name: {shader.Name}");
-            }
+                continue;
 
             loaded.Add(shader.Name, shader);
         }

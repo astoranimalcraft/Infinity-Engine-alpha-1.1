@@ -67,18 +67,16 @@ public sealed class InfinityRenderSettings
     {
         ArgumentNullException.ThrowIfNull(camera);
 
-        if (SSAO)
-            camera.PostProcessing = true;
-
-        camera.Profile =
-            VolumeProfile.CreateCameraDefault("Infinity Camera Profile");
-
-        AmbientOcclusion ao =
-            camera.Profile.Add<AmbientOcclusion>(overrideAll: true);
+        // The camera's profile is kept: replacing it would drop its tonemapping, exposure and every other effect.
+        // A camera that has no profile gets the shared one, which this then adds the occlusion component to.
+        AmbientOcclusion ao = camera.Profile.Add<AmbientOcclusion>();
 
         var quality = GetSSAOQuality();
 
         ao.Active = SSAO;
+
+        if (SSAO)
+            camera.PostProcessing = true;
 
         ao.Intensity.Set(
             SSAO ? Math.Clamp(SSAOIntensity, 0f, 4f) : 0f

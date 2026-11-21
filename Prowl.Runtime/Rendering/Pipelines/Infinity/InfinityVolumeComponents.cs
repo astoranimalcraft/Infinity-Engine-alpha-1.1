@@ -22,7 +22,7 @@ public sealed class InfinityTonemapping : PostEffect
 {
     public VolumeParameter<InfinityToneMappingMode> Mode = new(InfinityToneMappingMode.AgX);
 
-    public override bool IsActive => Mode.Value != InfinityToneMappingMode.Disabled;
+    public override bool IsActive => InfinityPipelineMode.Enabled && Mode.Value != InfinityToneMappingMode.Disabled;
     protected override PostEffectStage Stage => PostEffectStage.Tonemap;
 
     protected override string Shader => """
@@ -38,13 +38,36 @@ public sealed class InfinityTonemapping : PostEffect
             return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
         }
 
-        vec3 InfinityAgXApprox(vec3 x)
+        vec3 InfinityAgX(vec3 x)
         {
-            // Log-domain sigmoid approximation with a soft highlight shoulder.
-            vec3 logColor = log2(max(x, vec3(1e-6)));
-            vec3 t = clamp((logColor + 10.0) / 16.0, 0.0, 1.0);
-            t = t * t * (3.0 - 2.0 * t);
-            return clamp(t, 0.0, 1.0);
+            // AgX, the minimal fit: inset the primaries, encode over the usable EV range, apply the sigmoid
+            // polynomial, undo the inset. Its output is display referred, so it is decoded back to linear here:
+            // the Tonemap stage contract is linear in, linear out, and the display encoding happens after it.
+            const mat3 inset = mat3(
+                0.842479062253094, 0.0423282422610123, 0.0423756549057051,
+                0.0784335999999992, 0.878468636469772, 0.0784336,
+                0.0792237451477643, 0.0791661274605434, 0.879142973793104);
+
+            const mat3 outset = mat3(
+                1.19687900512017, -0.0528968517574562, -0.0529716355144438,
+                -0.0980208811401368, 1.15190312990417, -0.0980434501171241,
+                -0.0990297440797205, -0.0989611768448433, 1.15107367264116);
+
+            const float minEV = -12.47393;
+            const float maxEV = 4.026069;
+
+            vec3 c = inset * max(x, vec3(0.0));
+            c = clamp(log2(max(c, vec3(1e-10))), minEV, maxEV);
+            c = (c - minEV) / (maxEV - minEV);
+
+            vec3 c2 = c * c;
+            vec3 c4 = c2 * c2;
+            c = 15.5 * c4 * c2 - 40.14 * c4 * c + 31.96 * c4 - 6.868 * c2 * c + 0.4298 * c2 + 0.1191 * c - 0.00232;
+
+            c = clamp(outset * c, 0.0, 1.0);
+
+            // sRGB decode, so a mid grey comes back out of the stage as a mid grey
+            return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(vec3(0.04045), c));
         }
 
         vec3 InfinityUncharted2(vec3 x)
@@ -67,7 +90,7 @@ public sealed class InfinityTonemapping : PostEffect
             if (_Mode == 1)
                 color = InfinityACES(color);
             else if (_Mode == 2)
-                color = InfinityAgXApprox(color);
+                color = InfinityAgX(color);
             else if (_Mode == 3)
                 color = color / (1.0 + color);
             else if (_Mode == 4)
@@ -88,7 +111,7 @@ public sealed class InfinityAutoExposure : VolumeComponent<G.AutoExposure>
     public VolumeParameter<float> MinEV100 = new(-6f);
     public VolumeParameter<float> MaxEV100 = new(20f);
 
-    public override bool IsActive => Enabled.Value;
+    public override bool IsActive => InfinityPipelineMode.Enabled && Enabled.Value;
     protected override G.AutoExposure CreateFeature(G.Renderer renderer) => new(renderer);
 
     protected override void Apply(G.AutoExposure feature, Camera camera)
@@ -117,7 +140,7 @@ public sealed class InfinityAmbientOcclusion : VolumeComponent<G.Gtao>
     [Range(0f, 1f)] public VolumeParameter<float> TemporalResponse = new(0.9f);
     public VolumeParameter<EffectResolution> Resolution = new(EffectResolution.Quarter);
 
-    public override bool IsActive => Intensity.Value > 0f;
+    public override bool IsActive => InfinityPipelineMode.Enabled && Intensity.Value > 0f;
     protected override G.Gtao CreateFeature(G.Renderer renderer) => new(renderer);
 
     protected override void Apply(G.Gtao feature, Camera camera)
@@ -151,7 +174,7 @@ public sealed class InfinityScreenSpaceReflections : VolumeComponent<G.ScreenSpa
     public VolumeParameter<bool> ReflectionVelocity = new(true);
     [Range(0f, 1f)] public VolumeParameter<float> ScreenFadeSize = new(0.25f);
 
-    public override bool IsActive => Enabled.Value;
+    public override bool IsActive => InfinityPipelineMode.Enabled && Enabled.Value;
     protected override G.ScreenSpaceReflections CreateFeature(G.Renderer renderer) => new(renderer);
 
     protected override void Apply(G.ScreenSpaceReflections feature, Camera camera)
@@ -184,10 +207,10 @@ public sealed class InfinityColorGrading : PostEffect
     public VolumeParameter<Float4> Gamma = new(new Float4(0f, 0f, 0f, 0f));
     public VolumeParameter<Float4> Gain = new(new Float4(0f, 0f, 0f, 0f));
 
-    public override bool IsActive => ExposureEV.Value != 0f || Contrast.Value != 0f || Saturation.Value != 0f || Temperature.Value != 0f || Tint.Value != 0f
+    public override bool IsActive => InfinityPipelineMode.Enabled && (ExposureEV.Value != 0f || Contrast.Value != 0f || Saturation.Value != 0f || Temperature.Value != 0f || Tint.Value != 0f
         || Lift.Value.X != 0f || Lift.Value.Y != 0f || Lift.Value.Z != 0f
         || Gamma.Value.X != 0f || Gamma.Value.Y != 0f || Gamma.Value.Z != 0f
-        || Gain.Value.X != 0f || Gain.Value.Y != 0f || Gain.Value.Z != 0f;
+        || Gain.Value.X != 0f || Gain.Value.Y != 0f || Gain.Value.Z != 0f);
     protected override PostEffectStage Stage => PostEffectStage.BeforeTonemap;
     protected override int Order => 10;
 
@@ -234,7 +257,8 @@ public sealed class InfinityImageEffects : PostEffect
     [Range(0.5f, 4f)] public VolumeParameter<float> SharpenRadius = new(1f);
     [Range(0.5f, 4f)] public VolumeParameter<float> GrainScale = new(1.5f);
 
-    public override bool IsActive => Vignette.Value > 0f || ChromaticAberration.Value > 0f || FilmGrain.Value > 0f || Sharpen.Value > 0f;
+    public override bool IsActive => InfinityPipelineMode.Enabled
+        && (Vignette.Value > 0f || ChromaticAberration.Value > 0f || FilmGrain.Value > 0f || Sharpen.Value > 0f);
     protected override PostEffectStage Stage => PostEffectStage.AfterTonemap;
     protected override int Order => 40;
 
@@ -477,7 +501,7 @@ public sealed class InfinityMotionBlur : VolumeComponent<G.MotionBlur>
     [Range(1f, 32f)] public VolumeParameter<int> Samples = new(8);
     public VolumeParameter<float> MaxBlurRadius = new(40f);
 
-    public override bool IsActive => Intensity.Value > 0f;
+    public override bool IsActive => InfinityPipelineMode.Enabled && Intensity.Value > 0f;
     protected override G.MotionBlur CreateFeature(G.Renderer renderer) => new(renderer);
 
     protected override void Apply(G.MotionBlur feature, Camera camera)
@@ -500,7 +524,7 @@ public sealed class InfinityDepthOfField : VolumeComponent<G.DepthOfField>
     public VolumeParameter<DepthOfFieldQuality> Quality = new(DepthOfFieldQuality.Medium);
     public VolumeParameter<float> FocusSpeed = new(4f);
 
-    public override bool IsActive => Mode.Value != DepthOfFieldMode.Off;
+    public override bool IsActive => InfinityPipelineMode.Enabled && Mode.Value != DepthOfFieldMode.Off;
     protected override G.DepthOfField CreateFeature(G.Renderer renderer) => new(renderer);
 
     protected override void Apply(G.DepthOfField feature, Camera camera)
@@ -526,7 +550,7 @@ public sealed class InfinityGodRays : VolumeComponent<G.GodRays>
     [Range(8f, 128f)] public VolumeParameter<int> Samples = new(64);
     [Range(0f, 1f)] public VolumeParameter<float> Threshold = new(0.8f);
 
-    public override bool IsActive => Intensity.Value > 0f;
+    public override bool IsActive => InfinityPipelineMode.Enabled && Intensity.Value > 0f;
     protected override G.GodRays CreateFeature(G.Renderer renderer) => new(renderer);
 
     protected override void Apply(G.GodRays feature, Camera camera)
