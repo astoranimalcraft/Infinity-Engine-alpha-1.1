@@ -69,6 +69,20 @@ empty root theme: no fonts, no colours. Resolve theme values while building widg
 `CodeEditor.Build` does for its font), never inside the draw callback. A draw-time
 `Origami.Current.Mono` lookup is what made the script editor render nothing but its background.
 
+## Infinity post effects
+
+The Infinity family lives in `Prowl.Runtime/Rendering/Pipelines/Infinity`. A one pass effect is a
+`PostEffect` subclass: one `VolumeParameter` field per uniform (the field name with `_` in front), the
+GLSL in the `Shader` string, `Graphite_SampleSource(vUV)` in and `outColor` out. Pick the stage with
+`Stage` (`AfterTonemap` for display space looks, `BeforeTonemap` for anything that must blur or glow in
+linear HDR) and set `ReadsDepth` to get `_CameraDepthTexture`, reversed: 1 near, 0 far. `_Time` is
+bound automatically, in seconds, so animated shaders need no parameter for the clock. Gate `IsActive`
+on `InfinityPipelineMode.Enabled` so the stock Prowl components take over when the mode is off.
+
+Verify a new effect by adding it to a profile on the scene camera through the CLI
+(`VolumeProfile.CreateCameraDefault`, `profile.Add<T>()`, `camera.Profile = profile`) and reading the
+scene view; a broken shader logs a Graphite compile error and leaves the view unchanged.
+
 ## Headless editor checks
 
 ```bash

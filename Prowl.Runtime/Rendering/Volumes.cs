@@ -596,7 +596,8 @@ public enum PostEffectStage
 /// A post effect written as one fragment shader, the simplest kind there is. Each <see cref="VolumeParameter{T}"/>
 /// field reaches the shader as a uniform named after it with an underscore, Amount as _Amount: floats, ints and
 /// enums as themselves, bools as a float 0 or 1, colours and Float2 to Float4 as vectors, Texture2D as a sampler2D.
-/// The shader reads the colour with Graphite_SampleSource(vUV) and writes outColor.
+/// The shader reads the colour with Graphite_SampleSource(vUV) and writes outColor. Seconds since the game started
+/// reach it as the float _Time, so a shader can animate.
 /// <code>
 /// [VolumeComponentMenu("Custom/Invert")]
 /// public sealed class Invert : PostEffect
@@ -701,6 +702,9 @@ public sealed class PostEffectFeature : RenderFeature, IDisposable
 
     public override void Render(FeatureContext context)
     {
+        // Every effect gets the clock, so an animated shader needs no parameter of its own to read it
+        _properties.SetFloat("_Time", (float)context.Time.Time);
+
         for (int i = 0; i < _values.Length; i++)
         {
             PropertyID name = _names[i];
