@@ -26,8 +26,8 @@ public enum SpriteAnimationMode
 /// sliced into a grid or from a list of sprites. Point it at a sheet, set the columns and rows, and it animates;
 /// drop it on a character with a <see cref="SpriteRenderer"/> and that character is a 2D-HD sprite.
 /// </summary>
-[AddComponentMenu("Rendering/Sprite Animation")]
-[ComponentIcon("")] // Film
+[AddComponentMenu("2D/Sprite Animation")]
+[ComponentIcon("\uf008")] // Film
 public class SpriteAnimation : Component
 {
     [Header("Frames")]

@@ -30,7 +30,10 @@ public sealed class Gizmos : RenderFeature, IDisposable
 
     public void Remove(GizmoBatch batch) => _batches.Remove(batch);
 
-    public override void Setup(FeatureBuilder builder, in FeatureView view) => builder.WriteColor();
+    // Declares no pass. WriteColor starts a new colour target for the features after this one to fill, and nothing here
+    // fills it, so declaring the write left the view presenting an unwritten target: a blank viewport as soon as gizmos
+    // were switched on. The batches stay collected for hitbox picking, and for the rasteriser when it exists.
+    public override void Setup(FeatureBuilder builder, in FeatureView view) { }
 
     public override void Render(FeatureContext context) { }
 

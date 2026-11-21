@@ -1823,6 +1823,7 @@ public static class GameObjectInspector
             {
                 icon = category switch
                 {
+                    var c when c.StartsWith("2D") => EditorIcons.Image,
                     var c when c.StartsWith("Rendering") => EditorIcons.Cube,
                     var c when c.StartsWith("Audio") => EditorIcons.VolumeHigh,
                     var c when c.StartsWith("Light") => EditorIcons.Sun,

@@ -21,7 +21,7 @@ namespace Prowl.Runtime;
 /// the sprite's own geometry, so a tight-mesh sprite renders tight. (Nine-slice / tiled / filled are UI
 /// concerns handled by <c>UIImage</c>, not by world sprites.)
 /// </summary>
-[AddComponentMenu("Rendering/Sprite Renderer")]
+[AddComponentMenu("2D/Sprite Renderer")]
 [ComponentIcon("")] // Image
 public class SpriteRenderer : Component, IMaterialRenderer, IColorTint, IRenderSync
 {
