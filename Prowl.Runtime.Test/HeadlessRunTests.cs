@@ -1,0 +1,158 @@
+// This file is part of the Prowl Game Engine
+// Licensed under the MIT License. See the LICENSE file in the project root for details.
+
+using System.Globalization;
+using System.Threading;
+
+using Prowl.Runtime.Resources;
+
+using Xunit;
+
+namespace Prowl.Runtime.Test;
+
+/// <summary>
+/// Tests for the headless run loop (<see cref="Game.RunHeadless"/>) - the standalone-server path that
+/// drives gameplay/physics with no window, graphics or audio device.
+/// </summary>
+public class HeadlessRunTests
+{
+    /// <summary>A Game that loads a scene on Initialize and counts its update steps.</summary>
+    private sealed class CountingHeadlessGame : Game
+    {
+        private readonly SceneInstance _scene;
+        public int UpdateCount;
+
+        public CountingHeadlessGame(SceneInstance scene) => _scene = scene;
+
+        protected override SceneInstance CreateMainWorld()
+        {
+            _scene.Activate();
+            return _scene;
+        }
+        public override void OnUpdate() => UpdateCount++;
+    }
+
+    [Fact]
+    public void RunHeadless_RunsRequestedFrames_ThenExits()
+    {
+        try
+        {
+            var scene = new SceneInstance();
+            var game = new CountingHeadlessGame(scene);
+
+            game.RunHeadless(new HeadlessRunOptions { MaxFrames = 10, TargetFrameRate = 0 });
+
+            Assert.Equal(10, game.UpdateCount);
+            Assert.False(Application.IsHeadless); // reset on exit
+            Assert.True(scene.IsDisposed);        // the loaded scene is torn down on exit
+        }
+        finally
+        {
+            Application.IsPlaying = false;
+        }
+    }
+
+    // The engine's worker threads start without the main thread's execution context, so they never see a
+    // culture set on that thread alone.
+    [Fact]
+    public void RunHeadless_GivesThreadsStartedWithoutItsContextTheInvariantCulture()
+    {
+        CultureInfo? before = CultureInfo.DefaultThreadCurrentCulture;
+        CultureInfo? beforeUI = CultureInfo.DefaultThreadCurrentUICulture;
+        CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("de-DE");
+        try
+        {
+            new FlagProbeGame(() => { }).RunHeadless(new HeadlessRunOptions { MaxFrames = 1, TargetFrameRate = 0 });
+
+            CultureInfo? seen = null;
+            var worker = new Thread(() => seen = CultureInfo.CurrentCulture);
+            worker.UnsafeStart();
+            worker.Join();
+
+            Assert.Equal(CultureInfo.InvariantCulture, seen);
+        }
+        finally
+        {
+            CultureInfo.DefaultThreadCurrentCulture = before;
+            CultureInfo.DefaultThreadCurrentUICulture = beforeUI;
+            Application.IsPlaying = false;
+        }
+    }
+
+    [Fact]
+    public void RunHeadless_SetsHeadlessFlagDuringRun()
+    {
+        bool sawHeadless = false;
+
+        var probe = new FlagProbeGame(() => sawHeadless = Application.IsHeadless);
+        probe.RunHeadless(new HeadlessRunOptions { MaxFrames = 1, TargetFrameRate = 0 });
+
+        Assert.True(sawHeadless);
+        Application.IsPlaying = false;
+    }
+
+    /// <summary>
+    /// The rate a headless server ticks at is the same property a windowed game uses, so game code
+    /// has one answer wherever it runs. The options only seed it.
+    /// </summary>
+    [Fact]
+    public void RunHeadless_PacesThroughApplicationTargetFrameRate()
+    {
+        int seenDuringRun = -1;
+
+        var probe = new FlagProbeGame(() => seenDuringRun = Application.TargetFrameRate);
+        probe.RunHeadless(new HeadlessRunOptions { MaxFrames = 1, TargetFrameRate = 20 });
+
+        Assert.Equal(20, seenDuringRun);
+        Assert.Equal(0, Application.TargetFrameRate); // released on exit
+        Application.IsPlaying = false;
+    }
+
+    private sealed class FlagProbeGame : Game
+    {
+        private readonly Action _onUpdate;
+        public FlagProbeGame(Action onUpdate) => _onUpdate = onUpdate;
+        public override void OnUpdate() => _onUpdate();
+    }
+
+    [Fact]
+    public void RunHeadless_RequestQuit_StopsLoop()
+    {
+        var stopper = new SelfStoppingGame();
+        stopper.RunHeadless(new HeadlessRunOptions { MaxFrames = 0, TargetFrameRate = 0 });
+
+        // It quit itself after 3 frames rather than running unbounded.
+        Assert.Equal(3, stopper.Frames);
+        Application.IsPlaying = false;
+    }
+
+    [Fact]
+    public void ApplicationQuit_InHeadlessRun_StopsLoop()
+    {
+        var quitter = new QuittingGame();
+        quitter.RunHeadless(new HeadlessRunOptions { MaxFrames = 0, TargetFrameRate = 0 });
+
+        Assert.Equal(3, quitter.Frames);
+        Application.IsPlaying = false;
+    }
+
+    private sealed class QuittingGame : Game
+    {
+        public int Frames;
+        public override void OnUpdate()
+        {
+            Frames++;
+            if (Frames >= 3) Application.Quit();
+        }
+    }
+
+    private sealed class SelfStoppingGame : Game
+    {
+        public int Frames;
+        public override void OnUpdate()
+        {
+            Frames++;
+            if (Frames >= 3) RequestHeadlessQuit();
+        }
+    }
+}

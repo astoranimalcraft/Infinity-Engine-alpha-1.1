@@ -1,0 +1,83 @@
+#version 450
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+layout(set = 0, binding = 0) uniform sampler2D sceneColorTexture;
+layout(set = 0, binding = 1) uniform sampler2D deviceDepthTexture;
+layout(set = 0, binding = 2) uniform sampler2D viewNormalTexture;
+layout(set = 0, binding = 3) uniform sampler2D roughnessTexture;
+layout(set = 0, binding = 4, rgba16f) uniform writeonly image2D reflectionOutput;
+layout(set = 0, binding = 5, std140) uniform SSRSettings
+{
+    mat4 projection;
+    mat4 inverseProjection;
+    vec4 cameraAndRaySettings; // max distance, thickness, intensity, max roughness
+    ivec4 screenAndQuality; // width, height, ray steps, binary refinement steps
+} settings;
+
+vec3 ReconstructViewPosition(vec2 uv, float depth)
+{
+    vec4 p = settings.inverseProjection * vec4(uv * 2.0 - 1.0, depth, 1.0);
+    return p.xyz / max(abs(p.w), 1e-6);
+}
+
+bool ProjectViewPosition(vec3 p, out vec2 uv)
+{
+    vec4 clip = settings.projection * vec4(p, 1.0);
+    if (clip.w <= 1e-5) return false;
+    uv = clip.xy / clip.w * 0.5 + 0.5;
+    return all(greaterThanEqual(uv, vec2(0.0))) && all(lessThanEqual(uv, vec2(1.0)));
+}
+
+void main()
+{
+    ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(reflectionOutput);
+    if (any(greaterThanEqual(pixel, size))) return;
+
+    vec2 uv = (vec2(pixel) + 0.5) / vec2(size);
+    vec4 base = texture(sceneColorTexture, uv);
+    float depth = texture(deviceDepthTexture, uv).r;
+    float roughness = texture(roughnessTexture, uv).r;
+    if (depth <= 0.0 || roughness > settings.cameraAndRaySettings.w)
+    {
+        imageStore(reflectionOutput, pixel, vec4(0.0));
+        return;
+    }
+
+    vec3 position = ReconstructViewPosition(uv, depth);
+    vec3 normal = normalize(texture(viewNormalTexture, uv).xyz * 2.0 - 1.0);
+    vec3 viewDirection = normalize(-position);
+    vec3 rayDirection = normalize(reflect(-viewDirection, normal));
+
+    int steps = clamp(settings.screenAndQuality.z, 8, 128);
+    float maxDistance = max(settings.cameraAndRaySettings.x, 0.1);
+    float stepLength = maxDistance / float(steps);
+    vec2 hitUV = vec2(0.0);
+    float confidence = 0.0;
+
+    for (int i = 1; i <= steps; ++i)
+    {
+        float t = float(i) * stepLength;
+        vec3 rayPosition = position + rayDirection * t;
+        if (rayPosition.z >= -0.01) break;
+        vec2 sampleUV;
+        if (!ProjectViewPosition(rayPosition, sampleUV)) break;
+        float sceneDeviceDepth = texture(deviceDepthTexture, sampleUV).r;
+        vec3 scenePosition = ReconstructViewPosition(sampleUV, sceneDeviceDepth);
+        float sceneDepth = -scenePosition.z;
+        float rayDepth = -rayPosition.z;
+        float delta = rayDepth - sceneDepth;
+        if (sceneDeviceDepth > 0.0 && delta >= 0.0 && delta <= settings.cameraAndRaySettings.y)
+        {
+            hitUV = sampleUV;
+            float edgeFade = min(min(sampleUV.x, 1.0 - sampleUV.x), min(sampleUV.y, 1.0 - sampleUV.y)) * 10.0;
+            float distanceFade = 1.0 - float(i) / float(steps);
+            confidence = clamp(edgeFade, 0.0, 1.0) * distanceFade * (1.0 - roughness);
+            break;
+        }
+    }
+
+    vec3 reflected = texture(sceneColorTexture, hitUV).rgb;
+    float fresnel = 0.04 + 0.96 * pow(1.0 - max(dot(normal, viewDirection), 0.0), 5.0);
+    float weight = confidence * fresnel * clamp(settings.cameraAndRaySettings.z, 0.0, 1.0);
+    imageStore(reflectionOutput, pixel, vec4(reflected * weight, weight));
+}

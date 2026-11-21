@@ -1,0 +1,66 @@
+#version 450
+layout(local_size_x = 4, local_size_y = 4, local_size_z = 4) in;
+layout(set = 0, binding = 0, rgba16f) uniform writeonly image3D cloudShapeVolume;
+layout(set = 0, binding = 1, rgba16f) uniform writeonly image3D cloudDetailVolume;
+layout(set = 0, binding = 2, std140) uniform CloudNoiseSettings
+{
+    ivec4 volumeSizeSeed; // xyz dimensions, w seed
+    vec4 frequencySettings; // x shape frequency, y detail frequency, z worley frequency, w detail weight
+} settings;
+
+uint Hash3D(uvec3 p)
+{
+    p = ((p >> 8u) ^ p.yzx) * 1103515245u + uint(settings.volumeSizeSeed.w);
+    p = (p >> 8u) ^ p.yzx;
+    return p.x ^ p.y ^ p.z;
+}
+
+float Hash01(uvec3 p) { return float(Hash3D(p) & 0x00ffffffu) / 16777215.0; }
+
+float ValueNoise(vec3 p)
+{
+    vec3 i = floor(p);
+    vec3 f = fract(p);
+    f = f * f * (3.0 - 2.0 * f);
+    uvec3 u = uvec3(i);
+    float c000 = Hash01(u + uvec3(0,0,0));
+    float c100 = Hash01(u + uvec3(1,0,0));
+    float c010 = Hash01(u + uvec3(0,1,0));
+    float c110 = Hash01(u + uvec3(1,1,0));
+    float c001 = Hash01(u + uvec3(0,0,1));
+    float c101 = Hash01(u + uvec3(1,0,1));
+    float c011 = Hash01(u + uvec3(0,1,1));
+    float c111 = Hash01(u + uvec3(1,1,1));
+    float z0 = mix(mix(c000,c100,f.x), mix(c010,c110,f.x), f.y);
+    float z1 = mix(mix(c001,c101,f.x), mix(c011,c111,f.x), f.y);
+    return mix(z0,z1,f.z);
+}
+
+float FBM(vec3 p)
+{
+    float sum = 0.0;
+    float amplitude = 0.5;
+    for (int i = 0; i < 5; ++i)
+    {
+        sum += ValueNoise(p) * amplitude;
+        p = p * 2.03 + 17.17;
+        amplitude *= 0.5;
+    }
+    return sum;
+}
+
+void main()
+{
+    ivec3 id = ivec3(gl_GlobalInvocationID);
+    ivec3 size = imageSize(cloudShapeVolume);
+    if (any(greaterThanEqual(id, size))) return;
+
+    vec3 uvw = (vec3(id) + 0.5) / vec3(size);
+    float shape = FBM(uvw * settings.frequencySettings.x);
+    float detail = FBM(uvw * settings.frequencySettings.y + 31.7);
+    float worleyBase = 1.0 - abs(ValueNoise(uvw * settings.frequencySettings.z) * 2.0 - 1.0);
+    float detailWorley = 1.0 - abs(ValueNoise(uvw * settings.frequencySettings.z * 2.7 + 9.1) * 2.0 - 1.0);
+    float erosion = clamp(detail * settings.frequencySettings.w, 0.0, 1.0);
+    imageStore(cloudShapeVolume, id, vec4(shape, worleyBase, shape, 1.0));
+    imageStore(cloudDetailVolume, id, vec4(detail, detailWorley, detail, erosion));
+}

@@ -1,0 +1,60 @@
+#version 450
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+layout(set = 0, binding = 0) uniform sampler2D linearViewDepthTexture;
+layout(set = 0, binding = 1) uniform sampler3D fogNoiseTexture;
+layout(set = 0, binding = 2, rgba16f) uniform writeonly image2D fogOutput;
+layout(set = 0, binding = 3, std140) uniform VolumetricFogSettings
+{
+    mat4 inverseViewProjection;
+    vec4 cameraPosition;
+    vec4 sunDirection;
+    vec4 sunColor;
+    vec4 fogParameters; // density, height falloff, base height, max distance
+    vec4 fogColorAnisotropy; // rgb fog albedo, w phase g
+    ivec4 screenQuality; // width, height, steps, frame index
+} settings;
+
+float HenyeyGreenstein(float cosTheta, float g)
+{
+    g = clamp(g, -0.9, 0.9);
+    float g2 = g * g;
+    float d = max(1.0 + g2 - 2.0 * g * cosTheta, 1e-4);
+    return (1.0 - g2) / (12.5663706 * d * sqrt(d));
+}
+
+void main()
+{
+    ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(fogOutput);
+    if (any(greaterThanEqual(pixel, size))) return;
+
+    vec2 uv = (vec2(pixel) + 0.5) / vec2(size);
+    float depth = texture(linearViewDepthTexture, uv).r;
+    vec4 farPoint = settings.inverseViewProjection * vec4(uv * 2.0 - 1.0, 0.0, 1.0);
+    vec3 farWorld = farPoint.xyz / max(abs(farPoint.w), 1e-6);
+    vec3 ray = normalize(farWorld - settings.cameraPosition.xyz);
+    float maxDistance = min(settings.fogParameters.w, depth > 0.0 ? depth : settings.fogParameters.w);
+
+    int steps = clamp(settings.screenQuality.z, 8, 96);
+    float stepLength = maxDistance / float(steps);
+    float transmittance = 1.0;
+    vec3 scattering = vec3(0.0);
+    vec3 sunDir = normalize(settings.sunDirection.xyz);
+    float phase = HenyeyGreenstein(dot(ray, sunDir), settings.fogColorAnisotropy.w);
+    float jitter = texelFetch(linearViewDepthTexture, pixel, 0).r * 0.01;
+
+    for (int i = 0; i < steps; ++i)
+    {
+        float t = (float(i) + 0.5 + jitter) * stepLength;
+        vec3 p = settings.cameraPosition.xyz + ray * t;
+        float heightDensity = settings.fogParameters.x * exp(-max(p.y - settings.fogParameters.z, 0.0) * max(settings.fogParameters.y, 0.0));
+        float noise = texture(fogNoiseTexture, fract(p * 0.001)).r;
+        float density = heightDensity * mix(0.75, 1.25, noise);
+        float opticalDepth = density * stepLength;
+        float attenuation = exp(-opticalDepth);
+        scattering += transmittance * (1.0 - attenuation) * settings.fogColorAnisotropy.rgb * settings.sunColor.rgb * phase;
+        transmittance *= attenuation;
+        if (transmittance < 0.01) break;
+    }
+    imageStore(fogOutput, pixel, vec4(scattering, 1.0 - transmittance));
+}

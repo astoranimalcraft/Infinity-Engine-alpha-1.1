@@ -1,0 +1,135 @@
+#version 450
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(set = 0, binding = 0, rgba16f) writeonly uniform image2D uCloudOutput;
+layout(set = 0, binding = 1) uniform sampler3D uShapeNoise;
+layout(set = 0, binding = 2) uniform sampler3D uDetailNoise;
+layout(set = 0, binding = 3) uniform sampler2D uWeatherMap;
+
+layout(set = 0, binding = 4, std140) uniform CloudFrameData
+{
+    mat4 inverseViewProjection;
+    vec4 cameraPosition;
+    vec4 sunDirection;
+    vec4 sunColor;
+    vec4 viewportSize; // xy = pixel size, zw = inverse pixel size
+    vec4 cloudLayer;   // x = base altitude, y = top altitude, z = coverage, w = density
+    vec4 cloudShape;   // x = shape scale, y = detail scale, z = erosion, w = powder strength
+    vec4 windTime;     // xyz = wind velocity, w = time
+} clouds;
+
+float CloudDensity(vec3 worldPosition)
+{
+    float layerHeight = max(clouds.cloudLayer.y - clouds.cloudLayer.x, 1.0);
+    float height01 = clamp((worldPosition.y - clouds.cloudLayer.x) / layerHeight, 0.0, 1.0);
+
+    // Weather map controls where clouds form over the world.
+    vec2 weatherUV = worldPosition.xz * 0.00005 + clouds.windTime.xz * clouds.windTime.w * 0.00001;
+    vec4 weather = texture(uWeatherMap, weatherUV);
+    float coverage = clamp(clouds.cloudLayer.z * weather.r, 0.0, 1.0);
+
+    vec3 windOffset = clouds.windTime.xyz * clouds.windTime.w;
+    vec3 shapeUV = (worldPosition + windOffset) * max(clouds.cloudShape.x, 1e-6);
+    vec4 shapeNoise = texture(uShapeNoise, shapeUV);
+    float shape = shapeNoise.r * 0.55 + shapeNoise.g * 0.30 + shapeNoise.b * 0.15;
+
+    vec3 detailUV = (worldPosition + windOffset * 1.7) * max(clouds.cloudShape.y, 1e-6);
+    float detail = texture(uDetailNoise, detailUV).r;
+
+    // Cumulus-like vertical profile: soft bottom, fuller centre, eroded top.
+    float bottomProfile = smoothstep(0.0, 0.12, height01);
+    float topProfile = 1.0 - smoothstep(0.68, 1.0, height01);
+    float verticalProfile = bottomProfile * topProfile;
+
+    float threshold = 1.0 - coverage;
+    float baseShape = smoothstep(threshold - 0.12, threshold + 0.12, shape);
+    float eroded = baseShape - (1.0 - detail) * clouds.cloudShape.z * baseShape;
+
+    return max(eroded, 0.0) * verticalProfile * max(clouds.cloudLayer.w, 0.0);
+}
+
+float CloudShadow(vec3 position, vec3 sunDirection)
+{
+    float opticalDepth = 0.0;
+    vec3 p = position;
+    const int SHADOW_STEPS = 6;
+    for (int i = 0; i < SHADOW_STEPS; ++i)
+    {
+        p += sunDirection * 180.0;
+        opticalDepth += CloudDensity(p) * 0.035;
+    }
+    return exp(-opticalDepth);
+}
+
+void main()
+{
+    ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(uCloudOutput);
+    if (pixel.x >= size.x || pixel.y >= size.y)
+        return;
+
+    vec2 uv = (vec2(pixel) + 0.5) / vec2(size);
+    vec2 ndc = uv * 2.0 - 1.0;
+
+    vec4 farPoint = clouds.inverseViewProjection * vec4(ndc, 1.0, 1.0);
+    farPoint.xyz /= max(abs(farPoint.w), 1e-6);
+
+    vec3 origin = clouds.cameraPosition.xyz;
+    vec3 direction = normalize(farPoint.xyz - origin);
+
+    float baseHeight = clouds.cloudLayer.x;
+    float topHeight = max(clouds.cloudLayer.y, baseHeight + 1.0);
+    if (abs(direction.y) < 1e-5)
+    {
+        imageStore(uCloudOutput, pixel, vec4(0.0));
+        return;
+    }
+
+    float t0 = (baseHeight - origin.y) / direction.y;
+    float t1 = (topHeight - origin.y) / direction.y;
+    float tStart = max(min(t0, t1), 0.0);
+    float tEnd = max(t0, t1);
+
+    if (tEnd <= tStart)
+    {
+        imageStore(uCloudOutput, pixel, vec4(0.0));
+        return;
+    }
+
+    vec3 sunDirection = normalize(clouds.sunDirection.xyz);
+    vec3 sunRadiance = max(clouds.sunColor.rgb, vec3(0.0)) * max(clouds.sunColor.a, 0.0);
+
+    const int VIEW_STEPS = 64;
+    float stepLength = (tEnd - tStart) / float(VIEW_STEPS);
+    float transmittance = 1.0;
+    vec3 radiance = vec3(0.0);
+
+    for (int i = 0; i < VIEW_STEPS; ++i)
+    {
+        float t = tStart + (float(i) + 0.5) * stepLength;
+        vec3 samplePosition = origin + direction * t;
+        float density = CloudDensity(samplePosition);
+        if (density <= 0.001)
+            continue;
+
+        float sunVisibility = CloudShadow(samplePosition, sunDirection);
+        float powder = 1.0 + clouds.cloudShape.w * (1.0 - exp(-density * 2.0));
+        float phase = 0.65 + 0.35 * max(dot(direction, sunDirection), 0.0);
+        vec3 lighting = sunRadiance * sunVisibility * phase * powder;
+        float verticalFactor = clamp((samplePosition.y - baseHeight) / (topHeight - baseHeight), 0.0, 1.0);
+        float ambientTerm = mix(0.35, 0.9, verticalFactor);
+        lighting += vec3(0.48, 0.55, 0.68) * ambientTerm;
+
+        float extinction = exp(-density * stepLength * 0.0015);
+        float opacity = 1.0 - extinction;
+        radiance += transmittance * opacity * lighting;
+        transmittance *= extinction;
+
+        if (transmittance < 0.01)
+            break;
+    }
+
+    float alpha = clamp(1.0 - transmittance, 0.0, 1.0);
+    imageStore(uCloudOutput, pixel, vec4(radiance, alpha));
+}
