@@ -1,0 +1,6 @@
+
+<Project>
+  <PropertyGroup>
+    <ProwlLocalAnthology>true</ProwlLocalAnthology>
+  </PropertyGroup>
+</Project>
