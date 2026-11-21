@@ -14,9 +14,9 @@ Prowl looks like Unity but differs in many details. Check anything not listed he
 ```csharp
 using System;
 using System.Threading;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
 [RequireComponent(typeof(Rigidbody3D), typeof(BoxCollider))]
 [AddComponentMenu("Game/Player Mover")]
@@ -95,7 +95,7 @@ A destroyed engine object is still a live reference, so null checks miss it. Alw
 
 ## Transform
 
-`Transform` lives in namespace `Prowl.Vector` (with `Float2`, `Float3`, `Quaternion`). Reach it as `Transform` inside a component or `go.Transform`.
+`Transform` lives in namespace `Infinity.Vector` (with `Float2`, `Float3`, `Quaternion`). Reach it as `Transform` inside a component or `go.Transform`.
 
 - `Position`, `LocalPosition`, `Rotation`, `LocalRotation`, `EulerAngles`, `LocalEulerAngles` (**degrees**), `LocalScale`, `LossyScale`, `Forward` (+Z), `Right`, `Up`
 - `Translate(delta)` is in world space unless you pass a transform. `Rotate(Float3 eulerDegrees, relativeToSelf = true)`, `Rotate(Float3 axis, float degrees, relativeToSelf = true)`, `RotateAround(point, axis, degrees)`, `LookAt(target)`
@@ -104,7 +104,7 @@ A destroyed engine object is still a live reference, so null checks miss it. Alw
 
 ## Scenes
 
-`Scene` is in `Prowl.Runtime.Resources`. There is no SceneManager.
+`Scene` is in `Infinity.Runtime.Resources`. There is no SceneManager.
 
 - `SceneInstance.Main` is the game world. Inside a component use its own `Scene` property, elsewhere `SceneInstance.Active`, the world whose code is running. `Scene` is the saved scene asset.
 - A component's `Scene` throws while it is in no world: on a detached object, a prefab asset, and in `OnValidate` and `OnAfterDeserialize`. Check `IsInWorld` first there.
@@ -121,7 +121,7 @@ A destroyed engine object is still a live reference, so null checks miss it. Alw
 - `Input.GetKey/GetKeyDown/GetKeyUp(KeyCode.W)`, `GetMouseButton(0)`, `MousePosition`, `MouseDelta`, `MouseWheelDelta`, `GetWASD()`, `LockCursor()`, `UnlockCursor()`. Key names: `A` to `Z`, `Number0` to `Number9`, `Space`, `Enter`, `Escape`, `ShiftLeft`, `ControlLeft`, `Up`, `F1`. Check others with `api --type KeyCode`.
 - **`Input.MouseDelta.Y` is positive when the mouse moves down**, as in window coordinates. For mouse look, subtract it from the pitch.
 - Input actions: an `InputActionMap` (an asset made from the Input Actions create menu, or built in code), `Input.RegisterActionMap(map)`, `Input.FindAction(name)`, then `ReadValue<T>()`, `IsPressed()`, `WasPressedThisFrame()`. **Actions start disabled and read their default until you call `map.Enable()`.**
-- `Debug.Log`, `LogWarning`, `LogError`, `LogException`, and `LogOnce(id, message)` for things that repeat every frame. `Debug.DrawLine`, `DrawWireCube`, `DrawWireSphere` draw gizmos. If you also use `System.Diagnostics`, write `Prowl.Runtime.Debug`.
+- `Debug.Log`, `LogWarning`, `LogError`, `LogException`, and `LogOnce(id, message)` for things that repeat every frame. `Debug.DrawLine`, `DrawWireCube`, `DrawWireSphere` draw gizmos. If you also use `System.Diagnostics`, write `Infinity.Runtime.Debug`.
 
 ## Async and threads
 

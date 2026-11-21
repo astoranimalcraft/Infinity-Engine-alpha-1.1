@@ -10,9 +10,9 @@ namespace Infinity.Graphite.Rendering;
 /// over the finished image.
 /// </summary>
 /// <remarks>
-/// Graphite ships no gizmo rasteriser, so this collects the batches and leaves the draw to a backend that has one.
-/// Everything above it works unchanged: <see cref="Debug"/>'s draw calls fill a <see cref="GizmoBatch"/>, the batch
-/// reports its lines for hitbox picking, and views hold this feature.
+/// Graphite ships no gizmo rasteriser, so the editor's scene view draws these batches on its overlay and this feature
+/// only holds them. Everything above it works unchanged: <see cref="Debug"/>'s draw calls fill a
+/// <see cref="GizmoBatch"/>, the batch reports its lines for hitbox picking, and views hold this feature.
 /// </remarks>
 public sealed class Gizmos : RenderFeature, IDisposable
 {
@@ -32,7 +32,7 @@ public sealed class Gizmos : RenderFeature, IDisposable
 
     // Declares no pass. WriteColor starts a new colour target for the features after this one to fill, and nothing here
     // fills it, so declaring the write left the view presenting an unwritten target: a blank viewport as soon as gizmos
-    // were switched on. The batches stay collected for hitbox picking, and for the rasteriser when it exists.
+    // were switched on. The batches stay collected, for the scene view to draw and for hitbox picking.
     public override void Setup(FeatureBuilder builder, in FeatureView view) { }
 
     public override void Render(FeatureContext context) { }

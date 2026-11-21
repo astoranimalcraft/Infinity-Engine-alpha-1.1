@@ -663,7 +663,9 @@ public static class AgentFiles
 
     private static void WriteLauncher(string libraryPath)
     {
-        string exe = Path.Combine(AppContext.BaseDirectory, OperatingSystem.IsWindows() ? "Infinity.Cli.exe" : "Infinity.Cli");
+        // The CLI's assembly keeps its Prowl name through the rebrand, so its executable name is read from it.
+        string cliName = typeof(Infinity.Cli.CliProtocol).Assembly.GetName().Name!;
+        string exe = Path.Combine(AppContext.BaseDirectory, OperatingSystem.IsWindows() ? cliName + ".exe" : cliName);
         if (!File.Exists(exe)) return;
 
         Directory.CreateDirectory(libraryPath);

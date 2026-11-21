@@ -87,7 +87,7 @@ Animation graphs are built with the `graph` command. See the prowl-animation ski
 
 ```csharp
 // prowl eval: add a tag and name layer 8
-using Prowl.Editor.Projects.Settings;
+using Infinity.Editor.Projects.Settings;
 var settings = EditorRegistries.GetSettings<TagsAndLayersSettings>();
 if (!settings.Tags.Contains("Enemy")) settings.Tags.Add("Enemy");
 settings.Layers[8] = "Weapon";
@@ -97,8 +97,8 @@ EditorRegistries.SaveSettings();
 
 ```csharp
 // prowl eval: add the open scenes to the build scene list
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Projects.Settings;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Projects.Settings;
 var build = EditorRegistries.GetSettings<BuildSettings>();
 foreach (OpenScene open in EditorSceneManager.OpenScenes)
     if (open.Scene.IsValid() && open.Path is { } path && !build.Scenes.Exists(s => s.SceneGuid == open.Scene.AssetID))
@@ -109,7 +109,7 @@ EditorRegistries.SaveSettings();
 ```csharp
 // prowl eval: bake the first nav mesh surface in the scene
 var surface = SceneInstance.Main.GetAll<NavMeshSurface>(includeDisabled: true)[0]!;
-return Prowl.Editor.Navigation.NavMeshBakeService.Instance.Start(surface);
+return Infinity.Editor.Navigation.NavMeshBakeService.Instance.Start(surface);
 ```
 
 ## Gotchas

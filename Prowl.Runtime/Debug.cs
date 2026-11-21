@@ -718,6 +718,9 @@ public class GizmoBuilder
     /// <summary>The batch draws this frame go into.</summary>
     public GizmoBatch Batch => _building;
 
+    /// <summary>The batch being filled this frame, which the scene view draws once the frame's gizmos are in it.</summary>
+    internal GizmoBatch Current => _building;
+
     /// <summary>Whether nothing was drawn into this builder since it was last cleared.</summary>
     internal bool IsEmpty => _building.PrimitiveCount == 0;
 

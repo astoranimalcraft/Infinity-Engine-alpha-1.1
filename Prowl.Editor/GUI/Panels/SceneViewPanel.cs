@@ -12,6 +12,7 @@ using Infinity.OrigamiUI;
 using Infinity.OrigamiUI.Gizmo;
 using Infinity.PaperUI;
 using Infinity.PaperUI.LayoutEngine;
+using Infinity.Quill;
 using Infinity.Rosetta;
 using Infinity.Runtime;
 using Infinity.Runtime.Diagnostics;
@@ -548,6 +549,13 @@ public class SceneViewPanel : DockPanel
                         canvas.ClearBrushTexture();
                     });
 
+                    // Scene gizmos: the lines and triangles Debug and component DrawGizmos filled this frame,
+                    // projected onto the viewport. They draw under the transform gizmo and the tool overlays.
+                    if (ShowGizmos && scene.Gizmos.Current is { IsEmpty: false } gizmoBatch)
+                    {
+                        paper.DrawForeground(ref handle, (canvas2, r2) => DrawGizmoBatch(canvas2, r2, gizmoBatch));
+                    }
+
                     // Draw transform gizmo as 2D overlay
                     if (_transformGizmo != null && _gizmoActive)
                     {
@@ -698,6 +706,71 @@ public class SceneViewPanel : DockPanel
             // What the selected camera sees, bottom-right
             _cameraPreview.Draw(paper, font, width, height, _editorCamera!);
         }
+    }
+
+    // Gizmo strokes are hairlines, so they read as lines rather than shapes at any distance.
+    private const float GizmoOverlayThickness = 1.5f;
+
+    private readonly GizmoDraw3D _gizmoOverlay = new();
+
+    /// <summary>
+    /// Draws a frame of scene gizmos over the viewport. Graphite ships no gizmo rasteriser, so the batches the runtime
+    /// collects are projected here, on the overlay, the way the transform gizmo draws.
+    /// </summary>
+    private void DrawGizmoBatch(Canvas canvas, Rect rect, GizmoBatch batch)
+    {
+        if (batch.IsEmpty || _editorCamera == null || _editorCamera.Camera.IsNotValid()) return;
+
+        _gizmoOverlay.Begin(canvas, rect, _handles.ViewProjection);
+
+        // A line running through the near plane is clipped to it rather than dropped, so the part in front still draws
+        // and the gizmo stays visible from inside it.
+        Camera camera = _editorCamera.Camera;
+        Float3 eye = camera.Transform.Position;
+        Float3 forward = camera.Transform.Forward;
+        float near = MathF.Max(camera.NearClipPlane, 1e-4f);
+
+        foreach (GizmoLine line in batch.Lines)
+        {
+            Float3 a = line.A, b = line.B;
+            float da = Float3.Dot(a - eye, forward), db = Float3.Dot(b - eye, forward);
+            if (da < near && db < near) continue;
+            if (da < near) a = b + (a - b) * ((db - near) / (db - da));
+            else if (db < near) b = a + (b - a) * ((da - near) / (da - db));
+
+            _gizmoOverlay.LineSegment(a, b, new Stroke3D
+            {
+                Thickness = GizmoOverlayThickness,
+                Color = line.Color,
+            });
+        }
+
+        foreach (GizmoTriangle triangle in batch.Triangles)
+        {
+            _gizmoOverlay.Polygon([triangle.A, triangle.B, triangle.C], new Stroke3D { Color = triangle.Color });
+        }
+
+        foreach (GizmoIcon icon in batch.Icons)
+            DrawGizmoIcon(canvas, rect, icon);
+    }
+
+    /// <summary>Draws an icon at its world size, so it shrinks with distance like the geometry it marks.</summary>
+    private void DrawGizmoIcon(Canvas canvas, Rect rect, GizmoIcon icon)
+    {
+        if (icon.Texture == null) return;
+
+        Float4x4 mvp = _handles.ViewProjection;
+        if (Infinity.OrigamiUI.Gizmo.GizmoUtils.WorldToScreen(rect, mvp, icon.Center) is not { } center) return;
+
+        Float3 right = _editorCamera == null ? Float3.UnitX : _editorCamera.Camera.Transform.Right;
+        if (Infinity.OrigamiUI.Gizmo.GizmoUtils.WorldToScreen(rect, mvp, icon.Center + right * icon.Scale) is not { } edge) return;
+
+        float size = Float2.Distance(edge, center);
+        if (size < 2f || size > 4096f) return;
+
+        canvas.SetBrushTexture(icon.Texture);
+        canvas.RoundedRectFilled(center.X - size * 0.5f, center.Y - size * 0.5f, size, size, 0f, 0f, 0f, 0f, icon.Color);
+        canvas.ClearBrushTexture();
     }
 
     // How close, in pixels, the cursor must come to a gizmo line, and the least size a small or distant gizmo

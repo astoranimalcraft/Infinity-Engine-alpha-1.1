@@ -455,7 +455,7 @@ public class BuildSystemProjectTests : EditorTestHarness
             // 7. Build.
             var pipeline = new DesktopBuildPipeline();
             BuildResult result = pipeline.BuildAsync(Project.RootPath, build, buildOut).GetAwaiter().GetResult();
-            Assert.True(result.Success, $"Build failed: {result.Errors}");
+            Assert.True(result.Success, $"Build failed: {string.Join("\n", result.Errors)}");
 
             string exe = pipeline.GetExecutablePath(result.OutputPath, build);
             Assert.True(File.Exists(exe), $"Expected executable at {exe}");
@@ -593,7 +593,7 @@ public class BuildSystemProjectTests : EditorTestHarness
         try
         {
             BuildResult result = new DesktopBuildPipeline().BuildAsync(Project.RootPath, build, buildOut).GetAwaiter().GetResult();
-            Assert.True(result.Success, $"Build failed: {result.Errors}");
+            Assert.True(result.Success, $"Build failed: {string.Join("\n", result.Errors)}");
 
             string stdout = RunPlayerHeadless(result.OutputPath, frames: 60);
 
@@ -636,7 +636,7 @@ public class BuildSystemProjectTests : EditorTestHarness
         {
             var pipeline = new DesktopBuildPipeline();
             BuildResult result = pipeline.BuildAsync(Project.RootPath, build, buildOut).GetAwaiter().GetResult();
-            Assert.True(result.Success, $"Build failed: {result.Errors}");
+            Assert.True(result.Success, $"Build failed: {string.Join("\n", result.Errors)}");
 
             // The framework is what a self contained publish put in the root, so if any of it is here
             // then all of it has to be.
@@ -720,7 +720,7 @@ public class BuildSystemProjectTests : EditorTestHarness
         try
         {
             BuildResult result = new DesktopBuildPipeline().BuildAsync(Project.RootPath, build, buildOut).GetAwaiter().GetResult();
-            Assert.True(result.Success, $"Build failed: {result.Errors}");
+            Assert.True(result.Success, $"Build failed: {string.Join("\n", result.Errors)}");
             Assert.False(File.Exists(Path.Combine(result.OutputPath, "Infinity.Runtime.dll")), "A NativeAOT build shipped managed assemblies.");
 
             string stdout = RunPlayerHeadless(result.OutputPath, frames: 5);
@@ -772,7 +772,7 @@ public class BuildSystemProjectTests : EditorTestHarness
         build.OutputDirectory = outDir;
 
         BuildResult result = pipeline.BuildAsync(Project.RootPath, build, outDir).GetAwaiter().GetResult();
-        Assert.True(result.Success, $"Build failed: {result.Errors}");
+        Assert.True(result.Success, $"Build failed: {string.Join("\n", result.Errors)}");
         return result.OutputPath;
     }
 

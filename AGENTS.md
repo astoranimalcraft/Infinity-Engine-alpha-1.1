@@ -39,3 +39,29 @@ dotnet test Prowl.Runtime.Test/Prowl.Runtime.Test.csproj -c Release
 - Animation authoring lives in `Prowl.Runtime/Animation/Authoring` (take and tracks) and
   `Prowl.Runtime/Components/AnimationPlayer.cs`; the editor surface is
   `Prowl.Editor/GUI/Panels/AnimationTimelinePanel.cs` (Window/Animation/Timeline).
+
+## Rebrand pitfalls (namespaces vs assembly names)
+
+The rebrand renamed namespaces to `Infinity.*` but left assembly, project and resource names as
+`Prowl.*`. Anything that hardcodes an assembly or manifest-resource name breaks at runtime and
+usually fails silently:
+
+- Embedded resources are `Prowl.Editor.Resources.<path>`. `EditorApplication.ResourceRoot` derives
+  the prefix from `Assembly.GetManifestResourceNames()`; never hardcode it. A wrong prefix shows up
+  as an editor window with no text (the bundled fonts fail to load) and as locale keys returned
+  verbatim.
+- The generated user-script `.csproj` must reference the loaded assemblies by
+  `Assembly.GetName().Name` / `Assembly.Location` (`ScriptCompiler.GenerateCsproj`), not
+  `Infinity.Runtime.dll`.
+- Analyzer DLLs are matched by suffix (`.Analyzers` / `.Analyzer`), and the CLI executable name comes
+  from `typeof(Infinity.Cli.CliProtocol).Assembly` (`CliServer.WriteLauncher`).
+- Prefer `type.Assembly == typeof(...).Assembly` over comparing `GetName().Name` to `Infinity.*`.
+
+## Headless editor checks
+
+```bash
+Xvfb :99 -screen 0 1400x900x24 &
+export DISPLAY=:99 VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp_icd.json
+./Build/Editor/Release/net11.0/Prowl.Editor &   # needs `openbox` for mouse input, dotnet on PATH for script builds
+import -window root /tmp/shot.png                # ImageMagick
+```

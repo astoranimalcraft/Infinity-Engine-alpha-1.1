@@ -1105,7 +1105,7 @@ public class CliApiCommandTests : EditorTestHarness
         JsonNode type = Ok("--type", "AssetRef");
         Assert.Equal("Infinity.Runtime.AssetRef<T>", type["name"]!.GetValue<string>());
         Assert.Contains("asset", type["summary"]!.GetValue<string>());
-        Assert.Contains(type["members"]!.AsArray(), m => m!["signature"]!.GetValue<string>() == "public T Load()");
+        Assert.Contains(type["members"]!.AsArray(), m => m!["signature"]!.GetValue<string>() == "public T LoadImmediate()");
 
         JsonNode member = Ok("--type", "Infinity.Runtime.Debug", "--member", "EnsureMainThread")["members"]![0]!;
         Assert.Contains(member["parameters"]!.AsArray(), p => p!.GetValue<string>().StartsWith("member: Defaults to the calling member"));
@@ -1154,7 +1154,9 @@ public class AgentFilesTests : EditorTestHarness
         string launcher = Path.Combine(Project.LibraryPath, "prowl.cmd");
         File.WriteAllText(launcher, "stale");
         AgentFiles.Write(Project.RootPath, Project.LibraryPath);
-        Assert.Contains("Infinity.Cli", File.ReadAllText(launcher));
+        // The CLI keeps its Prowl assembly name through the rebrand, so the launcher names that executable.
+        string cliName = typeof(CliProtocol).Assembly.GetName().Name!;
+        Assert.Contains(cliName, File.ReadAllText(launcher));
 
         // Git Bash would otherwise turn a ref like /Player into C:/Program Files/Git/Player.
         Assert.Contains("MSYS_NO_PATHCONV=1", File.ReadAllText(Path.Combine(Project.LibraryPath, "prowl")));

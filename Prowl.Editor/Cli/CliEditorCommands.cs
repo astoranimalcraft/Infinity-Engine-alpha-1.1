@@ -1873,10 +1873,16 @@ internal static class CliApi
         return new { types = typeHits, members = memberHits };
     }
 
+    // The engine assemblies keep their Prowl names through the rebrand, so they are matched by identity.
+    private static readonly Assembly s_runtimeAssembly = typeof(Runtime.Game).Assembly;
+    private static readonly Assembly s_vectorAssembly = typeof(Vector.Float3).Assembly;
+
     private static int Rank(Type type)
     {
         if (ScriptAssemblyManager.IsScriptAssembly(type.Assembly)) return 0;
-        return type.Assembly.GetName().Name switch { "Infinity.Runtime" => 1, "Infinity.Vector" => 2, _ => int.MaxValue };
+        if (type.Assembly == s_runtimeAssembly) return 1;
+        if (type.Assembly == s_vectorAssembly) return 2;
+        return int.MaxValue;
     }
 
     public static object Describe(string typeName, string member, bool inherited)

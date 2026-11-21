@@ -38,12 +38,18 @@ public abstract class EditorTestHarness : IDisposable
     /// <summary>The live asset database for the project.</summary>
     protected EditorAssetBackend Assets { get; private set; }
 
-    // English text, as the editor shows it, so messages read the same in tests.
-    static EditorTestHarness() => Infinity.Rosetta.Loc.Configure(cfg => cfg
-        .SetFallbackLocale("en")
-        .AddProvider(new Infinity.Rosetta.EmbeddedResourceProvider(typeof(Infinity.Editor.Core.EditorApplication).Assembly, "Infinity.Editor.Resources.Locale"))
-        .SetLocale("en")
-        .OnMissingKey(Infinity.Rosetta.MissingKeyBehavior.ReturnKey));
+    // English text, as the editor shows it, so messages read the same in tests. The resource prefix follows the
+    // assembly name, which the rebrand left as Prowl.Editor.
+    static EditorTestHarness()
+    {
+        System.Reflection.Assembly editor = typeof(Infinity.Editor.Core.EditorApplication).Assembly;
+        string prefix = editor.GetName().Name + ".Resources.Locale";
+        Infinity.Rosetta.Loc.Configure(cfg => cfg
+            .SetFallbackLocale("en")
+            .AddProvider(new Infinity.Rosetta.EmbeddedResourceProvider(editor, prefix))
+            .SetLocale("en")
+            .OnMissingKey(Infinity.Rosetta.MissingKeyBehavior.ReturnKey));
+    }
 
     protected EditorTestHarness()
     {
@@ -303,7 +309,7 @@ public abstract class EditorTestHarness : IDisposable
         build.OutputDirectory = outDir;
 
         BuildResult result = new DesktopBuildPipeline().BuildAsync(Project.RootPath, build, outDir).GetAwaiter().GetResult();
-        Assert.True(result.Success, $"Build failed: {result.Errors}");
+        Assert.True(result.Success, $"Build failed: {string.Join("\n", result.Errors)}");
         return result.OutputPath;
     }
 

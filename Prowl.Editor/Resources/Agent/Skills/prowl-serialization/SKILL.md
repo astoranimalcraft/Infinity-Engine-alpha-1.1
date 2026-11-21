@@ -20,9 +20,9 @@ On any class or struct, including components and custom assets:
 ```csharp
 using System;
 using System.Collections.Generic;
-using Prowl.Echo;
-using Prowl.Runtime;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Runtime;
+using Infinity.Vector;
 
 public enum WeaponKind { Pistol, Rifle }
 
@@ -69,7 +69,7 @@ Primitives, `string`, `decimal`, enums (saved as numbers, so renaming a member i
 - Renaming a field drops its saved value unless you add `[FormerlySerializedAs("OldName")]` (repeat it for several old names). Field names also match case insensitively, so a change of case alone is safe.
 - Renaming a class needs `[FormerlySerializedAs("OldName")]` on the class (the old short name or the old namespace qualified name both work), or saved components of it become missing.
 
-## Attributes (Prowl.Echo)
+## Attributes (Infinity.Echo)
 
 | Attribute | Effect |
 | --- | --- |
@@ -87,13 +87,13 @@ Primitives, `string`, `decimal`, enums (saved as numbers, so renaming a member i
 ## When state resets
 
 - **Entering play mode** saves the edit scene and loads a copy. Anything not serialized, such as values set in a private non `[SerializeField]` field from the editor, starts at its initializer value.
-- **Script hot reload does not go through serialization.** Live objects move to the new code with every field kept, private ones included. Mark a field `[Prowl.Ember.ReloadIgnore]` to reset it on reload instead.
+- **Script hot reload does not go through serialization.** Live objects move to the new code with every field kept, private ones included. Mark a field `[Infinity.Ember.ReloadIgnore]` to reset it on reload instead.
 - **Duplicate, copy and paste, undo** all serialize, so they keep exactly the saved fields.
 
 ## Reading and writing Echo data directly
 
 ```csharp
-using Prowl.Echo;
+using Infinity.Echo;
 
 public static class SaveExample
 {
@@ -103,4 +103,4 @@ public static class SaveExample
 }
 ```
 
-`WriteToString` uses the Echo text format, which looks like JSON with type suffixes such as `1.5F` and `3L`. `WriteToJson` and `EchoObject.ReadFromJson` give plain JSON. `Serializer.DeserializeInto(data, existing)` loads into an object you already have. `ObjectCopy.Clone(obj)` (in `Prowl.Runtime`) deep copies through serialization. References to objects outside the copy stay pointing at the originals.
+`WriteToString` uses the Echo text format, which looks like JSON with type suffixes such as `1.5F` and `3L`. `WriteToJson` and `EchoObject.ReadFromJson` give plain JSON. `Serializer.DeserializeInto(data, existing)` loads into an object you already have. `ObjectCopy.Clone(obj)` (in `Infinity.Runtime`) deep copies through serialization. References to objects outside the copy stay pointing at the originals.

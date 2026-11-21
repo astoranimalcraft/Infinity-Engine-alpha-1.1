@@ -7,7 +7,7 @@ description: Prowl physics for gameplay. Use when writing movement with Characte
 
 ## Queries
 
-Queries live on the world: `SceneInstance.Main.Physics`, or the static `Physics` class for the world whose code is running. `SceneInstance` is in `Prowl.Runtime.Resources`. Inside a component, `Scene` is the component's own nullable `Scene` property. Queries are **main thread only**.
+Queries live on the world: `SceneInstance.Main.Physics`, or the static `Physics` class for the world whose code is running. `SceneInstance` is in `Infinity.Runtime.Resources`. Inside a component, `Scene` is the component's own nullable `Scene` property. Queries are **main thread only**.
 
 - `Raycast(origin, direction, out RaycastHit hit)` and `Raycast(origin, direction, maxDistance, out hit)`.
 - **With a filter, the out comes after the distance:** `Raycast(origin, direction, maxDistance, out hit, filter)`, the same as `SphereCast(origin, radius, direction, maxDistance, out hit, filter)`.
@@ -26,9 +26,9 @@ Filters and layers:
 - `default(LayerMask)` and `LayerMask.Everything` hit every layer. Build masks with `LayerMask.FromMask(1u << LayerMask.NameToLayer("Enemy"))`.
 
 ```csharp
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
 public sealed class HitscanGun : Component
 {
@@ -73,8 +73,8 @@ public sealed class Health : Component
 
 ```csharp
 using System;
-using Prowl.Runtime;
-using Prowl.Vector;
+using Infinity.Runtime;
+using Infinity.Vector;
 
 [RequireComponent(typeof(CharacterController))]
 public sealed class FpsMover : Component

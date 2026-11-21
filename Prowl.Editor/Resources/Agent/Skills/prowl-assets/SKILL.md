@@ -9,7 +9,7 @@ description: How Prowl assets work for scripts. Use when a script references tex
 
 - Every asset derives from `Asset` (an `EngineObject`). A database asset has a GUID (`AssetID`), a path (`AssetPath`) and a `Name` taken from its file name, or the part after `#` for a sub asset.
 - **One object per GUID for the whole session.** Unloading frees the data but keeps the object, and loading, reimporting or reverting refills that same object. So a reference you hold never goes stale or gets swapped for another object.
-- `asset.State` is an `AssetState` (a top level enum in `Prowl.Runtime`): `Loaded`, `Unloaded`, `Loading`, `Missing` or `Failed`. An unloaded or missing asset is still `IsValid()`. Check `IsLoaded` or `IsMissing` when the content matters.
+- `asset.State` is an `AssetState` (a top level enum in `Infinity.Runtime`): `Loaded`, `Unloaded`, `Loading`, `Missing` or `Failed`. An unloaded or missing asset is still `IsValid()`. Check `IsLoaded` or `IsMissing` when the content matters.
 - Reading an asset's data loads it on demand, blocking. A missing or failed asset reads as empty and logs one warning.
 - A runtime asset made with `new Material(shader)`, `new Mesh()` or `Clone()` has no GUID. It is always loaded, never unloaded by the engine, and belongs to whoever made it. Dispose it when done.
 - Never call `Dispose()` or `Destroy()` on a database asset, it throws. Use `AssetDatabase.Unload` if you really must.
@@ -26,8 +26,8 @@ description: How Prowl assets work for scripts. Use when a script references tex
 Use a plain field for almost everything. Use `AssetRef<T>` only for things needed maybe later, such as a list of levels or an optional high resolution texture.
 
 ```csharp
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
 public class Spawner : Component
 {

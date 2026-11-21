@@ -481,17 +481,20 @@ public static class ScriptCompiler
 
         sb.AppendLine("  <ItemGroup>");
 
-        // Engine references (Private=true forces use of the HintPath instead of local probing).
+        // Engine references (Private=true forces use of the HintPath instead of local probing). The assembly names are
+        // read from the loaded assemblies, since they are not the namespaces the rebrand gave the engine.
         if (!unit.NoEngineReferences)
         {
-            AppendReference(sb, emitted, "Infinity.Runtime", Path.Combine(engineDir, "Infinity.Runtime.dll"), copyLocal: true);
-            AppendReference(sb, emitted, "Infinity.Editor", Path.Combine(engineDir, "Infinity.Editor.dll"), copyLocal: true);
+            Assembly runtime = typeof(Runtime.Game).Assembly;
+            Assembly editor = Assembly.GetExecutingAssembly();
+            AppendReference(sb, emitted, runtime.GetName().Name!, runtime.Location, copyLocal: true);
+            AppendReference(sb, emitted, editor.GetName().Name!, editor.Location, copyLocal: true);
 
             foreach (string dll in Directory.EnumerateFiles(engineDir, "*.dll"))
             {
                 string name = Path.GetFileNameWithoutExtension(dll);
-                if (name == "Infinity.Runtime" || name == "Infinity.Editor" || unitNames.Contains(name)) continue;
-                if (name == "Infinity.Ember.Analyzers" || name == "Infinity.Analyzers") continue; // added below as <Analyzer>, not plain references
+                if (name == runtime.GetName().Name || name == editor.GetName().Name || unitNames.Contains(name)) continue;
+                if (IsAnalyzerAssembly(name)) continue; // added below as <Analyzer>, not plain references
 
                 // A self-contained Prowl publish drops the whole .NET runtime next to the app. Never
                 // reference the shared-framework assemblies (esp. System.Private.CoreLib): they are the
@@ -506,10 +509,9 @@ public static class ScriptCompiler
 
             // Run the Prowl script-safety analyzers over user scripts so the warnings show in the IDE too,
             // matching the editor's own in-process compile.
-            foreach (string analyzer in new[] { "Infinity.Ember.Analyzers.dll", "Infinity.Analyzers.dll" })
+            foreach (string analyzerDll in Directory.EnumerateFiles(engineDir, "*.dll"))
             {
-                string analyzerDll = Path.Combine(engineDir, analyzer);
-                if (File.Exists(analyzerDll))
+                if (IsAnalyzerAssembly(Path.GetFileNameWithoutExtension(analyzerDll)))
                     sb.AppendLine($"    <Analyzer Include=\"{Xml(analyzerDll)}\" />");
             }
         }
@@ -602,6 +604,11 @@ public static class ScriptCompiler
                 return false;
         }
     }
+
+    /// <summary>True for the script-safety analyzers, which are added as &lt;Analyzer&gt; rather than as references.</summary>
+    private static bool IsAnalyzerAssembly(string name)
+        => name.EndsWith(".Analyzers", StringComparison.OrdinalIgnoreCase)
+        || name.EndsWith(".Analyzer", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>True if the file is a managed .NET assembly. Native libraries (coreclr.dll, clrjit.dll,
     /// hostfxr.dll, msquic.dll, …) shipped by a self-contained publish are not compile references and

@@ -8,13 +8,13 @@ description: Paper, the immediate mode UI library Prowl uses for OnGui game UI a
 Paper is immediate mode with a flexbox style layout engine. Read the prowl-ui skill first for where Paper fits in a Prowl game. This skill is the library itself.
 
 ```csharp
-using Prowl.PaperUI;               // Paper, GuiProp, Layer, PaperCursor, PaperKey, LayoutType, PositionType
-using Prowl.PaperUI.Events;        // ClickEvent, DragEvent, ScrollEvent, KeyEvent
-using Prowl.PaperUI.LayoutEngine;  // UnitValue, ElementHandle
-using Prowl.Scribe;                // FontFile, TextWrapMode
-using Prowl.Vector;                // Color, Rect, Float2, Easing
-using Prowl.Quill;                 // Canvas, in paper.Draw
-using TextAlignment = Prowl.PaperUI.TextAlignment;   // Prowl.Scribe has one too
+using Infinity.PaperUI;               // Paper, GuiProp, Layer, PaperCursor, PaperKey, LayoutType, PositionType
+using Infinity.PaperUI.Events;        // ClickEvent, DragEvent, ScrollEvent, KeyEvent
+using Infinity.PaperUI.LayoutEngine;  // UnitValue, ElementHandle
+using Infinity.Scribe;                // FontFile, TextWrapMode
+using Infinity.Vector;                // Color, Rect, Float2, Easing
+using Infinity.Quill;                 // Canvas, in paper.Draw
+using TextAlignment = Infinity.PaperUI.TextAlignment;   // Infinity.Scribe has one too
 ```
 
 ## The frame model
@@ -81,7 +81,7 @@ Free placement:
 
 ## Styling
 
-- Colors are `Prowl.Vector.Color` with floats 0 to 1. **Integer arguments pick the byte overload**, so `new Color(1, 0, 0, 1)` is nearly black. Write `1f`.
+- Colors are `Infinity.Vector.Color` with floats 0 to 1. **Integer arguments pick the byte overload**, so `new Color(1, 0, 0, 1)` is nearly black. Write `1f`.
 - `BackgroundColor`, `BorderColor`, `BorderWidth`, `Rounded(r)` or `Rounded(tl, tr, br, bl)`, `BoxShadow(x, y, blur, spread, color)`, `BackdropBlur(radius)`, `Opacity(0..1)` (for the whole subtree).
 - Gradients replace the background color: `BackgroundLinearGradient(x1, y1, x2, y2, c1, c2)` with coordinates as fractions 0 to 1 of the element, also radial and box gradients.
 - `BackgroundImage(texture)` and `Image(texture, tint, rotation, pivot, ImageScaleMode.Fit)` take a Prowl `Texture2D`. The rotation is in degrees.
@@ -110,7 +110,7 @@ Reusable styles: `static readonly StyleTemplate Card = new StyleTemplate().Backg
 
 Paper runs on real time, so transitions and the helpers below keep animating while `Time.TimeScale` is 0, and a pause menu can fade in.
 
-- `.Transition(GuiProp.BackgroundColor, seconds, Easing.CubicOut)` animates a property toward whatever value is declared this frame. **Declare it every frame.** Easings are in `Prowl.Vector.Easing`. Width, margins and other layout values animate too.
+- `.Transition(GuiProp.BackgroundColor, seconds, Easing.CubicOut)` animates a property toward whatever value is declared this frame. **Declare it every frame.** Easings are in `Infinity.Vector.Easing`. Width, margins and other layout values animate too.
 - **Transforms snap back unless the resting value is declared.** Write `.Scale(1f).Active.Scale(0.95f).End()`, not only the Active part.
 - Elements snap on the frame they first appear.
 - Helpers on `paper` return animated values: `AnimateBool(open, 0.25f, Easing.CubicInOut)` (0 to 1), `AnimateFloat(target, speed)`, `AnimateSpring`, `AnimateColor`, `OneShot(trigger)`, `Pulse(period)`, `Shake(trigger, intensity, decay, frequency)`. They keep state on the current parent, keyed by the calling line. At the top level of OnGui that parent is the root, shared by every component, so **prefer calling them inside the `Enter` scope of your own element that exists every frame**, and pass `id:` when calling one from a loop or helper.
@@ -141,7 +141,7 @@ Paper runs on real time, so transitions and the helpers below keep animating whi
 Paper has no buttons, sliders, toggles, dropdowns, tabs, tooltips or scroll views. Build them from boxes, as in the examples below. It does have:
 
 - `.TextField(value, font, onChange, textColor, placeholder, placeholderColor)` and `.TextArea(...)` on any box. Write the new value back to your field in `onChange`. While focused the field keeps its own text. Font size comes from `.FontSize()` and colour from the arguments, `.TextColor()` does nothing. Enter does not submit, add `.OnKeyPressed` for that. `TextInputSettings` adds `MaxLength`, `ReadOnly`, `MaskChar`, `CharFilter` and more.
-- `MarkdownBuilder` (namespace `Prowl.PaperUI.Markdown`) renders markdown. Keep the builder in a field.
+- `MarkdownBuilder` (namespace `Infinity.PaperUI.Markdown`) renders markdown. Keep the builder in a field.
 - F12 toggles Paper's dev tools in a running game.
 
 ## Popups and layers
@@ -176,13 +176,13 @@ A menu with styled, animated buttons:
 
 ```csharp
 using System;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Scribe;
-using Prowl.Vector;
-using TextAlignment = Prowl.PaperUI.TextAlignment;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Scribe;
+using Infinity.Vector;
+using TextAlignment = Infinity.PaperUI.TextAlignment;
 
 public sealed class MainMenu : Component
 {
@@ -237,13 +237,13 @@ A scrolling, selectable list:
 ```csharp
 using System;
 using System.Collections.Generic;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Scribe;
-using Prowl.Vector;
-using TextAlignment = Prowl.PaperUI.TextAlignment;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Scribe;
+using Infinity.Vector;
+using TextAlignment = Infinity.PaperUI.TextAlignment;
 
 public sealed class InventoryList : Component
 {
@@ -310,13 +310,13 @@ If the wheel scrolls the wrong way, flip the sign of `e.Delta`.
 A text field that keeps its value and submits on Enter, without the game reacting to the typing:
 
 ```csharp
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Scribe;
-using Prowl.Vector;
-using TextAlignment = Prowl.PaperUI.TextAlignment;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Scribe;
+using Infinity.Vector;
+using TextAlignment = Infinity.PaperUI.TextAlignment;
 
 public sealed class NameEntry : Component
 {
@@ -373,13 +373,13 @@ public sealed class NameEntry : Component
 A panel that slides in with a progress bar, and a centred crosshair:
 
 ```csharp
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Scribe;
-using Prowl.Vector;
-using TextAlignment = Prowl.PaperUI.TextAlignment;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Scribe;
+using Infinity.Vector;
+using TextAlignment = Infinity.PaperUI.TextAlignment;
 
 public sealed class LoadingPanel : Component
 {

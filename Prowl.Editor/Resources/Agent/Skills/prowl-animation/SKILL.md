@@ -26,8 +26,8 @@ Prowl animation graphs are not Unity's Animator Controller. Transitions have no 
 - Call `Rebind()` after adding or removing bones under it.
 
 ```csharp
-using Prowl.Runtime;
-using Prowl.Vector;
+using Infinity.Runtime;
+using Infinity.Vector;
 
 public sealed class ArmsInput : Component
 {
@@ -49,7 +49,7 @@ public sealed class ArmsInput : Component
 - With a `CharacterController`, leave it off and feed the delta into `Move` in `LateUpdate`. The delta is in the character's local space.
 
 ```csharp
-using Prowl.Runtime;
+using Infinity.Runtime;
 
 public sealed class RootMotionMover : Component
 {

@@ -125,8 +125,8 @@ public class EditorApplication : Game
         // Load Font Awesome as fallback fonts for icons. Keep the FontFile handles so icons can also
         // be drawn in a chosen weight directly (e.g. an outline vs filled star), independent of the
         // fallback resolution order.
-        EditorTheme.FontIconOutline = LoadFallbackFont("Infinity.Editor.Resources.fa-regular-400.ttf");
-        EditorTheme.FontIconSolid = LoadFallbackFont("Infinity.Editor.Resources.fa-solid-900.ttf");
+        EditorTheme.FontIconOutline = LoadFallbackFont("fa-regular-400.ttf");
+        EditorTheme.FontIconSolid = LoadFallbackFont("fa-solid-900.ttf");
 
         // Load CJK/international fallback fonts from system for localization support
         LoadSystemFallbackFonts();
@@ -186,7 +186,7 @@ public class EditorApplication : Game
         Infinity.Rosetta.Loc.Configure(cfg => cfg
             .SetFallbackLocale("en")
             .AddProvider(new EmbeddedResourceProvider(
-                System.Reflection.Assembly.GetExecutingAssembly(), "Infinity.Editor.Resources.Locale"))
+                System.Reflection.Assembly.GetExecutingAssembly(), ResourceRoot + "Locale"))
             .SetLocale(EditorSettings.Instance.Locale)
             .OnMissingKey(Infinity.Rosetta.MissingKeyBehavior.ReturnKey)
         );
@@ -1265,12 +1265,30 @@ public class EditorApplication : Game
         return data;
     }
 
-    /// <summary> Opens a stream to an embedded resource in the Infinity.Editor.Resources namespace. </summary>
+    /// <summary>
+    /// The prefix of this assembly's embedded resources. Manifest names start with the project's root namespace, which
+    /// is the assembly name and so stays Prowl.Editor even though the engine is Infinity, so it is read from the
+    /// assembly rather than written out.
+    /// </summary>
+    private static readonly string ResourceRoot = FindResourceRoot();
+
+    private static string FindResourceRoot()
+    {
+        Assembly assembly = Assembly.GetExecutingAssembly();
+        foreach (string name in assembly.GetManifestResourceNames())
+        {
+            int at = name.IndexOf(".Resources.", StringComparison.Ordinal);
+            if (at > 0) return name[..(at + ".Resources.".Length)];
+        }
+        return (assembly.GetName().Name ?? "Prowl.Editor") + ".Resources.";
+    }
+
+    /// <summary> Opens a stream to an embedded resource in the editor's Resources folder. </summary>
     public static Stream? GetEmbeddedResource(string resource)
     {
         var assembly = Assembly.GetExecutingAssembly();
 
-        string resourceName = "Infinity.Editor.Resources." + resource;
+        string resourceName = ResourceRoot + resource;
 
         Stream? stream = assembly.GetManifestResourceStream(resourceName);
         return stream;
@@ -1281,7 +1299,7 @@ public class EditorApplication : Game
     {
         var assembly = Assembly.GetExecutingAssembly();
 
-        string resourceName = "Infinity.Editor.Resources." + resource;
+        string resourceName = ResourceRoot + resource;
 
         string pathToFile = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) +
                           resourceName;
@@ -1448,8 +1466,9 @@ public class EditorApplication : Game
     private static float EaseOutQuart(float x) => 1f - MathF.Pow(1f - x, 4f);
     private static float EaseInOutQuart(float x) => x < 0.5f ? 8f * x * x * x * x : 1f - MathF.Pow(-2f * x + 2f, 4f) / 2f;
 
-    private Scribe.FontFile? LoadFallbackFont(string resourceName)
+    private Scribe.FontFile? LoadFallbackFont(string fileName)
     {
+        string resourceName = ResourceRoot + fileName;
         using Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
         if (stream == null) { Runtime.Debug.LogWarning($"Could not load font resource: {resourceName}"); return null; }
         Runtime.Debug.Log($"Loaded fallback font: {resourceName} ({stream.Length} bytes)");

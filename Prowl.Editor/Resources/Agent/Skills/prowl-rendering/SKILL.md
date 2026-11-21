@@ -35,14 +35,14 @@ The built in `Standard` shader uses these property names. `material <ref>` lists
 - `Camera.Main` is the enabled camera with the highest `Depth` that draws to the screen.
 - Anti aliasing is a camera field, not an effect: `camera.AntiAliasing = AntiAliasingMode.FXAA` (also `SMAA`, `TAA`), tuned through `camera.Fxaa`, `camera.Smaa` and `camera.Taa`.
 - `camera.HDR` (on by default) renders into float colour, which the `Tonemapping` volume component maps to the display. Without one, or with `Mode` `None`, light above 1 clips. Cameras made by a new scene or GameObject > Camera start with `VolumeProfile.CreateCameraDefault(name)`, a profile with `Tonemapping` set to `AgXPunchy`. A camera added with `AddComponent<Camera>()` has no profile, so give it that one.
-- Post processing comes from volume profiles. A `VolumeProfile` holds volume components from `Prowl.Runtime.Rendering`: `Tonemapping`, `Bloom`, `AutoExposure`, `AmbientOcclusion`, `ScreenSpaceReflections`, `MotionBlur`, `DepthOfField`, `GodRays`, `Vignette`, `ChromaticAberration`, `FilmGrain`, `ColorGrading`, `ColorLookup`, `Sharpen`, `EdgeDetection`, `Pixelation`, `VolumetricFog`. The camera's own `Profile` applies under every `Volume` component in the scene. A `Volume` is global by default, or set `IsGlobal = false` and a `Size` to apply it only inside a box.
+- Post processing comes from volume profiles. A `VolumeProfile` holds volume components from `Infinity.Runtime.Rendering`: `Tonemapping`, `Bloom`, `AutoExposure`, `AmbientOcclusion`, `ScreenSpaceReflections`, `MotionBlur`, `DepthOfField`, `GodRays`, `Vignette`, `ChromaticAberration`, `FilmGrain`, `ColorGrading`, `ColorLookup`, `Sharpen`, `EdgeDetection`, `Pixelation`, `VolumetricFog`. The camera's own `Profile` applies under every `Volume` component in the scene. A `Volume` is global by default, or set `IsGlobal = false` and a `Size` to apply it only inside a box.
 - Each setting is a `VolumeParameter` and only counts once overridden. Use `.Set(value)` to set and override it in one go, or `Add<T>(overrideAll: true)`.
 - `Bloom` is off until `Intensity` is above 0. `Threshold` defaults to 1.2, so mostly emissive and very bright surfaces bloom. Lower it to make lit surfaces glow too. `Tonemapping.Mode` is a `TonemappingMode`: `None`, `ACES`, `AgXNeutral`, `AgXPunchy`, `Reinhard`, `RomBinDaHouse` or `Uncharted2`. `AgXNeutral` is a soft filmic curve that desaturates bright colours, `AgXPunchy` adds contrast and saturation, and `ACES` keeps colours punchier still.
 - A custom tonemapper is a `PostEffect` whose `Stage` is `PostEffectStage.Tonemap`. Its shader maps linear HDR light to linear 0 to 1 in `outColor`, Prowl clamps and encodes it for the display, and it takes the place of the `Tonemapping` component.
 
 ```csharp
 // prowl eval: bloom, tonemapping and FXAA on the main camera
-using Prowl.Runtime.Rendering;
+using Infinity.Runtime.Rendering;
 var camera = SceneInstance.Main.GetAll<Camera>(includeDisabled: true)[0]!;
 camera.Profile = VolumeProfile.CreateCameraDefault("Main Camera Profile");
 camera.Profile.Add<Bloom>().Intensity.Set(1f);
@@ -56,7 +56,7 @@ Eval changes do not mark the scene dirty, so `scene --action save` afterwards.
 A first person viewmodel camera keeps the gun from clipping into walls:
 
 ```csharp
-using Prowl.Runtime;
+using Infinity.Runtime;
 
 public sealed class ViewmodelSetup : Component
 {
@@ -80,7 +80,7 @@ The viewmodel camera is a child of the world camera, and the arms and gun object
 
 ## Environment
 
-`SceneInstance.Main.Environment` holds the sky, ambient light and fog. `SkyMaterial` is a Material whose shader has a Sky pass, usually from `SceneEnvironment.CreateSkyMaterial(BuiltInSky.Procedural)` (also Gradient, Cubemap, Panorama, SixSided), null shows `SkyColor`. `Ambient` (Mode Uniform, Hemisphere or Sky, Intensity, colours) and `Fog` (Mode Off, Linear, Exponential, ExponentialSquared, Color, Density, Start, End, UseSky) are struct fields: set them directly, for example `SceneInstance.Main.Environment.Fog.Mode = FogMode.Off` (FogMode and AmbientMode are in Prowl.Graphite.Rendering). Copying one into a local and changing the local does nothing. Fog is on by default (exponential squared, density 0.01).
+`SceneInstance.Main.Environment` holds the sky, ambient light and fog. `SkyMaterial` is a Material whose shader has a Sky pass, usually from `SceneEnvironment.CreateSkyMaterial(BuiltInSky.Procedural)` (also Gradient, Cubemap, Panorama, SixSided), null shows `SkyColor`. `Ambient` (Mode Uniform, Hemisphere or Sky, Intensity, colours) and `Fog` (Mode Off, Linear, Exponential, ExponentialSquared, Color, Density, Start, End, UseSky) are struct fields: set them directly, for example `SceneInstance.Main.Environment.Fog.Mode = FogMode.Off` (FogMode and AmbientMode are in Infinity.Graphite.Rendering). Copying one into a local and changing the local does nothing. Fog is on by default (exponential squared, density 0.01).
 
 ## Lights and lightmaps
 
@@ -90,12 +90,12 @@ The viewmodel camera is a child of the world camera, and the arms and gun object
 
 ## Particles
 
-- `ParticleSystemComponent` (namespace `Prowl.Runtime.ParticleSystem`, module types and their enums such as `ParticleBlendMode` in `Prowl.Runtime.ParticleSystem.Modules`) modules are fields: `Initial`, `Emission`, `Shape`, `Renderer` start enabled, the rest (`ColorOverLifetime`, `SizeOverLifetime`, `Trails` and so on) need `Enabled = true`.
+- `ParticleSystemComponent` (namespace `Infinity.Runtime.ParticleSystem`, module types and their enums such as `ParticleBlendMode` in `Infinity.Runtime.ParticleSystem.Modules`) modules are fields: `Initial`, `Emission`, `Shape`, `Renderer` start enabled, the rest (`ColorOverLifetime`, `SizeOverLifetime`, `Trails` and so on) need `Enabled = true`.
 - Curves are `MinMaxCurve`. From the CLI: `set /Muzzle:ParticleSystemComponent Emission.RateOverTime.ConstantValue 0`.
 
 ```csharp
-using Prowl.Runtime;
-using Prowl.Runtime.ParticleSystem;
+using Infinity.Runtime;
+using Infinity.Runtime.ParticleSystem;
 
 public sealed class MuzzleFlash : Component
 {

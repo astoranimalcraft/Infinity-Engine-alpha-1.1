@@ -72,6 +72,9 @@ public class HotReloadAnalyzerTests : EditorTestHarness
             .FirstOrDefault(t => t.Contains("<Compile"));
         Assert.NotNull(csproj);
         Assert.Contains("<Analyzer Include=", csproj);
-        Assert.Contains("Infinity.Ember.Analyzers.dll", csproj);
+        string analyzer = Directory.EnumerateFiles(AppContext.BaseDirectory, "*.Analyzers.dll")
+            .Select(Path.GetFileName)
+            .First(n => n!.Contains("Ember", StringComparison.OrdinalIgnoreCase))!;
+        Assert.Contains(analyzer, csproj);
     }
 }

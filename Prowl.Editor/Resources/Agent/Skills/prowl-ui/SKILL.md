@@ -17,12 +17,12 @@ Paper is a large library with its own layout rules and traps. **Read the prowl-p
 Override `OnGui(Paper paper)` on any component. It runs every frame after the cameras render and needs no canvas. In the editor it draws only in the game view during play.
 
 ```csharp
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Scribe;
-using Prowl.Vector;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Scribe;
+using Infinity.Vector;
 
 public sealed class Hud : Component
 {
