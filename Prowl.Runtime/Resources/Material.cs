@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,16 +6,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using Prowl.Echo;
-using Prowl.Graphite.Rendering;
-using Prowl.Graphite.ShaderDef;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Graphite.Rendering;
+using Infinity.Graphite.ShaderDef;
+using Infinity.Vector;
 
-using GMaterial = Prowl.Graphite.Rendering.Material;
-using GShader = Prowl.Graphite.Rendering.Shader;
-using GTexture = Prowl.Graphite.Texture;
+using GMaterial = Infinity.Graphite.Rendering.Material;
+using GShader = Infinity.Graphite.Rendering.Shader;
+using GTexture = Infinity.Graphite.Texture;
 
-namespace Prowl.Runtime.Resources;
+namespace Infinity.Runtime.Resources;
 
 /// <summary>
 /// A shader with values for its properties and keywords. It keeps its values itself, so it saves, loads and works
@@ -36,10 +36,10 @@ public sealed class Material : Asset, ISerializationCallbackReceiver
     {
         string fileName = material switch
         {
-            Prowl.Runtime.Resources.DefaultMaterial.Standard => "Standard.mat",
-            Prowl.Runtime.Resources.DefaultMaterial.Particle => "Particle.mat",
-            Prowl.Runtime.Resources.DefaultMaterial.Terrain => "Standard Terrain.mat",
-            Prowl.Runtime.Resources.DefaultMaterial.Grass => "Grass.mat",
+            Infinity.Runtime.Resources.DefaultMaterial.Standard => "Standard.mat",
+            Infinity.Runtime.Resources.DefaultMaterial.Particle => "Particle.mat",
+            Infinity.Runtime.Resources.DefaultMaterial.Terrain => "Standard Terrain.mat",
+            Infinity.Runtime.Resources.DefaultMaterial.Grass => "Grass.mat",
             _ => throw new ArgumentException($"Unknown default material: {material}")
         };
 

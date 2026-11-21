@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI.Panels;
-using Prowl.Editor.Theming;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI.Panels;
+using Infinity.Editor.Theming;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-namespace Prowl.Editor.GUI.SceneView;
+namespace Infinity.Editor.GUI.SceneView;
 
 /// <summary> Attribute that marks a class as a handler for dropping assets of a specific type into the scene view. </summary>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]

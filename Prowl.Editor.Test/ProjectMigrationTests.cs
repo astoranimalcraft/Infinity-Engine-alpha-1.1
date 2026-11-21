@@ -1,24 +1,24 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.IO.Compression;
 using System.Text.Json.Nodes;
 
-using Prowl.Echo;
-using Prowl.Editor.Migration;
-using Prowl.Editor.Migration.Releases;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Projects.Settings;
-using Prowl.Runtime;
-using Prowl.Runtime.ParticleSystem;
-using Prowl.Runtime.ParticleSystem.Modules;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Editor.Migration;
+using Infinity.Editor.Migration.Releases;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Projects.Settings;
+using Infinity.Runtime;
+using Infinity.Runtime.ParticleSystem;
+using Infinity.Runtime.ParticleSystem.Modules;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 public class ProjectMigrationTests : IDisposable
 {
@@ -56,7 +56,7 @@ public class ProjectMigrationTests : IDisposable
     private static EchoObject OldComponent(string type, Guid id, params (string Name, EchoObject Value)[] fields)
     {
         var component = EchoObject.NewCompound();
-        component["$type"] = new EchoObject($"Prowl.Runtime.{type}, Prowl.Runtime");
+        component["$type"] = new EchoObject($"Infinity.Runtime.{type}, Infinity.Runtime");
         component["_identifier"] = new EchoObject(id.ToString());
         foreach ((string name, EchoObject value) in fields)
             component[name] = value;
@@ -124,7 +124,7 @@ public class ProjectMigrationTests : IDisposable
     [Fact]
     public void UnversionedProject_MigratesToCurrent()
     {
-        string scene = WriteAsset("Main.scene", Scene(OldComponent("MeshRenderer", Guid.NewGuid(), ("ShadowCasting", new EchoObject(0L)))), "Prowl.Editor.Assets.SceneImporter");
+        string scene = WriteAsset("Main.scene", Scene(OldComponent("MeshRenderer", Guid.NewGuid(), ("ShadowCasting", new EchoObject(0L)))), "Infinity.Editor.Assets.SceneImporter");
         Directory.CreateDirectory(Path.Combine(_root, "Library", "cache"));
         File.WriteAllText(Path.Combine(_root, "Library", "cache", "stale.bin"), "x");
 
@@ -227,7 +227,7 @@ public class ProjectMigrationTests : IDisposable
     private static EchoObject VolumeComponent(string type, long? mode = null)
     {
         var component = EchoObject.NewCompound();
-        component["$type"] = new EchoObject($"Prowl.Runtime.Rendering.{type}, Prowl.Runtime");
+        component["$type"] = new EchoObject($"Infinity.Runtime.Rendering.{type}, Infinity.Runtime");
         if (mode is long value)
         {
             var parameter = EchoObject.NewCompound();
@@ -242,13 +242,13 @@ public class ProjectMigrationTests : IDisposable
     private static EchoObject[] ProfileComponents(EchoObject camera) => [.. camera["Profile"]["Components"]["$values"].List];
 
     private static long TonemappingMode(EchoObject camera)
-        => ProfileComponents(camera).Single(c => c["$type"].StringValue.StartsWith("Prowl.Runtime.Rendering.Tonemapping,")).Get("Mode")!["Value"].LongValue;
+        => ProfileComponents(camera).Single(c => c["$type"].StringValue.StartsWith("Infinity.Runtime.Rendering.Tonemapping,")).Get("Mode")!["Value"].LongValue;
 
     [Fact]
     public void CameraTonemapping_MovesIntoTheBaseProfile()
     {
         EchoObject sharedAsset = Profile();
-        sharedAsset["$type"] = new EchoObject("Prowl.Runtime.Rendering.VolumeProfile, Prowl.Runtime");
+        sharedAsset["$type"] = new EchoObject("Infinity.Runtime.Rendering.VolumeProfile, Infinity.Runtime");
         string profilePath = WriteAsset("Shared.volume", sharedAsset.WriteToString(), "CustomAssetImporter");
         Guid shared = MetaFile.Read(profilePath + ".meta").Guid;
         var sharedRef = EchoObject.NewCompound();
@@ -277,9 +277,9 @@ public class ProjectMigrationTests : IDisposable
         EchoObject sharedProfile = EchoObject.ReadFromString(File.ReadAllText(profilePath));
         Assert.Equal(6L, Assert.Single(sharedProfile["Components"]["$values"].List).Get("Mode")!["Value"].LongValue);
 
-        var profile = Serializer.Deserialize<Prowl.Runtime.Rendering.VolumeProfile>(cameras[0]["Profile"])!;
-        var tonemapping = profile.Get<Prowl.Runtime.Rendering.Tonemapping>()!;
-        Assert.Equal(Prowl.Runtime.Rendering.TonemappingMode.ACES, tonemapping.Mode.Value);
+        var profile = Serializer.Deserialize<Infinity.Runtime.Rendering.VolumeProfile>(cameras[0]["Profile"])!;
+        var tonemapping = profile.Get<Infinity.Runtime.Rendering.Tonemapping>()!;
+        Assert.Equal(Infinity.Runtime.Rendering.TonemappingMode.ACES, tonemapping.Mode.Value);
         Assert.True(tonemapping.Mode.Override);
     }
 
@@ -399,7 +399,7 @@ public class ProjectMigrationTests : IDisposable
     private static string PreGraphiteMaterial(string shader, string textures) => $$"""
         {
           "$id": 1,
-          "$type": "Prowl.Runtime.Resources.Material, Prowl.Runtime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+          "$type": "Infinity.Runtime.Resources.Material, Infinity.Runtime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
           "_shader": { "$asset": "{{BuiltInAssets.DeterministicGuid($"$Default:Shader/{shader}")}}" },
           "_properties": {
             "$id": 2,
@@ -596,7 +596,7 @@ public class ProjectMigrationTests : IDisposable
     private static EchoObject OldScene(SceneEnvironment environment, params EchoObject[] items)
     {
         EchoObject scene = EchoObject.ReadFromString(Scene(items));
-        scene["$type"] = new EchoObject("Prowl.Runtime.Resources.Scene, Prowl.Runtime");
+        scene["$type"] = new EchoObject("Infinity.Runtime.Resources.Scene, Infinity.Runtime");
         scene["Environment"] = Serializer.Serialize(environment);
         return scene;
     }
@@ -681,7 +681,7 @@ public class ProjectMigrationTests : IDisposable
     {
         EchoObject echo = scene.ActiveSection.CaptureTree();
         scene.Dispose();
-        echo["$type"] = new EchoObject("Prowl.Runtime.Resources.Scene, Prowl.Runtime");
+        echo["$type"] = new EchoObject("Infinity.Runtime.Resources.Scene, Infinity.Runtime");
         echo["serializeObj"] = echo["Objects"].Clone();
         echo.Remove("Objects");
         echo["BakedLighting"] = echo["Lighting"].Clone();
@@ -733,16 +733,16 @@ public class ProjectMigrationTests : IDisposable
         string scene = WriteAsset("Main.scene", LegacyScene(world).WriteToString(), "SceneImporter");
 
         EchoObject holder = EchoObject.NewCompound();
-        holder["$type"] = new EchoObject("Prowl.Runtime.Resources.SceneAsset, Prowl.Runtime");
+        holder["$type"] = new EchoObject("Infinity.Runtime.Resources.SceneAsset, Infinity.Runtime");
         holder["Placements"] = EchoObject.NewCompound();
-        holder["Placements"]["$type"] = new EchoObject("System.Collections.Generic.Dictionary`2[[System.Guid, System.Private.CoreLib],[Prowl.Runtime.Resources.Scene+LightmapPlacement, Prowl.Runtime]], System.Private.CoreLib");
+        holder["Placements"]["$type"] = new EchoObject("System.Collections.Generic.Dictionary`2[[System.Guid, System.Private.CoreLib],[Infinity.Runtime.Resources.Scene+LightmapPlacement, Infinity.Runtime]], System.Private.CoreLib");
         string prefab = WriteAsset("Holder.prefab", holder.WriteToString(), "PrefabImporter");
         WriteProwlFile("1.0", appliedSteps: Array.FindIndex(new Release_1_0().Steps, s => s.Name.StartsWith("Scenes stored as SceneContent")));
 
         ProjectMigration.Migrate(Project.Open(_root));
 
         EchoObject migrated = EchoObject.ReadFromString(File.ReadAllText(scene));
-        Assert.Equal("Prowl.Runtime.Resources.SceneContent, Prowl.Runtime", migrated["$type"].StringValue);
+        Assert.Equal("Infinity.Runtime.Resources.SceneContent, Infinity.Runtime", migrated["$type"].StringValue);
         Assert.False(migrated.Contains("serializeObj"));
         Assert.False(migrated.Contains("BakedLighting"));
         SceneContent content = SceneContent.Read(migrated);
@@ -751,8 +751,8 @@ public class ProjectMigrationTests : IDisposable
         Assert.Equal(5, content.LightmapBake.Bounces);
 
         EchoObject renamed = EchoObject.ReadFromString(File.ReadAllText(prefab));
-        Assert.Equal("Prowl.Runtime.Resources.Scene, Prowl.Runtime", renamed["$type"].StringValue);
-        Assert.Contains("[Prowl.Runtime.Resources.LightmapPlacement, Prowl.Runtime]", renamed["Placements"]["$type"].StringValue);
+        Assert.Equal("Infinity.Runtime.Resources.Scene, Infinity.Runtime", renamed["$type"].StringValue);
+        Assert.Contains("[Infinity.Runtime.Resources.LightmapPlacement, Infinity.Runtime]", renamed["Placements"]["$type"].StringValue);
     }
 
     [Fact]
@@ -962,9 +962,9 @@ public class ProjectMigrationTests : IDisposable
             if (e.Severity == LogSeverity.Warning && e.Message.Contains("Custom.shader", StringComparison.Ordinal))
                 lock (warnings) warnings.Add(e.Message);
         }
-        Prowl.Runtime.Debug.OnLog += Collect;
+        Infinity.Runtime.Debug.OnLog += Collect;
         try { ProjectMigration.Migrate(Project.Open(_root)); }
-        finally { Prowl.Runtime.Debug.OnLog -= Collect; }
+        finally { Infinity.Runtime.Debug.OnLog -= Collect; }
 
         Assert.Equal(source, File.ReadAllText(shader));
         Assert.Contains("_MainColor is now base_color", Assert.Single(warnings));
@@ -985,7 +985,7 @@ public class ProjectMigrationTests : IDisposable
         string settingsFolder = Path.Combine(_root, "ProjectSettings");
         Directory.CreateDirectory(settingsFolder);
         var settings = EchoObject.NewCompound();
-        settings["$type"] = new EchoObject("Prowl.Editor.Projects.Settings.GeneralSettings, Prowl.Editor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+        settings["$type"] = new EchoObject("Infinity.Editor.Projects.Settings.GeneralSettings, Infinity.Editor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
         settings["ProductName"] = new EchoObject("Kept");
         settings["LastScenePath"] = new EchoObject("Scenes/Level.scene");
         string path = Path.Combine(settingsFolder, "General.yaml");

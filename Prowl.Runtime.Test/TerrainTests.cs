@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 //
 // Every terrain test lives here: physics raycasts, the coordinate conventions the maps share, and
@@ -10,15 +10,15 @@ using System.Text.RegularExpressions;
 
 using Jitter2.LinearMath;
 
-using Prowl.Echo;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Runtime.Terrain;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Runtime.Terrain;
+using Infinity.Vector;
 
 using Xunit;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>
 /// Every terrain test: the physics raycast, the coordinate conventions the height, splat and detail

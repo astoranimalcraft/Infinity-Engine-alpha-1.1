@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -7,22 +7,22 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json.Nodes;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.Core.Diagnostics;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Quill;
-using Prowl.Rosetta;
-using Prowl.Runtime.Diagnostics;
-using Prowl.Scribe;
-using Prowl.Vector;
+using Infinity.Editor.Core;
+using Infinity.Editor.Core.Diagnostics;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Quill;
+using Infinity.Rosetta;
+using Infinity.Runtime.Diagnostics;
+using Infinity.Scribe;
+using Infinity.Vector;
 
 using Color = System.Drawing.Color;
-using VColor = Prowl.Vector.Color;
+using VColor = Infinity.Vector.Color;
 
-namespace Prowl.Editor.GUI.Panels;
+namespace Infinity.Editor.GUI.Panels;
 
 /// <summary>
 /// Live view of <see cref="FrameStats"/>: a scrolling chart stacked by category over a table of every

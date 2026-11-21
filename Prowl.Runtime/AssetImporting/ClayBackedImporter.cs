@@ -1,4 +1,4 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,27 +6,27 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using Prowl.Clay;
-using Prowl.Clay.Importer;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Clay;
+using Infinity.Clay.Importer;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using ClayMesh = Prowl.Clay.Mesh;
-using ClayMaterial = Prowl.Clay.Material;
-using ClayAnim = Prowl.Clay.AnimationClip;
-using ClayBinding = Prowl.Clay.AnimationBinding;
-using ClayTexture = Prowl.Clay.Texture;
-using ClaySettings = Prowl.Clay.Importer.ModelImporterSettings;
-using PMesh = Prowl.Runtime.Resources.Mesh;
-using PMaterial = Prowl.Runtime.Resources.Material;
-using PAnim = Prowl.Runtime.AnimationClip;
-using PBlendShape = Prowl.Runtime.Resources.BlendShape;
-using PBlendShapeFrame = Prowl.Runtime.Resources.BlendShapeFrame;
+using ClayMesh = Infinity.Clay.Mesh;
+using ClayMaterial = Infinity.Clay.Material;
+using ClayAnim = Infinity.Clay.AnimationClip;
+using ClayBinding = Infinity.Clay.AnimationBinding;
+using ClayTexture = Infinity.Clay.Texture;
+using ClaySettings = Infinity.Clay.Importer.ModelImporterSettings;
+using PMesh = Infinity.Runtime.Resources.Mesh;
+using PMaterial = Infinity.Runtime.Resources.Material;
+using PAnim = Infinity.Runtime.AnimationClip;
+using PBlendShape = Infinity.Runtime.Resources.BlendShape;
+using PBlendShapeFrame = Infinity.Runtime.Resources.BlendShapeFrame;
 
-namespace Prowl.Runtime.AssetImporting;
+namespace Infinity.Runtime.AssetImporting;
 
 /// <summary>
-/// Bakes a <see cref="Prowl.Clay.Model"/> into a Prowl <see cref="ModelImportResult"/>:
+/// Bakes a <see cref="Infinity.Clay.Model"/> into a Prowl <see cref="ModelImportResult"/>:
 /// runtime <see cref="PMesh"/>es, <see cref="PMaterial"/>s wired to the Standard shader, a
 /// <see cref="GameObject"/> hierarchy with MeshRenderer / SkinnedMeshRenderer components, and
 /// <see cref="PAnim"/>s with per-axis curves.

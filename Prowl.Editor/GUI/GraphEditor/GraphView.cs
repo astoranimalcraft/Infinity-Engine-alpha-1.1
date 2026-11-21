@@ -1,20 +1,20 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Echo;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Vector;
 
 using Color = System.Drawing.Color;
 
-namespace Prowl.Editor.GraphEditor;
+namespace Infinity.Editor.GraphEditor;
 
 /// <summary>What is wrong with one node, or with the graph when <see cref="NodeId"/> is empty.</summary>
 public readonly struct GraphProblem

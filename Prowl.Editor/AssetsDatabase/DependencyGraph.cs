@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 /// <summary>
 /// Tracks forward and reverse dependencies between assets.

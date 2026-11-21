@@ -1,20 +1,20 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Theming;
-using Prowl.Motion;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Vector;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Theming;
+using Infinity.Motion;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Vector;
 
-namespace Prowl.Editor.GUI.Panels;
+namespace Infinity.Editor.GUI.Panels;
 
 /// <summary>
 /// Builds a ragdoll of the humanoid character selected in the scene: a copy of it with its animators

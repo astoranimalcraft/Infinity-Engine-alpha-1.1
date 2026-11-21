@@ -1,18 +1,18 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Collections.Generic;
 
-using Prowl.Motion;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
-using Prowl.Vector.Spatial;
+using Infinity.Motion;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
+using Infinity.Vector.Spatial;
 
 using Xunit;
 
-using MotionSkeleton = Prowl.Motion.Skeleton;
+using MotionSkeleton = Infinity.Motion.Skeleton;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>The Animator: binding a rig to a hierarchy, playing clips, and moving by root motion.</summary>
 public class AnimatorTests : RuntimeTestBase

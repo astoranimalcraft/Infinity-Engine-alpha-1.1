@@ -1,17 +1,17 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-using Prowl.Runtime.Diagnostics;
+using Infinity.Runtime.Diagnostics;
 
 using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.Windowing;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>How the game window occupies the screen, see <see cref="Window.Mode"/>.</summary>
 public enum WindowMode { Windowed, Fullscreen, Borderless }

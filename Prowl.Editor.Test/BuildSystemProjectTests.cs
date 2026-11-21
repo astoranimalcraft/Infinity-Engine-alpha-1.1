@@ -1,17 +1,17 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Diagnostics;
 using System.Reflection;
 
 
-using Prowl.Echo;
-using Prowl.Editor.Build;
-using Prowl.Editor.Importers;
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Editor.Projects.Settings;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Editor.Build;
+using Infinity.Editor.Importers;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Editor.Projects.Settings;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 
@@ -19,7 +19,7 @@ using Xunit;
 // which could resume on another thread.
 #pragma warning disable xUnit1031
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>
 /// The parts of the build that need a real project: collecting its assets, compiling its scripts,
@@ -154,8 +154,8 @@ public class BuildSystemProjectTests : EditorTestHarness
         // Scene references texture A directly (NOT the sprite) - the sprite is only pulled into the
         // build via the "sub-assets of collected parents" backfill, never via a direct edge.
         File.WriteAllText(AssetAbsolutePath("ParentRefComponent.cs"), """
-            using Prowl.Runtime;
-            using Prowl.Runtime.Resources;
+            using Infinity.Runtime;
+            using Infinity.Runtime.Resources;
 
             public class ParentRefComponent : Component
             {
@@ -220,8 +220,8 @@ public class BuildSystemProjectTests : EditorTestHarness
         Assert.NotEqual(Guid.Empty, texGuid);
 
         File.WriteAllText(AssetAbsolutePath("EditorTexRefComponent.cs"), """
-            using Prowl.Runtime;
-            using Prowl.Runtime.Resources;
+            using Infinity.Runtime;
+            using Infinity.Runtime.Resources;
 
             public class EditorTexRefComponent : Component
             {
@@ -396,8 +396,8 @@ public class BuildSystemProjectTests : EditorTestHarness
         // 2. Author a game script (global namespace so its serialized $type is just the simple name)
         //    that logs the build-smoke marker and reports back whether the texture/sprite resolved.
         File.WriteAllText(AssetAbsolutePath("BuildLogComponent.cs"), $$"""
-            using Prowl.Runtime;
-            using Prowl.Runtime.Resources;
+            using Infinity.Runtime;
+            using Infinity.Runtime.Resources;
 
             public class BuildLogComponent : Component
             {
@@ -515,7 +515,7 @@ public class BuildSystemProjectTests : EditorTestHarness
     public void AsyncVoidInAGameScript_RunsInABuild(bool selfContained)
     {
         File.WriteAllText(AssetAbsolutePath("AsyncVoidComponent.cs"), """
-            using Prowl.Runtime;
+            using Infinity.Runtime;
 
             public class AsyncVoidComponent : Component
             {
@@ -674,8 +674,8 @@ public class BuildSystemProjectTests : EditorTestHarness
 
         File.WriteAllText(AssetAbsolutePath("AotComponent.cs"), """
             using System.Collections.Generic;
-            using Prowl.Runtime;
-            using Prowl.Runtime.Resources;
+            using Infinity.Runtime;
+            using Infinity.Runtime.Resources;
 
             public class AotComponent : Component
             {
@@ -721,7 +721,7 @@ public class BuildSystemProjectTests : EditorTestHarness
         {
             BuildResult result = new DesktopBuildPipeline().BuildAsync(Project.RootPath, build, buildOut).GetAwaiter().GetResult();
             Assert.True(result.Success, $"Build failed: {result.Errors}");
-            Assert.False(File.Exists(Path.Combine(result.OutputPath, "Prowl.Runtime.dll")), "A NativeAOT build shipped managed assemblies.");
+            Assert.False(File.Exists(Path.Combine(result.OutputPath, "Infinity.Runtime.dll")), "A NativeAOT build shipped managed assemblies.");
 
             string stdout = RunPlayerHeadless(result.OutputPath, frames: 5);
             Assert.Contains($"PROWL_AOT|tex=True|width={TexSize}|numbers=1,2,3|named=2.5", stdout);

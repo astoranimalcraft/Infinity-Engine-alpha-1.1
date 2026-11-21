@@ -1,17 +1,17 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Linq;
 
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Rosetta;
-using Prowl.Runtime;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.GUI.SceneView;
+namespace Infinity.Editor.GUI.SceneView;
 
 /// <summary>
 /// The list of component types that draw gizmos, dropped down from the Scene view toolbar. Each category has a

@@ -1,19 +1,19 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using Prowl.Echo;
-using Prowl.Recast.Detour.TileCache;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Recast.Detour.TileCache;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
 using Xunit;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>
 /// NavMeshObstacle carving: obstacles carve holes that incremental updates apply across frames,
@@ -1170,8 +1170,8 @@ public class NavMeshObstacleTests : RuntimeTestBase
         }
 
         Float3 expected = cart.Transform.Position;
-        Prowl.Recast.Detour.Crowd.DtCrowd crowd = scene.Navigation.GetNativeCrowd()!;
-        foreach (Prowl.Recast.Detour.Crowd.DtCrowdAgent a in crowd.GetActiveAgents())
+        Infinity.Recast.Detour.Crowd.DtCrowd crowd = scene.Navigation.GetNativeCrowd()!;
+        foreach (Infinity.Recast.Detour.Crowd.DtCrowdAgent a in crowd.GetActiveAgents())
         {
             if (!ReferenceEquals(a.option.userData, obstacle)) continue;
             Assert.True(Math.Abs(a.npos.X - expected.X) < 0.05f && Math.Abs(a.npos.Z - expected.Z) < 0.05f,
@@ -1210,8 +1210,8 @@ public class NavMeshObstacleTests : RuntimeTestBase
         }
 
         Tick(scene, 300);
-        Prowl.Recast.Detour.Crowd.DtCrowd crowd = scene.Navigation.GetNativeCrowd()!;
-        foreach (Prowl.Recast.Detour.Crowd.DtCrowdAgent a in crowd.GetActiveAgents())
+        Infinity.Recast.Detour.Crowd.DtCrowd crowd = scene.Navigation.GetNativeCrowd()!;
+        foreach (Infinity.Recast.Detour.Crowd.DtCrowdAgent a in crowd.GetActiveAgents())
         {
             if (!ReferenceEquals(a.option.userData, obstacle)) continue;
             Assert.True(Math.Abs(a.npos.X) < 0.05f && Math.Abs(a.npos.Z) < 0.05f,
@@ -1258,10 +1258,10 @@ public class NavMeshObstacleTests : RuntimeTestBase
     /// a count so a failure reports which side of the switch broke.</summary>
     private static int BlockerCount(SceneInstance scene, NavMeshObstacle obstacle)
     {
-        Prowl.Recast.Detour.Crowd.DtCrowd? crowd = scene.Navigation.GetNativeCrowd();
+        Infinity.Recast.Detour.Crowd.DtCrowd? crowd = scene.Navigation.GetNativeCrowd();
         if (crowd == null) return 0;
         int count = 1;
-        foreach (Prowl.Recast.Detour.Crowd.DtCrowdAgent a in crowd.GetActiveAgents())
+        foreach (Infinity.Recast.Detour.Crowd.DtCrowdAgent a in crowd.GetActiveAgents())
             if (ReferenceEquals(a.option.userData, obstacle))
                 count++;
         return count;

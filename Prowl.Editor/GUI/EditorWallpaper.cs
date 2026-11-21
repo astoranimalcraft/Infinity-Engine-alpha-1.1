@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 
-using Prowl.Aperture;
-using Prowl.Editor.Theming;
-using Prowl.Quill;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
-using Prowl.Vector.Geometry;
+using Infinity.Aperture;
+using Infinity.Editor.Theming;
+using Infinity.Quill;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
+using Infinity.Vector.Geometry;
 
-namespace Prowl.Editor.GUI;
+namespace Infinity.Editor.GUI;
 
 /// <summary>
 /// The user's wallpaper image for the editor background. Read straight from disk, never imported into

@@ -2,20 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Echo;
-using Prowl.Editor.GUI;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Runtime.AssetImporting;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.AssetImporting;
+using Infinity.Runtime.Resources;
 
-using static Prowl.Editor.GUI.EditorGUI;
+using static Infinity.Editor.GUI.EditorGUI;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 // Targets the importer, not the asset type: a model imports into a PrefabAsset like any prefab,
 // so keying on the asset would hand these files the generic prefab editor and drop the import settings.
@@ -234,7 +234,7 @@ public class ModelAssetEditor : ImportSettingsEditor
         EditorGUI.SettingsToggle(paper, $"{id}_impBlendShapes", "Import Blend Shapes", Bool(settings, "importBlendShapes", true),
             v => settings["importBlendShapes"] = new EchoObject(v), separator: false);
 
-        // Lightmapping generates a UV2 atlas for every mesh via Prowl.Unwrapper. Off by default:
+        // Lightmapping generates a UV2 atlas for every mesh via Infinity.Unwrapper. Off by default:
         // it's slow (a full unwrap per mesh) and some models already ship their own UV2.
         EditorGUI.SettingsToggle(paper, $"{id}_lightmapUVs", "Generate Lightmap UVs (slow)", Bool(settings, "generateLightmapUVs", false),
             v => settings["generateLightmapUVs"] = new EchoObject(v), separator: false);
@@ -313,7 +313,7 @@ public class ModelAssetEditor : ImportSettingsEditor
         {
             int mapped = CountMappedBones(avatar);
             EditorGUI.Note(paper, $"{id}_rigOk",
-                $"Mapped to the human body: {mapped} of {Prowl.Motion.HumanTrait.BoneCount} humanoid bones. Clips from this model retarget onto any humanoid rig.");
+                $"Mapped to the human body: {mapped} of {Infinity.Motion.HumanTrait.BoneCount} humanoid bones. Clips from this model retarget onto any humanoid rig.");
         }
         else
         {
@@ -346,12 +346,12 @@ public class ModelAssetEditor : ImportSettingsEditor
 
     private static int CountMappedBones(Avatar avatar)
     {
-        Prowl.Motion.HumanDescription? description = avatar.Description;
+        Infinity.Motion.HumanDescription? description = avatar.Description;
         if (description == null) return 0;
 
         int mapped = 0;
-        for (int i = 0; i < Prowl.Motion.HumanTrait.BoneCount; i++)
-            if (description.GetSkeletonBoneIndex((Prowl.Motion.HumanBodyBone)i) >= 0) mapped++;
+        for (int i = 0; i < Infinity.Motion.HumanTrait.BoneCount; i++)
+            if (description.GetSkeletonBoneIndex((Infinity.Motion.HumanBodyBone)i) >= 0) mapped++;
         return mapped;
     }
 

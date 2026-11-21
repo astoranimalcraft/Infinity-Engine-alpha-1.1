@@ -1,18 +1,18 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 
-using Prowl.Editor.GUI;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Editor.Projects.Settings;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Editor.Projects.Settings;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>
 /// Tests for how user scripts are compiled into the default Game/Editor assemblies: editor/game
@@ -63,7 +63,7 @@ public class ScriptCompilationTests : EditorTestHarness
     [Fact]
     public void EditorAssembly_IsNotShippedInBuild()
     {
-        WriteScript("PlayComponent.cs", "using Prowl.Runtime; public class PlayComponent : Component { }");
+        WriteScript("PlayComponent.cs", "using Infinity.Runtime; public class PlayComponent : Component { }");
         WriteScript(Path.Combine("Editor", "EditorOnlyTool.cs"), "public class EditorOnlyTool { public static int X => 1; }");
 
         ScriptCompiler.CompileResult compile = ScriptCompiler.CompileAll(Project);
@@ -86,7 +86,7 @@ public class ScriptCompilationTests : EditorTestHarness
     [InlineData(BuildConfiguration.Debug)]
     public void Build_ShipsOptimizedGameScriptsOnlyInRelease(BuildConfiguration configuration)
     {
-        WriteScript("PlayComponent.cs", "using Prowl.Runtime; public class PlayComponent : Component { }");
+        WriteScript("PlayComponent.cs", "using Infinity.Runtime; public class PlayComponent : Component { }");
         Assert.True(ScriptCompiler.CompileAll(Project).Success);
         Guid scene = AuthorSceneWithComponent("PlayComponent");
 
@@ -211,11 +211,11 @@ public class ScriptCompilationTests : EditorTestHarness
     public void EditorScript_CanDeclareEditorWindow_DiscoverableByEngineScan()
     {
         WriteScript(Path.Combine("Editor", "MyTestWindow.cs"), """
-            using Prowl.Editor;
-            using Prowl.Editor.Core;
-            using Prowl.Editor.GUI;
-            using Prowl.OrigamiUI;
-            using Prowl.PaperUI;
+            using Infinity.Editor;
+            using Infinity.Editor.Core;
+            using Infinity.Editor.GUI;
+            using Infinity.OrigamiUI;
+            using Infinity.PaperUI;
 
             public class MyTestWindow : DockPanel
             {
@@ -233,7 +233,7 @@ public class ScriptCompilationTests : EditorTestHarness
 
         var editor = Assembly.Load(File.ReadAllBytes(Project.EditorAssemblyPath));
 
-        // (DockPanel matched by name to avoid a compile dependency on Prowl.PaperUI in the test project.)
+        // (DockPanel matched by name to avoid a compile dependency on Infinity.PaperUI in the test project.)
         Type? window = editor.GetTypes()
             .Where(t => !t.IsAbstract && DerivesFromDockPanel(t))
             .SingleOrDefault(t => t.Name == "MyTestWindow");
@@ -269,7 +269,7 @@ public class ScriptCompilationTests : EditorTestHarness
         try
         {
             File.WriteAllText(Path.Combine(proj.AssetsPath, "UsesEngine.cs"),
-                "using Prowl.OrigamiUI; public class UsesEngine { public static System.Type T() => typeof(DockPanel); }");
+                "using Infinity.OrigamiUI; public class UsesEngine { public static System.Type T() => typeof(DockPanel); }");
 
             ScriptCompiler.CompileResult result = ScriptCompiler.CompileAll(proj);
             Assert.True(result.Success, $"Engine references were dropped for a prefix-colliding project name:\n{result.Errors}");

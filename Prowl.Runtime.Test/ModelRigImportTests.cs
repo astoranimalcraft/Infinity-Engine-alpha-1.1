@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,18 +6,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-using Prowl.Motion;
-using Prowl.Runtime;
-using Prowl.Runtime.AssetImporting;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
-using Prowl.Vector.Spatial;
+using Infinity.Motion;
+using Infinity.Runtime;
+using Infinity.Runtime.AssetImporting;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
+using Infinity.Vector.Spatial;
 
 using Xunit;
 
-using MotionClip = Prowl.Motion.AnimationClipBase;
+using MotionClip = Infinity.Motion.AnimationClipBase;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>
 /// The rig a model import produces: a skeleton covering the hierarchy, and clips sampled from the
@@ -246,14 +246,14 @@ public class ModelRigImportTests
             new[] { Skeleton.InvalidIndex, 0 },
             new[] { Transform3D.Identity, Transform3D.Identity });
 
-        static Prowl.Clay.AnimationBinding Track(int node, Float3 from, Float3 to) => new()
+        static Infinity.Clay.AnimationBinding Track(int node, Float3 from, Float3 to) => new()
         {
             NodeIndex = node,
-            Property = Prowl.Clay.AnimatedProperty.Position,
-            Curve = new Prowl.Vector.AnimationCurve(3, new Keyframe(0f, from), new Keyframe(1f, to)),
+            Property = Infinity.Clay.AnimatedProperty.Position,
+            Curve = new Infinity.Vector.AnimationCurve(3, new Keyframe(0f, from), new Keyframe(1f, to)),
         };
 
-        var take = new Prowl.Clay.AnimationClip
+        var take = new Infinity.Clay.AnimationClip
         {
             Name = "Walk",
             EndTime = 1f,

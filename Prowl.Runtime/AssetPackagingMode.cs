@@ -1,4 +1,4 @@
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// How assets are packaged in a built player.

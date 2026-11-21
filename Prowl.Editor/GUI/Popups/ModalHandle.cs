@@ -1,12 +1,12 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
 
-namespace Prowl.Editor.GUI.Popups;
+namespace Infinity.Editor.GUI.Popups;
 
 internal sealed class ModalHandle
 {

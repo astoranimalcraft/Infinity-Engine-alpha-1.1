@@ -1,7 +1,7 @@
 ﻿
 using System;
 
-namespace Prowl.Runtime.Rendering.Pipelines.Infinity;
+namespace Infinity.Runtime.Rendering.Pipelines.Infinity;
 
 public sealed class InfinityRenderPipeline : IDisposable
 {

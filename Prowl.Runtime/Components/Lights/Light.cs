@@ -1,19 +1,19 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Echo;
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Runtime.Tasks;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Runtime.Tasks;
+using Infinity.Vector;
 
-using GShadowFilter = Prowl.Graphite.Rendering.ShadowFilter;
+using GShadowFilter = Infinity.Graphite.Rendering.ShadowFilter;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>How a light's shadow edges are filtered.</summary>
 public enum ShadowFilter

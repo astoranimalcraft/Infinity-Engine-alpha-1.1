@@ -1,13 +1,13 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Editor.GUI.PropertyEditors;
-using Prowl.Editor.Projects.Settings;
-using Prowl.Runtime;
+using Infinity.Editor.GUI.PropertyEditors;
+using Infinity.Editor.Projects.Settings;
+using Infinity.Runtime;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>Tests for project settings persistence (<see cref="ProjectSettingsRegistry"/> load/save).</summary>
 public class ProjectSettingsTests : EditorTestHarness
@@ -25,16 +25,16 @@ public class ProjectSettingsTests : EditorTestHarness
     public void NavigationSettings_ResetToDefaults_IgnoresTheLiveAreaTable()
     {
         const int Custom = 3; // built-in areas are immutable, so only custom ones can drift
-        Prowl.Runtime.NavMeshAreas.SetAreaName(Custom, "Swamp");
-        Prowl.Runtime.NavMeshAreas.SetAreaCost(Custom, 5f);
+        Infinity.Runtime.NavMeshAreas.SetAreaName(Custom, "Swamp");
+        Infinity.Runtime.NavMeshAreas.SetAreaCost(Custom, 5f);
 
         NavigationSettings settings = EditorRegistries.GetSettings<NavigationSettings>();
         settings.ResetToDefaults();
 
         Assert.Equal(string.Empty, settings.AreaNames[Custom]);
         Assert.Equal(1f, settings.AreaCosts[Custom]);
-        Assert.Equal("Walkable", settings.AreaNames[Prowl.Runtime.NavMeshAreas.Walkable]);
-        Assert.Equal("Jump", settings.AreaNames[Prowl.Runtime.NavMeshAreas.Jump]);
+        Assert.Equal("Walkable", settings.AreaNames[Infinity.Runtime.NavMeshAreas.Walkable]);
+        Assert.Equal("Jump", settings.AreaNames[Infinity.Runtime.NavMeshAreas.Jump]);
     }
 
     // Settings apply again whenever scripts reload, which must not undo a pause the running game set.
@@ -64,9 +64,9 @@ public class ProjectSettingsTests : EditorTestHarness
         NavigationSettings settings = EditorRegistries.GetSettings<NavigationSettings>();
         settings.ResetToDefaults();
 
-        for (int area = 0; area < Prowl.Runtime.NavMeshAreas.MaxAreas; area++)
-            Assert.Equal(Prowl.Runtime.NavMeshAreas.GetDefaultAreaCost(area), settings.AreaCosts[area]);
-        Assert.Equal(2f, settings.AreaCosts[Prowl.Runtime.NavMeshAreas.Jump]);
+        for (int area = 0; area < Infinity.Runtime.NavMeshAreas.MaxAreas; area++)
+            Assert.Equal(Infinity.Runtime.NavMeshAreas.GetDefaultAreaCost(area), settings.AreaCosts[area]);
+        Assert.Equal(2f, settings.AreaCosts[Infinity.Runtime.NavMeshAreas.Jump]);
     }
 
     // The mask field only lists defined areas. Unticking one must rewrite only those bits, or every
@@ -74,7 +74,7 @@ public class ProjectSettingsTests : EditorTestHarness
     [Fact]
     public void NavMeshAreaMaskField_Pick_LeavesUndefinedAreasAlone()
     {
-        const int Jump = Prowl.Runtime.NavMeshAreas.Jump;
+        const int Jump = Infinity.Runtime.NavMeshAreas.Jump;
         int[] shown = [0, 1, Jump];
 
         NavMeshAreaMask withoutJump = NavMeshAreaMaskPropertyEditor.ApplyPicked(NavMeshAreaMask.Everything, shown, [0, 1]);

@@ -1,4 +1,4 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -14,10 +14,10 @@ using Jitter2.Dynamics;
 using Jitter2.LinearMath;
 using Jitter2.SoftBodies;
 
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// Persistent keeps them alive between steps for lower latency at idle CPU cost.

@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Vector;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Vector;
 
-namespace Prowl.Editor.GUI;
+namespace Infinity.Editor.GUI;
 
 /// <summary>
 /// Panel maximizing for the editor's dock space. Double-clicking a docked panel's tab fills the

@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.Runtime;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Core;
+namespace Infinity.Editor.Core;
 
 /// <summary>
 /// Central selection system for the editor.

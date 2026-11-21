@@ -1,9 +1,9 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-namespace Prowl.Runtime.ParticleSystem;
+namespace Infinity.Runtime.ParticleSystem;
 
 /// <summary>
 /// Base class for particle system modules. A module is a group of settings the system reads while it

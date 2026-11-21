@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using Prowl.Editor.Projects;
-using Prowl.Editor.Projects.Scripting;
-using Prowl.OrigamiUI.CSharp;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.OrigamiUI.CSharp;
 
-namespace Prowl.Editor.GUI.ScriptEditor;
+namespace Infinity.Editor.GUI.ScriptEditor;
 
 /// <summary>
 /// One Roslyn workspace per script compilation unit, built from what the last editor compile used, so the

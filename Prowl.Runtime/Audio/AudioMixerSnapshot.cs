@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,10 +6,10 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
-using Prowl.Echo;
-using Prowl.Runtime.Audio.Effects;
+using Infinity.Echo;
+using Infinity.Runtime.Audio.Effects;
 
-namespace Prowl.Runtime.Audio;
+namespace Infinity.Runtime.Audio;
 
 /// <summary>One parameter of a mixer, as a snapshot recorded it.</summary>
 /// <remarks>

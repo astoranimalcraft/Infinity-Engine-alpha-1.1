@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,9 +6,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
-using Prowl.Editor.Projects;
+using Infinity.Editor.Projects;
 
-namespace Prowl.Editor.Core;
+namespace Infinity.Editor.Core;
 
 /// <summary>
 /// Cached Git status for the currently open project. Shells out to <c>git</c> on a background thread

@@ -1,12 +1,12 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Analyzers;
-using Prowl.Editor.Projects.Scripting;
+using Infinity.Analyzers;
+using Infinity.Editor.Projects.Scripting;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>
 /// Verifies the analyzer that steers users away from constructors on components, and refuses one
@@ -22,7 +22,7 @@ public class ComponentConstructorAnalyzerTests : EditorTestHarness
     [Fact]
     public void ErrorsWhenNothingCanConstructIt()
     {
-        WriteScript("NeedsArgs.cs", "public class NeedsArgs : Prowl.Runtime.Component { public NeedsArgs(int x) { } }");
+        WriteScript("NeedsArgs.cs", "public class NeedsArgs : Infinity.Runtime.Component { public NeedsArgs(int x) { } }");
 
         ScriptCompiler.CompileResult result = ScriptCompiler.CompileAll(Project);
 
@@ -32,7 +32,7 @@ public class ComponentConstructorAnalyzerTests : EditorTestHarness
     [Fact]
     public void APrivateParameterlessConstructorStillCannotBeConstructed()
     {
-        WriteScript("Hidden.cs", "public class Hidden : Prowl.Runtime.Component { private Hidden() { } }");
+        WriteScript("Hidden.cs", "public class Hidden : Infinity.Runtime.Component { private Hidden() { } }");
 
         ScriptCompiler.CompileResult result = ScriptCompiler.CompileAll(Project);
 
@@ -44,7 +44,7 @@ public class ComponentConstructorAnalyzerTests : EditorTestHarness
     public void APublicParameterlessOverloadIsConstructableButStillWarns()
     {
         WriteScript("Both.cs",
-            "public class Both : Prowl.Runtime.Component { public Both() { } public Both(int x) { } }");
+            "public class Both : Infinity.Runtime.Component { public Both() { } public Both(int x) { } }");
 
         ScriptCompiler.CompileResult result = ScriptCompiler.CompileAll(Project);
 
@@ -58,7 +58,7 @@ public class ComponentConstructorAnalyzerTests : EditorTestHarness
     public void AnAbstractComponentIsNotAskedToBeConstructable()
     {
         WriteScript("Base.cs",
-            "public abstract class BaseThing : Prowl.Runtime.Component { protected BaseThing(int x) { } }");
+            "public abstract class BaseThing : Infinity.Runtime.Component { protected BaseThing(int x) { } }");
 
         ScriptCompiler.CompileResult result = ScriptCompiler.CompileAll(Project);
 
@@ -74,7 +74,7 @@ public class ComponentConstructorAnalyzerTests : EditorTestHarness
     public void WarnsOnAFieldInitializerThatCallsSomething()
     {
         WriteScript("Reg.cs", "public static class Reg { public static System.Func<int> Get; }");
-        WriteScript("Init.cs", "public class Init : Prowl.Runtime.Component { private int _v = Reg.Get(); }");
+        WriteScript("Init.cs", "public class Init : Infinity.Runtime.Component { private int _v = Reg.Get(); }");
 
         ScriptCompiler.CompileResult result = ScriptCompiler.CompileAll(Project);
 
@@ -91,7 +91,7 @@ public class ComponentConstructorAnalyzerTests : EditorTestHarness
     public void WarnsButCompilesWhenAnInitializerCallsOwnCode()
     {
         WriteScript("Pure.cs", "public static class Pure { public static int Twice(int x) => x * 2; }");
-        WriteScript("Uses.cs", "public class Uses : Prowl.Runtime.Component { private int _v = Pure.Twice(2); }");
+        WriteScript("Uses.cs", "public class Uses : Infinity.Runtime.Component { private int _v = Pure.Twice(2); }");
 
         ScriptCompiler.CompileResult result = ScriptCompiler.CompileAll(Project);
 
@@ -104,7 +104,7 @@ public class ComponentConstructorAnalyzerTests : EditorTestHarness
     public void SaysNothingAboutAFrameworkCall()
     {
         WriteScript("Fw.cs",
-            "public class Fw : Prowl.Runtime.Component { private string _id = System.Guid.NewGuid().ToString(); }");
+            "public class Fw : Infinity.Runtime.Component { private string _id = System.Guid.NewGuid().ToString(); }");
 
         ScriptCompiler.CompileResult result = ScriptCompiler.CompileAll(Project);
 
@@ -118,7 +118,7 @@ public class ComponentConstructorAnalyzerTests : EditorTestHarness
     public void SaysNothingAboutAPlainFieldInitializer()
     {
         WriteScript("Defaults.cs",
-            "public class Defaults : Prowl.Runtime.Component " +
+            "public class Defaults : Infinity.Runtime.Component " +
             "{ public int Speed = 5; public string Name = \"hi\"; " +
             "public System.Collections.Generic.List<int> Items = new(); }");
 
@@ -132,7 +132,7 @@ public class ComponentConstructorAnalyzerTests : EditorTestHarness
     [Fact]
     public void SaysNothingAboutAComponentWithNoConstructor()
     {
-        WriteScript("Plain.cs", "public class Plain : Prowl.Runtime.Component { public int Speed = 5; }");
+        WriteScript("Plain.cs", "public class Plain : Infinity.Runtime.Component { public int Speed = 5; }");
 
         ScriptCompiler.CompileResult result = ScriptCompiler.CompileAll(Project);
 

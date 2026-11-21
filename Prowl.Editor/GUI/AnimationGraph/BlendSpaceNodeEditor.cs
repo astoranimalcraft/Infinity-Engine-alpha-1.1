@@ -1,27 +1,27 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Editor.Theming;
-using Prowl.Editor.GraphEditor;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.Events;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Runtime.AnimationNodes;
-using Prowl.Scribe;
-using Prowl.Vector;
+using Infinity.Editor.Theming;
+using Infinity.Editor.GraphEditor;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.Events;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.AnimationNodes;
+using Infinity.Scribe;
+using Infinity.Vector;
 
-using AnimationNodeCard = Prowl.Editor.GraphEditor.NodeCard<Prowl.Runtime.GraphNodeRecord, Prowl.Editor.Inspector.AnimationGraphEditing>;
-using AnimationNodeInspector = Prowl.Editor.GraphEditor.NodeInspector<Prowl.Runtime.GraphNodeRecord, Prowl.Editor.Inspector.AnimationGraphEditing>;
-using Canvas = Prowl.Quill.Canvas;
+using AnimationNodeCard = Infinity.Editor.GraphEditor.NodeCard<Infinity.Runtime.GraphNodeRecord, Infinity.Editor.Inspector.AnimationGraphEditing>;
+using AnimationNodeInspector = Infinity.Editor.GraphEditor.NodeInspector<Infinity.Runtime.GraphNodeRecord, Infinity.Editor.Inspector.AnimationGraphEditing>;
+using Canvas = Infinity.Quill.Canvas;
 using Color = System.Drawing.Color;
-using Color32 = Prowl.Vector.Color32;
+using Color32 = Infinity.Vector.Color32;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 /// <summary>A blend space is a layout, so it is laid out on a chart rather than listed, with each sample's exact value under it.</summary>
 [NodeEditor(typeof(Blend1DNode))]

@@ -1,11 +1,11 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Graphite.Rendering;
+using Infinity.Graphite.Rendering;
 
-namespace Prowl.Runtime.Rendering;
+namespace Infinity.Runtime.Rendering;
 
 /// <summary>How a camera smooths the edges of what it draws.</summary>
 public enum AntiAliasingMode

@@ -1,10 +1,10 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>A kind of graph node, found by the registry. Declare pins and settings in the constructor, in saved order.</summary>
 public abstract class AnimationGraphNode

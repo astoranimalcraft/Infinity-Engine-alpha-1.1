@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,14 +6,14 @@ using System.Collections.Generic;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 
-using Prowl.Recast.Core;
-using Prowl.Recast.Detour;
-using Prowl.Recast.Detour.TileCache;
-using Prowl.Recast.Detour.TileCache.Io.Compress;
+using Infinity.Recast.Core;
+using Infinity.Recast.Detour;
+using Infinity.Recast.Detour.TileCache;
+using Infinity.Recast.Detour.TileCache.Io.Compress;
 
-using Prowl.Vector;
+using Infinity.Vector;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// A baked navmesh as a standalone <c>.navmesh</c> asset: the compressed layers plus everything

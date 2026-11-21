@@ -1,15 +1,15 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Recast.Detour;
+using Infinity.Recast.Detour;
 
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
 using Xunit;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>
 /// NavMeshLink: off-mesh connections baked from components — gap bridging, directionality,
@@ -434,8 +434,8 @@ public class NavMeshLinkTests : RuntimeTestBase
         Runtime.NavMeshData baked = surface.NavMeshData!;
         Assert.NotEmpty(baked.Links);
 
-        Prowl.Echo.EchoObject echo = Prowl.Echo.Serializer.Serialize(typeof(object), baked);
-        NavMeshData? loaded = Prowl.Echo.Serializer.Deserialize<Runtime.NavMeshData>(echo);
+        Infinity.Echo.EchoObject echo = Infinity.Echo.Serializer.Serialize(typeof(object), baked);
+        NavMeshData? loaded = Infinity.Echo.Serializer.Deserialize<Runtime.NavMeshData>(echo);
         Assert.NotNull(loaded);
         Assert.Equal(baked.Links.Count, loaded!.Links.Count);
 

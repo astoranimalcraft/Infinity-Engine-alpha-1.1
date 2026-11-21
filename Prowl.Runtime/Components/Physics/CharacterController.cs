@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -8,9 +8,9 @@ using Jitter2.Collision;
 using Jitter2.Collision.Shapes;
 using Jitter2.LinearMath;
 
-using Prowl.Vector;
+using Infinity.Vector;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// A kinematic character that moves by sweeping its own shape through the world. It walks along the

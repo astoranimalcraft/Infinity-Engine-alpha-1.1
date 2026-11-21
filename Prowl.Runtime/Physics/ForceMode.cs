@@ -1,10 +1,10 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
-/// How a value passed to <see cref="Rigidbody3D.AddForce(Prowl.Vector.Float3, ForceMode)"/> and friends
+/// How a value passed to <see cref="Rigidbody3D.AddForce(Infinity.Vector.Float3, ForceMode)"/> and friends
 /// is interpreted. The continuous modes accumulate for the next step; the instant ones change velocity
 /// straight away.
 /// </summary>

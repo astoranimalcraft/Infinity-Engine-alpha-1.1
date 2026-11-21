@@ -1,12 +1,12 @@
 using System;
 
-using Prowl.Editor.Core;
-using Prowl.Runtime;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Editor.Core;
+using Infinity.Runtime;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-namespace Prowl.Editor.GUI.SceneView;
+namespace Infinity.Editor.GUI.SceneView;
 
 /// <summary>
 /// Editor camera controller with orbit, pan, zoom, and FPS navigation modes.
@@ -284,7 +284,7 @@ public class EditorCamera
         {
             FallbackTarget = _renderTarget,
             DisplayGizmos = ShowGizmos,
-            Kind = Prowl.Graphite.Rendering.ViewKind.SceneView,
+            Kind = Infinity.Graphite.Rendering.ViewKind.SceneView,
             Features = ShowGrid ? GridFeature.SceneList : null,
             Keywords = DebugViews.Keywords(DebugView),
         });

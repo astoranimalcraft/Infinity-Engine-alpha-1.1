@@ -1,12 +1,12 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.PaperUI;
-using Prowl.Runtime;
+using Infinity.PaperUI;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.GUI.PropertyEditors;
+namespace Infinity.Editor.GUI.PropertyEditors;
 
 /// <summary>
 /// Draws a float or int as a slider while its field's [Range] is in scope, and defers to the

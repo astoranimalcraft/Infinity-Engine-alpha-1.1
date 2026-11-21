@@ -1,14 +1,14 @@
 using System;
 using System.Text.Json.Nodes;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI.Panels;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI.Panels;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 public sealed class SceneGizmoProbe : Component
 {

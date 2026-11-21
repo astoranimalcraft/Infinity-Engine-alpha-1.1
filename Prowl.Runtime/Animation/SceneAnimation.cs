@@ -1,10 +1,10 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>Every animator in a scene, advanced in one pass between the Update and LateUpdate phases.</summary>
 public sealed class SceneAnimation

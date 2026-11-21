@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,20 +6,20 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using BufferAccess = Prowl.Graphite.BufferAccess;
-using BufferDescription = Prowl.Graphite.BufferDescription;
-using BufferUsage = Prowl.Graphite.BufferUsage;
-using CommandBuffer = Prowl.Graphite.CommandBuffer;
-using DeviceBuffer = Prowl.Graphite.DeviceBuffer;
-using GMaterial = Prowl.Graphite.Rendering.Material;
-using Material = Prowl.Runtime.Resources.Material;
-using Mesh = Prowl.Runtime.Resources.Mesh;
+using BufferAccess = Infinity.Graphite.BufferAccess;
+using BufferDescription = Infinity.Graphite.BufferDescription;
+using BufferUsage = Infinity.Graphite.BufferUsage;
+using CommandBuffer = Infinity.Graphite.CommandBuffer;
+using DeviceBuffer = Infinity.Graphite.DeviceBuffer;
+using GMaterial = Infinity.Graphite.Rendering.Material;
+using Material = Infinity.Runtime.Resources.Material;
+using Mesh = Infinity.Runtime.Resources.Mesh;
 
-namespace Prowl.Runtime.ParticleSystem.Modules;
+namespace Infinity.Runtime.ParticleSystem.Modules;
 
 public enum ParticleRenderMode
 {

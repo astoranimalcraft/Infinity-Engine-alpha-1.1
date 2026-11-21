@@ -1,9 +1,9 @@
 using System;
 
-using Prowl.PaperUI;
-using Prowl.Vector;
+using Infinity.PaperUI;
+using Infinity.Vector;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// A no-op input handler that returns safe defaults for all queries.

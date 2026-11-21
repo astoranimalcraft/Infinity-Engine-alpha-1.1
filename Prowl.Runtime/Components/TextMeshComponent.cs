@@ -1,23 +1,23 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Collections.Generic;
 
-using Prowl.Echo;
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Runtime.UI;
-using Prowl.Scribe;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Runtime.UI;
+using Infinity.Scribe;
+using Infinity.Vector;
 
-using GMaterial = Prowl.Graphite.Rendering.Material;
-using Material = Prowl.Runtime.Resources.Material;
-using Shader = Prowl.Runtime.Resources.Shader;
-using ScribeAlign = Prowl.Scribe.TextAlignment;
-using TAlignment = Prowl.Runtime.UI.TextAlignment;
+using GMaterial = Infinity.Graphite.Rendering.Material;
+using Material = Infinity.Runtime.Resources.Material;
+using Shader = Infinity.Runtime.Resources.Shader;
+using ScribeAlign = Infinity.Scribe.TextAlignment;
+using TAlignment = Infinity.Runtime.UI.TextAlignment;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// Draws text as a mesh in arbitrary 3D world space, independent of any <see cref="GameCanvas"/>.

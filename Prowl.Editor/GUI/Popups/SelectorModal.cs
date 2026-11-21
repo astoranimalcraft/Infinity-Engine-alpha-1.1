@@ -1,24 +1,24 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Theming;
-using Prowl.Editor.Utils;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Rosetta;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Theming;
+using Infinity.Editor.Utils;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
 using Color = System.Drawing.Color;
 
-namespace Prowl.Editor.GUI.Popups;
+namespace Infinity.Editor.GUI.Popups;
 
 /// <summary>
 /// Controls which tabs are available in the selector.
@@ -115,7 +115,7 @@ public static class SelectorModal
     //  Header
     // ================================================================
 
-    private static void DrawHeader(Paper paper, Prowl.Scribe.FontFile font)
+    private static void DrawHeader(Paper paper, Infinity.Scribe.FontFile font)
     {
         using (paper.Row("sel_header")
             .Height(32).PaddingLeft(12).PaddingRight(8).Gap(8)
@@ -139,7 +139,7 @@ public static class SelectorModal
     //  Search bar
     // ================================================================
 
-    private static void DrawSearchBar(Paper paper, Prowl.Scribe.FontFile font)
+    private static void DrawSearchBar(Paper paper, Infinity.Scribe.FontFile font)
     {
         using (paper.Row("sel_searchrow").Height(30).Margin(6, 6, 6, 0).Gap(4).Enter())
         {
@@ -151,7 +151,7 @@ public static class SelectorModal
     //  Tabs (Scene / Assets)
     // ================================================================
 
-    private static void DrawTabs(Paper paper, Prowl.Scribe.FontFile font)
+    private static void DrawTabs(Paper paper, Infinity.Scribe.FontFile font)
     {
         using (paper.Row("sel_tabs").Height(28).Margin(6, 6, 0, 0).Enter())
         {
@@ -168,7 +168,7 @@ public static class SelectorModal
     //  Scene tab list of GameObjects / Components
     // ================================================================
 
-    private static void DrawSceneTab(Paper paper, Prowl.Scribe.FontFile font, float height)
+    private static void DrawSceneTab(Paper paper, Infinity.Scribe.FontFile font, float height)
     {
         SceneInstance scene = EditorSceneManager.EditedWorld;
         if (scene.IsNotValid())
@@ -244,7 +244,7 @@ public static class SelectorModal
         });
     }
 
-    private static void DrawSceneItem(Paper paper, Prowl.Scribe.FontFile font,
+    private static void DrawSceneItem(Paper paper, Infinity.Scribe.FontFile font,
         string id, string name, string detail, string icon, object value)
     {
         using (paper.Row(id)
@@ -282,7 +282,7 @@ public static class SelectorModal
     //  Assets tab grid with thumbnails
     // ================================================================
 
-    private static void DrawAssetsTab(Paper paper, Prowl.Scribe.FontFile font, float height)
+    private static void DrawAssetsTab(Paper paper, Infinity.Scribe.FontFile font, float height)
     {
         EditorAssetBackend? db = EditorAssetBackend.Instance;
         if (db == null)
@@ -347,7 +347,7 @@ public static class SelectorModal
         });
     }
 
-    private static void DrawAssetGridItem(Paper paper, Prowl.Scribe.FontFile font,
+    private static void DrawAssetGridItem(Paper paper, Infinity.Scribe.FontFile font,
         string id, Guid guid, string name, float cellSize, float labelH, float totalCellH)
     {
         Texture2D? thumbTex = EditorAssetBackend.Instance?.GetThumbnailTexture(guid);

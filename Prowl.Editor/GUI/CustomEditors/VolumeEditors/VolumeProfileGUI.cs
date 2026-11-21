@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -7,23 +7,23 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using Prowl.Editor.Core;
-using Prowl.Ember;
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.PropertyEditors;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Theming;
-using Prowl.Editor.Utils;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Rosetta;
-using Prowl.Runtime;
-using Prowl.Runtime.Rendering;
+using Infinity.Editor.Core;
+using Infinity.Ember;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.PropertyEditors;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Theming;
+using Infinity.Editor.Utils;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.Runtime.Rendering;
 
 using Color = System.Drawing.Color;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 /// <summary>
 /// The component list of a <see cref="VolumeProfile"/>, shared by the profile asset editor, the Volume inspector and

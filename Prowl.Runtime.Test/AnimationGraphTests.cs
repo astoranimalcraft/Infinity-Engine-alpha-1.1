@@ -1,22 +1,22 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.Echo;
-using Prowl.Motion;
-using Prowl.Runtime.AnimationNodes;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
-using Prowl.Vector.Spatial;
+using Infinity.Echo;
+using Infinity.Motion;
+using Infinity.Runtime.AnimationNodes;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
+using Infinity.Vector.Spatial;
 
 using Xunit;
 
-using MotionGraph = Prowl.Motion.AnimationGraph;
-using MotionSkeleton = Prowl.Motion.Skeleton;
+using MotionGraph = Infinity.Motion.AnimationGraph;
+using MotionSkeleton = Infinity.Motion.Skeleton;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>The graph asset: node records compiled through the registry into a Motion graph.</summary>
 public class AnimationGraphTests : RuntimeTestBase

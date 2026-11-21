@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
-namespace Prowl.Analyzers;
+namespace Infinity.Analyzers;
 
 /// <summary>
 /// Flags constructors declared on a <c>Component</c>. The engine constructs components itself,
@@ -23,7 +23,7 @@ public sealed class ComponentConstructorAnalyzer : DiagnosticAnalyzer
     public const string RunsBeforeAttachId = "PROWLCO003";
     public const string InvokesDelegateId = "PROWLCO004";
 
-    private const string ComponentMetadataName = "Prowl.Runtime.Component";
+    private const string ComponentMetadataName = "Infinity.Runtime.Component";
 
     public static readonly DiagnosticDescriptor DeclaredConstructor = new(
         DeclaredConstructorId,
@@ -71,7 +71,7 @@ public sealed class ComponentConstructorAnalyzer : DiagnosticAnalyzer
         context.RegisterCompilationStartAction(start =>
         {
             INamedTypeSymbol? component = start.Compilation.GetTypeByMetadataName(ComponentMetadataName);
-            if (component is null) return; // no reference to Prowl.Runtime in this compilation
+            if (component is null) return; // no reference to Infinity.Runtime in this compilation
 
             start.RegisterSymbolAction(ctx => Analyze(ctx, component), SymbolKind.NamedType);
 
@@ -150,7 +150,7 @@ public sealed class ComponentConstructorAnalyzer : DiagnosticAnalyzer
         if (SymbolEqualityComparer.Default.Equals(from, ownAssembly)) return true;
 
         string name = from.Name;
-        return name == "Prowl.Runtime" || name.StartsWith("Prowl.", System.StringComparison.Ordinal);
+        return name == "Infinity.Runtime" || name.StartsWith("Infinity.", System.StringComparison.Ordinal);
     }
 
     private static IEnumerable<ISymbol> InitializedSymbols(ISymbolInitializerOperation initializer) =>

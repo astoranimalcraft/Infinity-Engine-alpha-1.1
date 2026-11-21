@@ -1,11 +1,11 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using Xunit;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 public class GameObjectCloneTests : RuntimeTestBase
 {

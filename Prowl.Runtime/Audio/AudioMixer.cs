@@ -1,15 +1,15 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Echo;
-using Prowl.Runtime.Audio.Effects;
-using Prowl.Runtime.Audio.Native;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Runtime.Audio.Effects;
+using Infinity.Runtime.Audio.Native;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.Audio;
+namespace Infinity.Runtime.Audio;
 
 /// <summary>
 /// A named bus that audio is routed through on its way to the device, carrying a volume and a mute

@@ -1,12 +1,12 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Drawing;
 
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
 
-namespace Prowl.Editor.GUI.Registries;
+namespace Infinity.Editor.GUI.Registries;
 
 /// <summary>
 /// Visual style for an asset/file type in the browser: either a vector <see cref="IOrigamiIcon"/> or a

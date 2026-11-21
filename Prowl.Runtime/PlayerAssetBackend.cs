@@ -5,9 +5,9 @@ using System.IO;
 using System.IO.Compression;
 using System.Reflection;
 
-using Prowl.Echo;
+using Infinity.Echo;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// Asset content for built standalone players, from loose files, ProwlPak archives or embedded resources. The

@@ -1,20 +1,20 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Echo;
+using Infinity.Echo;
 using System.Collections.Generic;
 
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using GMaterial = Prowl.Graphite.Rendering.Material;
-using GTexture = Prowl.Graphite.Texture;
-using Material = Prowl.Runtime.Resources.Material;
-using Shader = Prowl.Runtime.Resources.Shader;
+using GMaterial = Infinity.Graphite.Rendering.Material;
+using GTexture = Infinity.Graphite.Texture;
+using Material = Infinity.Runtime.Resources.Material;
+using Shader = Infinity.Runtime.Resources.Shader;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// Draws a <see cref="Sprite"/> in world space on the XY plane at its native size (pixels-per-unit). It uses
@@ -260,7 +260,7 @@ internal sealed class OwnedMaterial
 {
     private GMaterial? _parent;
     private GMaterial? _child;
-    private readonly Dictionary<string, (GTexture? Texture, Prowl.Graphite.SamplerDescription Sampler)> _textures = [];
+    private readonly Dictionary<string, (GTexture? Texture, Infinity.Graphite.SamplerDescription Sampler)> _textures = [];
     private readonly Dictionary<string, Float4> _values = [];
 
     /// <summary>The child of <paramref name="parent"/>, made again when the parent changes. Null without a parent.</summary>
@@ -293,7 +293,7 @@ internal sealed class OwnedMaterial
         if (_child == null) return;
         GTexture? gpu = texture.IsValid() ? texture.GpuIfLoaded : null;
         if (texture.IsValid() && gpu == null && texture.State == AssetState.Unloaded) _ = texture.LoadAsync();
-        Prowl.Graphite.SamplerDescription sampler = texture.IsValid() ? texture.SamplerUnchecked : Prowl.Graphite.SamplerDescription.Linear;
+        Infinity.Graphite.SamplerDescription sampler = texture.IsValid() ? texture.SamplerUnchecked : Infinity.Graphite.SamplerDescription.Linear;
         if (_textures.TryGetValue(name, out var bound) && bound.Texture == gpu && bound.Sampler.Equals(sampler)) return;
         _textures[name] = (gpu, sampler);
         if (_child.Shader.FindProperty(name) >= 0) _child.SetTexture(name, gpu, sampler);

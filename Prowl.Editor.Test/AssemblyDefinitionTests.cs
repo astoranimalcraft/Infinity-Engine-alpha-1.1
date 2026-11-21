@@ -1,12 +1,12 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Editor.Projects.Settings;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Editor.Projects.Settings;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>
 /// Tests for the assembly definition (.asmdef) feature: the reference graph, dependency-order
@@ -81,7 +81,7 @@ public class AssemblyDefinitionTests : EditorTestHarness
 
         // Loose script (default game assembly) uses the Gameplay assembly via auto-reference.
         WriteScript("Main.cs", """
-            using Prowl.Runtime;
+            using Infinity.Runtime;
             using Acme.Gameplay;
             public class Main : Component
             {

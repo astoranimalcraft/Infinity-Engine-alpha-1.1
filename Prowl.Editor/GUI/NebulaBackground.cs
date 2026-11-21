@@ -1,13 +1,13 @@
 using System;
 
-using Prowl.Editor.Theming;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Quill;
-using Prowl.Vector;
-using Prowl.Vector.Geometry;
+using Infinity.Editor.Theming;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Quill;
+using Infinity.Vector;
+using Infinity.Vector.Geometry;
 
-namespace Prowl.Editor.GUI;
+namespace Infinity.Editor.GUI;
 
 /// <summary>
 /// The animated "Nebula" backdrop drawn behind the editor's translucent glass panels (and the

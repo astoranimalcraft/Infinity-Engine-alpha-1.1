@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -9,9 +9,9 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Prowl.Ember;
+using Infinity.Ember;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 // Loaded first, so a runtime asset made any way at all starts loaded.
 public enum AssetState { Loaded, Unloaded, Loading, Missing, Failed }

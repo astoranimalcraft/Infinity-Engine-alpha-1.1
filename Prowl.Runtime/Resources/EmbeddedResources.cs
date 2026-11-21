@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,10 +6,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Prowl.Runtime.Resources;
+namespace Infinity.Runtime.Resources;
 
 /// <summary>
-/// Helper class for loading embedded resources from the Prowl.Runtime assembly
+/// Helper class for loading embedded resources from the Infinity.Runtime assembly
 /// </summary>
 internal static class EmbeddedResources
 {

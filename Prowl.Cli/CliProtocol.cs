@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace Prowl.Cli;
+namespace Infinity.Cli;
 
 /// <summary> Wire types shared by the prowl CLI and the editor's command server. Compiled into both. </summary>
 public static class CliProtocol

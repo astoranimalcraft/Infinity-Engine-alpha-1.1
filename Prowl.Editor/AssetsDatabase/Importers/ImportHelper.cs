@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Echo;
-using Prowl.Runtime;
+using Infinity.Echo;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Importers;
+namespace Infinity.Editor.Importers;
 
 /// <summary> Provides common import operations for Echo-serialized assets, including deserialization with dependency tracking, dependency collection, and prefab link flattening. </summary>
 public static class ImportHelper

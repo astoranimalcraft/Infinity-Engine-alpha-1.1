@@ -1,11 +1,11 @@
 using System;
 
-using Prowl.Runtime;
-using Prowl.Vector;
+using Infinity.Runtime;
+using Infinity.Vector;
 
 using Silk.NET.Maths;
 
-namespace Prowl.Editor.GUI;
+namespace Infinity.Editor.GUI;
 
 /// <summary>
 /// Cursor lock context that locks to the center of an editor panel instead of the OS window.

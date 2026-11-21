@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -10,14 +10,14 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Runtime.Tasks;
-using Prowl.Vector;
-using Material = Prowl.Runtime.Resources.Material;
-using Shader = Prowl.Runtime.Resources.Shader;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Runtime.Tasks;
+using Infinity.Vector;
+using Material = Infinity.Runtime.Resources.Material;
+using Shader = Infinity.Runtime.Resources.Shader;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 public enum LogSeverity
 {
@@ -500,10 +500,10 @@ public static class Debug
     // Built games draw no gizmos, so their draw calls return before touching a scene
     private static GizmoBatch? Gizmos => Application.IsEditor ? s_gizmoBuilder.Batch : null;
 
-    private static Prowl.Graphite.Rendering.Gizmos? s_gizmoFeature;
+    private static Infinity.Graphite.Rendering.Gizmos? s_gizmoFeature;
 
     /// <summary>The render feature every view showing gizmos draws them with, made on first use.</summary>
-    internal static Prowl.Graphite.Rendering.Gizmos GizmoFeature => s_gizmoFeature ??= new Prowl.Graphite.Rendering.Gizmos(Graphics.Renderer!);
+    internal static Infinity.Graphite.Rendering.Gizmos GizmoFeature => s_gizmoFeature ??= new Infinity.Graphite.Rendering.Gizmos(Graphics.Renderer!);
 
     internal static void DisposeGizmoFeature()
     {
@@ -712,7 +712,7 @@ public class GizmoBuilder
     private GizmoBatch _building = new() { Visible = false };
     private GizmoBatch _shown = new() { Visible = false };
     private RenderWorld? _world;
-    private Prowl.Graphite.Rendering.Gizmos? _feature;
+    private Infinity.Graphite.Rendering.Gizmos? _feature;
     private readonly Stack<Float4x4> _matrices = new();
 
     /// <summary>The batch draws this frame go into.</summary>
@@ -831,7 +831,7 @@ public class GizmoBuilder
     }
 
     /// <summary>Shows this frame's gizmos in the views of a world that draw gizmos with the feature.</summary>
-    internal void Submit(RenderWorld world, Prowl.Graphite.Rendering.Gizmos feature)
+    internal void Submit(RenderWorld world, Infinity.Graphite.Rendering.Gizmos feature)
     {
         if (_feature != feature)
         {

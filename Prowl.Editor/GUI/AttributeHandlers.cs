@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 //
 // Built-in attribute handlers for the Origami PropertyGrid.
@@ -9,14 +9,14 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-using Prowl.Editor.GUI.PropertyEditors;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Scribe;
+using Infinity.Editor.GUI.PropertyEditors;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Scribe;
 
-namespace Prowl.Editor.GUI;
+namespace Infinity.Editor.GUI;
 
 /// <summary>[Header("text")] - draws a header label above the field.</summary>
 public class HeaderAttributeHandler : OrigamiUI.AttributeHandler

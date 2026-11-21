@@ -1,7 +1,7 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-namespace Prowl.Runtime.Rendering;
+namespace Infinity.Runtime.Rendering;
 
 /// <summary>
 /// What the renderer drew last frame and how long frames take, for stats overlays and performance captures. Call

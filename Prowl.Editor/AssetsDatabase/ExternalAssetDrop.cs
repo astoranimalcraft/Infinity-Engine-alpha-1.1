@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -7,16 +7,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.Panels;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Utils;
-using Prowl.OrigamiUI;
-using Prowl.Rosetta;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.Panels;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Utils;
+using Infinity.OrigamiUI;
+using Infinity.Rosetta;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 /// <summary>
 /// Handles files dragged from the OS onto the editor window: copies them into the Project

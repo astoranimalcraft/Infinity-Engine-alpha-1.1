@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,16 +6,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using Prowl.Editor.GUI;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
 
 using Color = System.Drawing.Color;
 
-namespace Prowl.Editor.GUI.PropertyEditors;
+namespace Infinity.Editor.GUI.PropertyEditors;
 
 /// <summary>
 /// Inspector for <see cref="ProwlAction"/> - the persistent call list. Each row picks a scene
@@ -44,10 +44,10 @@ public class ProwlActionPropertyEditor : PropertyEditor
         // A null action draws as an empty one, assigned by the first edit through onChange.
         var action = value as ProwlAction ?? new ProwlAction();
 
-        Prowl.Scribe.FontFile? font = EditorTheme.Font;
+        Infinity.Scribe.FontFile? font = EditorTheme.Font;
         if (font == null) return;
-        Prowl.Scribe.FontFile semi = EditorTheme.FontSemiBold ?? font;
-        Prowl.Scribe.FontFile mono = EditorTheme.FontMono ?? font;
+        Infinity.Scribe.FontFile semi = EditorTheme.FontSemiBold ?? font;
+        Infinity.Scribe.FontFile mono = EditorTheme.FontMono ?? font;
 
         List<ProwlCall> calls = action.Calls;
         string title = string.IsNullOrEmpty(label) ? "Actions" : label;
@@ -88,7 +88,7 @@ public class ProwlActionPropertyEditor : PropertyEditor
     }
 
     private static void DrawCallCard(Paper paper, string id, int index, ProwlCall call,
-        Prowl.Scribe.FontFile mono, Action changed, Action remove)
+        Infinity.Scribe.FontFile mono, Action changed, Action remove)
     {
 
         // The stored Target is the exact object the call runs on (a GameObject or one of its

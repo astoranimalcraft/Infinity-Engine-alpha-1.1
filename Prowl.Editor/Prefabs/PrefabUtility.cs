@@ -4,17 +4,17 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using Prowl.Echo;
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Projects;
-using Prowl.Ember;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Projects;
+using Infinity.Ember;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-namespace Prowl.Editor.Prefabs;
+namespace Infinity.Editor.Prefabs;
 
 /// <summary>
 /// Editor-side prefab operations: create, instantiate, break, apply, revert.

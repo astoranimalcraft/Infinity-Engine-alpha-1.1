@@ -5,4 +5,4 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "IDE0017:Simplify object initialization", Justification = "<Pending>", Scope = "member", Target = "~M:Prowl.Runtime.Test.MeshTests.VertexBlob_InterleavesEveryAttributeInLayoutOrder")]
+[assembly: SuppressMessage("Style", "IDE0017:Simplify object initialization", Justification = "<Pending>", Scope = "member", Target = "~M:Infinity.Runtime.Test.MeshTests.VertexBlob_InterleavesEveryAttributeInLayoutOrder")]

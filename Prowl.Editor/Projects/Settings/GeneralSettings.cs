@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 
-using Prowl.Editor.GUI;
-using Prowl.Editor.Inspector;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-namespace Prowl.Editor.Projects.Settings;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Inspector;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+namespace Infinity.Editor.Projects.Settings;
 
 /// <summary> Project settings for general project information such as company name, product name, version, and the last opened scene. </summary>
 [ProjectSettings("General", EditorIcons.Gear, order: 0)]

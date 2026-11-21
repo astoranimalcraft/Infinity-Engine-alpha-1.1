@@ -1,15 +1,15 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.Theming;
-using Prowl.Runtime;
+using Infinity.Editor.Core;
+using Infinity.Editor.Theming;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.GUI.SceneView;
+namespace Infinity.Editor.GUI.SceneView;
 
 /// <summary>Registration record for one discovered <see cref="SceneTool"/>.</summary>
 public sealed class SceneToolEntry

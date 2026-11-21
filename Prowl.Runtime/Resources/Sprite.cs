@@ -1,13 +1,13 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Echo;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.Resources;
+namespace Infinity.Runtime.Resources;
 
 /// <summary>
 /// Named pivot presets. <see cref="SpriteAlignment.Custom"/> uses the normalized pivot value directly.

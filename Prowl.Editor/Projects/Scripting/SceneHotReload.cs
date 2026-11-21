@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using Prowl.Ember;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Ember;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor.Projects.Scripting;
+namespace Infinity.Editor.Projects.Scripting;
 
 /// <summary>
 /// Migrates the live worlds onto recompiled user types with the <see cref="ReloadEngine"/>: the engine, the editor
@@ -52,8 +52,8 @@ public static class SceneHotReload
             // The engine and the editor: their statics and delegates hold user references, including the editor's
             // own into the scene (selection, inspector target, hierarchy). Walking the editor headless is covered
             // by RealRecompile_MigratesLiveScene_ToNewTypes_PreservingStateAndIdentity, so no separate repoint pass is needed.
-            options.Scope.Include(typeof(GameObject).Assembly);     // Prowl.Runtime
-            options.Scope.Include(typeof(SceneHotReload).Assembly); // Prowl.Editor
+            options.Scope.Include(typeof(GameObject).Assembly);     // Infinity.Runtime
+            options.Scope.Include(typeof(SceneHotReload).Assembly); // Infinity.Editor
 
             foreach ((Assembly? previous, Assembly _) in assemblyPairs)
                 options.Scope.Include(previous); // user statics live on the previous assembly

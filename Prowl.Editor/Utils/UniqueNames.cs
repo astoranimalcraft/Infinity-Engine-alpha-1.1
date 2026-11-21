@@ -1,14 +1,14 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor.Utils;
+namespace Infinity.Editor.Utils;
 
 /// <summary>
 /// Helpers for generating names that don't collide with an existing set.

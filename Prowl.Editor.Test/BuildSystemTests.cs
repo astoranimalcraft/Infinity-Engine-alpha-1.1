@@ -1,19 +1,19 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml.Linq;
 
-using Prowl.Echo;
-using Prowl.Editor.Build;
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Editor.Projects.Settings;
-using Prowl.Runtime;
+using Infinity.Echo;
+using Infinity.Editor.Build;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Editor.Projects.Settings;
+using Infinity.Runtime;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>
 /// The project building system: the stage graph and the executor that walks it, targets and their
@@ -823,7 +823,7 @@ public class BuildSystemTests : IDisposable
     {
         var profile = new DesktopBuildProfile();
 
-        foreach (BuildTarget platform in Enum.GetValues<Prowl.Editor.Projects.Settings.BuildTarget>())
+        foreach (BuildTarget platform in Enum.GetValues<Infinity.Editor.Projects.Settings.BuildTarget>())
         {
             profile.Platform = platform;
 
@@ -1380,12 +1380,12 @@ public class BuildSystemTests : IDisposable
     {
         XDocument doc = Render(Minimal() with
         {
-            References = [new AssemblyRef("Prowl.Runtime", @"C:\100%Done\$(Weird)\Prowl.Runtime.dll")],
+            References = [new AssemblyRef("Infinity.Runtime", @"C:\100%Done\$(Weird)\Infinity.Runtime.dll")],
         });
 
         string hint = doc.Descendants("HintPath").Single().Value;
 
-        Assert.Equal(@"C:\100%25Done\%24(Weird)\Prowl.Runtime.dll", hint);
+        Assert.Equal(@"C:\100%25Done\%24(Weird)\Infinity.Runtime.dll", hint);
     }
 
     // Semicolons separate the values in DefineConstants and RuntimeIdentifiers, so escaping them would
@@ -1486,10 +1486,10 @@ public class BuildSystemTests : IDisposable
     [Fact]
     public void References_CarryHintPathAndArePrivate()
     {
-        XDocument doc = Render(Minimal() with { References = [new AssemblyRef("Prowl.Runtime", @"C:\e\Prowl.Runtime.dll")] });
+        XDocument doc = Render(Minimal() with { References = [new AssemblyRef("Infinity.Runtime", @"C:\e\Infinity.Runtime.dll")] });
         XElement reference = doc.Descendants("Reference").Single();
 
-        Assert.Equal("Prowl.Runtime", reference.Attribute("Include")!.Value);
+        Assert.Equal("Infinity.Runtime", reference.Attribute("Include")!.Value);
         Assert.Equal("true", reference.Element("Private")!.Value);
         Assert.Equal("false", reference.Element("SpecificVersion")!.Value);
     }
@@ -1815,7 +1815,7 @@ public class BuildSystemTests : IDisposable
 
         string dir = Path.Combine(_root, "Settings");
         Directory.CreateDirectory(dir);
-        EchoObject echo = Prowl.Echo.Serializer.Serialize(typeof(TagsAndLayersSettings), settings, Prowl.Echo.TypeMode.None);
+        EchoObject echo = Infinity.Echo.Serializer.Serialize(typeof(TagsAndLayersSettings), settings, Infinity.Echo.TypeMode.None);
         File.WriteAllText(Path.Combine(dir, PlayerSettingsFiles.TagsAndLayers + ".yaml"), echo.WriteToYaml());
 
         TagLayerManager.ResetDefault();

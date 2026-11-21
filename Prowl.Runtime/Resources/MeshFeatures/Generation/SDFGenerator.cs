@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -9,13 +9,13 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
 using Lanes = System.Numerics.Vector;
 using Stopwatch = System.Diagnostics.Stopwatch;
 
-namespace Prowl.Runtime.MeshFeatures.Generation;
+namespace Infinity.Runtime.MeshFeatures.Generation;
 
 /// <summary>
 /// CPU generator for the signed distance field stored in <see cref="MeshSDF"/>, negative inside.

@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,10 +6,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using Prowl.Echo;
-using Prowl.Editor.Projects.Settings;
+using Infinity.Echo;
+using Infinity.Editor.Projects.Settings;
 
-namespace Prowl.Editor.Projects.Scripting;
+namespace Infinity.Editor.Projects.Scripting;
 
 /// <summary>
 /// Well-known platform names used by assembly definitions and plugin platform settings.
@@ -85,7 +85,7 @@ public sealed class AssemblyDefinition
     /// <summary>Scripting define symbols that must all be set for this assembly to be compiled.</summary>
     public List<string> DefineConstraints = [];
 
-    /// <summary>When true the assembly does not reference the engine assemblies (Prowl.Runtime/Editor).</summary>
+    /// <summary>When true the assembly does not reference the engine assemblies (Infinity.Runtime/Editor).</summary>
     public bool NoEngineReferences = false;
 
     // ------------------------------------------------------------------
@@ -183,7 +183,7 @@ public sealed class AssemblyDefinition
 /// and can use the normal type-keyed inspector (<see cref="AssemblyDefinition"/> data lives in the
 /// file itself). It is editor-only and never shipped.
 /// </summary>
-public sealed class AssemblyDefinitionAsset : Prowl.Runtime.Asset { }
+public sealed class AssemblyDefinitionAsset : Infinity.Runtime.Asset { }
 
 /// <summary>An assembly definition file discovered on disk, paired with its owning directory.</summary>
 public sealed class AsmDefFile

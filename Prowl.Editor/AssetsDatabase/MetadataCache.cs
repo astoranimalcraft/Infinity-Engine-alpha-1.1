@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Echo;
+using Infinity.Echo;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 /// <summary>
 /// Persists the full asset index to Library/metadata.db for fast startup.

@@ -2,17 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.Editor.Build;
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Inspector;
-using Prowl.Editor.Theming;
-using Prowl.Editor.Utils;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.Runtime;
+using Infinity.Editor.Build;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Inspector;
+using Infinity.Editor.Theming;
+using Infinity.Editor.Utils;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Projects.Settings;
+namespace Infinity.Editor.Projects.Settings;
 
 public enum BuildTarget { Windows, Linux, MacOS }
 public enum BuildConfiguration { Debug, Release }

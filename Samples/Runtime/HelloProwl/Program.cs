@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 //
@@ -15,13 +15,13 @@
 //   Escape   Quit
 //
 
-using Prowl.PaperUI;
-using Prowl.Runtime;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Samples;
-using Prowl.Scribe;
-using Prowl.Vector;
+using Infinity.PaperUI;
+using Infinity.Runtime;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Samples;
+using Infinity.Scribe;
+using Infinity.Vector;
 
 namespace HelloProwl;
 

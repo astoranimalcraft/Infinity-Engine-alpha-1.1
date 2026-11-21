@@ -1,14 +1,14 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using Prowl.Editor.Theming;
-using Prowl.Runtime;
+using Infinity.Editor.Theming;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Core;
+namespace Infinity.Editor.Core;
 
 /// <summary>
 /// A rebindable key combination: a primary key plus optional modifier flags.

@@ -1,17 +1,17 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Editor.Core;
-using Prowl.PaperUI;
-using Prowl.Runtime;
-using Prowl.Vector;
+using Infinity.Editor.Core;
+using Infinity.PaperUI;
+using Infinity.Runtime;
+using Infinity.Vector;
 
-using GizmoUtils = Prowl.OrigamiUI.Gizmo.GizmoUtils;
+using GizmoUtils = Infinity.OrigamiUI.Gizmo.GizmoUtils;
 
-namespace Prowl.Editor.GUI.SceneView;
+namespace Infinity.Editor.GUI.SceneView;
 
 /// <summary>
 /// Arbitration bus for interactive scene-view handles. Every handle reports how far it is from the

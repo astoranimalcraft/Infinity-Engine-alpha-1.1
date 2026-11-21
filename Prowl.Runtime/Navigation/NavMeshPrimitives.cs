@@ -1,16 +1,16 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Echo;
-using Prowl.Recast.Core.Numerics;
-using Prowl.Recast.Detour;
-using Prowl.Recast.Detour.Crowd;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Recast.Core.Numerics;
+using Infinity.Recast.Detour;
+using Infinity.Recast.Detour.Crowd;
+using Infinity.Vector;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>Status of a calculated path.</summary>
 public enum NavMeshPathStatus

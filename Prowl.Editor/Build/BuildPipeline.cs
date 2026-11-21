@@ -4,10 +4,10 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Prowl.Echo;
-using Prowl.Editor.Projects.Settings;
+using Infinity.Echo;
+using Infinity.Editor.Projects.Settings;
 
-namespace Prowl.Editor.Build;
+namespace Infinity.Editor.Build;
 
 /// <summary>
 /// A player build pipeline: what the build settings panel lists one card per, and what a build runs. A platform

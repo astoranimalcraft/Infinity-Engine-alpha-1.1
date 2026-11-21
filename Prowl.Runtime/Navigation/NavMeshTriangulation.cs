@@ -1,13 +1,13 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Collections.Generic;
 
-using Prowl.Recast.Detour;
+using Infinity.Recast.Detour;
 
-using Prowl.Vector;
+using Infinity.Vector;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// A triangulated snapshot of a navmesh, for debug drawing and user tooling. Triangles come from

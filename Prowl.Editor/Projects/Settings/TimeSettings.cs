@@ -1,11 +1,11 @@
 using System;
 
-using Prowl.Editor.GUI;
-using Prowl.Editor.Inspector;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-namespace Prowl.Editor.Projects.Settings;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Inspector;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+namespace Infinity.Editor.Projects.Settings;
 
 /// <summary> Project settings for time configuration, including fixed timestep, max fixed iterations, and default time scale. </summary>
 [ProjectSettings("Time", EditorIcons.Clock, order: 22)]

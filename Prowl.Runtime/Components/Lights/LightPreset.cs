@@ -1,7 +1,7 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>A unit a light's intensity can be given in. <see cref="Light.ToStored"/> turns it into the one the light keeps.</summary>
 public enum LightUnit

@@ -1,17 +1,17 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Threading;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Runtime.Tasks;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Runtime.Tasks;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>The editor on worlds: play mode on a copy over a dormant edit world, and prefab editing in its own world.</summary>
 public class EditorWorldTests : EditorTestHarness

@@ -1,9 +1,9 @@
 using System.IO;
 
-using Prowl.Editor.Projects;
-using Prowl.Editor.Projects.Scripting;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Projects.Scripting;
 
-namespace Prowl.Editor.Importers;
+namespace Infinity.Editor.Importers;
 
 /// <summary> Tracks .cs script files. Does not produce an EngineObject - scripts are compiled externally. Triggers recompilation only when the script is newer than the compiled assembly. </summary>
 [ImporterFor(".cs")]

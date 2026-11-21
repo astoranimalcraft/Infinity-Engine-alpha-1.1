@@ -1,12 +1,12 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using GLightmapBinding = Prowl.Graphite.Rendering.LightmapBinding;
+using GLightmapBinding = Infinity.Graphite.Rendering.LightmapBinding;
 
-namespace Prowl.Runtime.Rendering;
+namespace Infinity.Runtime.Rendering;
 
 /// <summary>Where a renderer's surface landed in its scene's baked lightmaps.</summary>
 internal static class BakedLightingBinding

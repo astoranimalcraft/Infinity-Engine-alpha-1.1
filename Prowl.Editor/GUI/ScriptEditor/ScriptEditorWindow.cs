@@ -9,23 +9,23 @@ using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI.Panels;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Theming;
-using Prowl.Editor.Utils;
-using Prowl.OrigamiUI;
-using Prowl.OrigamiUI.CSharp;
-using Prowl.OrigamiUI.Graphite;
-using Prowl.PaperUI;
-using Prowl.Rosetta;
-using Prowl.Runtime;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Vector;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI.Panels;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Theming;
+using Infinity.Editor.Utils;
+using Infinity.OrigamiUI;
+using Infinity.OrigamiUI.CSharp;
+using Infinity.OrigamiUI.Graphite;
+using Infinity.PaperUI;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Vector;
 
-using TextAlignment = Prowl.PaperUI.TextAlignment;
+using TextAlignment = Infinity.PaperUI.TextAlignment;
 
-namespace Prowl.Editor.GUI.ScriptEditor;
+namespace Infinity.Editor.GUI.ScriptEditor;
 
 /// <summary>Whether a double clicked script opens in the editor's own code editor or the system's default app.</summary>
 public enum ScriptEditorMode
@@ -227,7 +227,7 @@ public sealed class ScriptEditorPreferences : EditorPreferences
 
     private static void SchemeColorField(Paper paper, string id, CodeColorScheme scheme, string key, Color32 value)
     {
-        var color = new Prowl.Vector.Color(value.R / 255f, value.G / 255f, value.B / 255f, value.A / 255f);
+        var color = new Infinity.Vector.Color(value.R / 255f, value.G / 255f, value.B / 255f, value.A / 255f);
         Origami.ColorField(paper, id, color, v =>
         {
             scheme.Colors[key] = CodeColorSchemes.ToHex(new Color32(ToByte(v.R), ToByte(v.G), ToByte(v.B), ToByte(v.A)));

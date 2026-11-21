@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -7,15 +7,15 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-using Prowl.Recast.Core;
-using Prowl.Recast.Core.Numerics;
-using Prowl.Recast.Detour;
-using Prowl.Recast.Detour.Crowd;
-using Prowl.Recast.Detour.TileCache;
+using Infinity.Recast.Core;
+using Infinity.Recast.Core.Numerics;
+using Infinity.Recast.Detour;
+using Infinity.Recast.Detour.Crowd;
+using Infinity.Recast.Detour.TileCache;
 
-using Prowl.Vector;
+using Infinity.Vector;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// Per-scene navigation state: the registered navmeshes, the query API over them, and (once

@@ -1,11 +1,11 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using Jitter2.LinearMath;
 
-using Prowl.Vector;
+using Infinity.Vector;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>Converts vectors and rotations between the engine's types and the physics engine's.</summary>
 internal static class JitterConvert

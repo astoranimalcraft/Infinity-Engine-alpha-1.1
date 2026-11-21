@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -7,9 +7,9 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
-using Prowl.Graphite.ShaderDef;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Graphite.ShaderDef;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
 using Silk.NET.Core;
 using Silk.NET.Core.Native;
@@ -19,7 +19,7 @@ using Silk.NET.OpenXR.Extensions.KHR;
 using VkFormat = Silk.NET.Vulkan.Format;
 using XrApi = Silk.NET.OpenXR.XR;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// One OpenXR instance and session rendering through Graphite's Vulkan device.

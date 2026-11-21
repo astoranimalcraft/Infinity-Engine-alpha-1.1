@@ -1,18 +1,18 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Quill;
-using Prowl.Scribe;
-using Prowl.Vector;
+using Infinity.Quill;
+using Infinity.Scribe;
+using Infinity.Vector;
 
-using GizmoDraw3D = Prowl.OrigamiUI.Gizmo.GizmoDraw3D;
-using GizmoUtils = Prowl.OrigamiUI.Gizmo.GizmoUtils;
-using Stroke3D = Prowl.OrigamiUI.Gizmo.Stroke3D;
+using GizmoDraw3D = Infinity.OrigamiUI.Gizmo.GizmoDraw3D;
+using GizmoUtils = Infinity.OrigamiUI.Gizmo.GizmoUtils;
+using Stroke3D = Infinity.OrigamiUI.Gizmo.Stroke3D;
 
-namespace Prowl.Editor.GUI.SceneView;
+namespace Infinity.Editor.GUI.SceneView;
 
 /// <summary>Grab-point shapes for <see cref="SceneDrawList.Dot"/>.</summary>
 public enum HandleCap
@@ -23,7 +23,7 @@ public enum HandleCap
     Circle,
 }
 
-/// <summary> Immediate-mode 3D drawing for scene tools and handles, projected onto the viewport's 2D overlay. This is the thick, anti-aliased canvas path; use Prowl.Runtime.Debug gizmos for geometry that should be depth-tested against the scene. </summary>
+/// <summary> Immediate-mode 3D drawing for scene tools and handles, projected onto the viewport's 2D overlay. This is the thick, anti-aliased canvas path; use Infinity.Runtime.Debug gizmos for geometry that should be depth-tested against the scene. </summary>
 public sealed class SceneDrawList
 {
     private enum Kind { Line, Polyline, Polygon, Circle, Arc, Sector, Arrow, Dot, Label, ScreenRect }

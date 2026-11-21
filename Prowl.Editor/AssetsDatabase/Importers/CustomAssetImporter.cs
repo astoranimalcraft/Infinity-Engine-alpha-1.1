@@ -1,7 +1,7 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-namespace Prowl.Editor.Importers;
+namespace Infinity.Editor.Importers;
 
 /// <summary> Imports an Echo-serialized EngineObject whose type carries CreateAssetMenuAttribute but has no dedicated importer. The concrete type is read from the file itself, so a single importer handles all custom asset types. </summary>
 public class CustomAssetImporter : AssetImporter

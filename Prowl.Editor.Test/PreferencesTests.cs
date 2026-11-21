@@ -1,16 +1,16 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Editor.Theming;
-using Prowl.Runtime;
+using Infinity.Editor.Theming;
+using Infinity.Runtime;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 public class PreferencesTests : IDisposable
 {

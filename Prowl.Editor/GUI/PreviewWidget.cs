@@ -1,12 +1,12 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Runtime;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.GUI;
+namespace Infinity.Editor.GUI;
 
 /// <summary>Manages a lazy PreviewRenderer and invalidates it when the displayed subject changes.</summary>
 public sealed class PreviewWidget : IDisposable

@@ -1,13 +1,13 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Motion;
+using Infinity.Motion;
 
-using MotionEvent = Prowl.Motion.AnimationEvent;
+using MotionEvent = Infinity.Motion.AnimationEvent;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>Whether a clip node loops, or takes the clip's own setting.</summary>
 public enum ClipLooping

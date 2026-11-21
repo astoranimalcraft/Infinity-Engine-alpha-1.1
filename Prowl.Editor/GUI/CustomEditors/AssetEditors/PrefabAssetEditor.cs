@@ -1,13 +1,13 @@
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.Rosetta;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 [CustomAssetEditor(typeof(PrefabAsset))]
 public class PrefabAssetEditor : AssetImporterEditor

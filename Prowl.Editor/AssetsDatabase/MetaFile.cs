@@ -1,9 +1,9 @@
 using System;
 using System.IO;
 
-using Prowl.Echo;
+using Infinity.Echo;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 /// <summary>
 /// Data stored in a .meta companion file.

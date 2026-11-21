@@ -1,6 +1,6 @@
 using System;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>Hides a field from the inspector but keeps it serialized.</summary>
 [AttributeUsage(AttributeTargets.Field)]

@@ -1,16 +1,16 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-using Prowl.Runtime.Audio.Native;
-using Prowl.Runtime.Diagnostics;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Runtime.Audio.Native;
+using Infinity.Runtime.Diagnostics;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.Audio;
+namespace Infinity.Runtime.Audio;
 
 public delegate void DeviceDataEvent(NativeArray<float> data, UInt32 frameCount);
 

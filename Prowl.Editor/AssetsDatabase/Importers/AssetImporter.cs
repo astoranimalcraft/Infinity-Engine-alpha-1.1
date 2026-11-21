@@ -1,8 +1,8 @@
 using System;
 
-using Prowl.Echo;
+using Infinity.Echo;
 
-namespace Prowl.Editor.Importers;
+namespace Infinity.Editor.Importers;
 
 /// <summary>
 /// Attribute to register an importer for specific file extensions.

@@ -1,6 +1,6 @@
-﻿using Prowl.Runtime.Rendering.Pipelines;
+﻿using Infinity.Runtime.Rendering.Pipelines;
 
-namespace Prowl.Runtime.Rendering.Settings;
+namespace Infinity.Runtime.Rendering.Settings;
 
 public sealed class BuildGraphicsSettings
 {

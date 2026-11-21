@@ -1,7 +1,7 @@
-using Prowl.Runtime;
-using Prowl.Runtime.Audio;
+using Infinity.Runtime;
+using Infinity.Runtime.Audio;
 
-namespace Prowl.Editor.Importers;
+namespace Infinity.Editor.Importers;
 
 /// <summary>
 /// Imports .audiomixer files, Echo-serialized <see cref="AudioMixer"/> assets.

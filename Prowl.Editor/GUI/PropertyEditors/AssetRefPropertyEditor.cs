@@ -1,13 +1,13 @@
 using System;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI.Popups;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.Runtime;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI.Popups;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.GUI.PropertyEditors;
+namespace Infinity.Editor.GUI.PropertyEditors;
 
 /// <summary>
 /// PropertyEditor for AssetRef&lt;T&gt; fields. Shows the asset named without loading it, and assigns a new

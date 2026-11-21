@@ -1,31 +1,31 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-using Prowl.Editor.GUI;
-using Prowl.Editor.Theming;
-using Prowl.Graphite.ShaderDef;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Theming;
+using Infinity.Graphite.ShaderDef;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using static Prowl.Graphite.Rendering.PropertyIDText;
+using static Infinity.Graphite.Rendering.PropertyIDText;
 
-using KeywordBinding = Prowl.Graphite.Rendering.KeywordBinding;
-using Material = Prowl.Runtime.Resources.Material;
-using MaterialProperty = Prowl.Graphite.Rendering.MaterialProperty;
-using MaterialPropertyType = Prowl.Graphite.Rendering.MaterialPropertyType;
-using PassType = Prowl.Graphite.Rendering.PassType;
-using PropertyGridUtils = Prowl.Editor.GUI.PropertyGridUtils;
-using Shader = Prowl.Runtime.Resources.Shader;
+using KeywordBinding = Infinity.Graphite.Rendering.KeywordBinding;
+using Material = Infinity.Runtime.Resources.Material;
+using MaterialProperty = Infinity.Graphite.Rendering.MaterialProperty;
+using MaterialPropertyType = Infinity.Graphite.Rendering.MaterialPropertyType;
+using PassType = Infinity.Graphite.Rendering.PassType;
+using PropertyGridUtils = Infinity.Editor.GUI.PropertyGridUtils;
+using Shader = Infinity.Runtime.Resources.Shader;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 /// <summary>
 /// Draws a material from its shader's metadata: the variant parent, the surface settings, every property shaped by its
@@ -70,7 +70,7 @@ public static class MaterialPropertyDrawer
 
     private static void DrawSurface(Paper paper, string id, Material material, Shader shader, Action? onChanged)
     {
-        bool standard = HasAxis(shader, Prowl.Graphite.Rendering.SurfaceSettings.SurfaceAxis);
+        bool standard = HasAxis(shader, Infinity.Graphite.Rendering.SurfaceSettings.SurfaceAxis);
         bool overridden = material.IsSurfaceOverridden;
         SurfaceSettings? current = material.Surface;
         if (!standard && current == null && !shader.HasPass(PassType.Forward)) return;
@@ -111,7 +111,7 @@ public static class MaterialPropertyDrawer
         List<VariantSpace> free = [];
         foreach (VariantSpace axis in shader.Keywords)
         {
-            if (axis.Name == Prowl.Graphite.Rendering.SurfaceSettings.SurfaceAxis || IsDriven(shader, axis.Name)) continue;
+            if (axis.Name == Infinity.Graphite.Rendering.SurfaceSettings.SurfaceAxis || IsDriven(shader, axis.Name)) continue;
             free.Add(axis);
         }
         if (free.Count == 0) return;

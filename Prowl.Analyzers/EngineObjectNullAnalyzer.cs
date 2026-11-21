@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
-namespace Prowl.Analyzers;
+namespace Infinity.Analyzers;
 
 /// <summary>
 /// Flags null-conditional (<c>?.</c>, <c>?[]</c>) and null-coalescing (<c>??</c>, <c>??=</c>) operators and comparisons
@@ -21,7 +21,7 @@ public sealed class EngineObjectNullAnalyzer : DiagnosticAnalyzer
     public const string NullCoalescingId = "PROWLEO002";
     public const string NullComparisonId = "PROWLEO003";
 
-    private const string EngineObjectMetadataName = "Prowl.Runtime.EngineObject";
+    private const string EngineObjectMetadataName = "Infinity.Runtime.EngineObject";
 
     private static readonly DiagnosticDescriptor s_nullConditional = new(
         NullConditionalId,
@@ -60,7 +60,7 @@ public sealed class EngineObjectNullAnalyzer : DiagnosticAnalyzer
         context.RegisterCompilationStartAction(start =>
         {
             INamedTypeSymbol? engineObject = start.Compilation.GetTypeByMetadataName(EngineObjectMetadataName);
-            if (engineObject is null) return; // no reference to Prowl.Runtime in this compilation
+            if (engineObject is null) return; // no reference to Infinity.Runtime in this compilation
 
             start.RegisterOperationAction(ctx =>
             {

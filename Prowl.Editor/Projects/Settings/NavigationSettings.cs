@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
 
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Editor.Theming;
 
-using Prowl.Editor.GUI;
+using Infinity.Editor.GUI;
 
-namespace Prowl.Editor.Projects.Settings;
+namespace Infinity.Editor.Projects.Settings;
 
 /// <summary>
 /// Project-wide navigation configuration: the area table (names + default path costs)
@@ -71,7 +71,7 @@ public class NavigationSettings : ProjectSettingsBase
     /// with (opaque for the UI).</summary>
     private static System.Drawing.Color AreaSwatchColor(int areaIndex)
     {
-        Prowl.Vector.Color c = NavMeshDebugDisplay.AreaColor(areaIndex);
+        Infinity.Vector.Color c = NavMeshDebugDisplay.AreaColor(areaIndex);
         return System.Drawing.Color.FromArgb(255,
             (int)(Math.Clamp(c.R, 0f, 1f) * 255),
             (int)(Math.Clamp(c.G, 0f, 1f) * 255),
@@ -115,7 +115,7 @@ public class NavigationSettings : ProjectSettingsBase
 
     // ── Agents tab ──────────────────────────────────────────────────────
 
-    private void DrawAgentsTab(Paper paper, Prowl.Scribe.FontFile font)
+    private void DrawAgentsTab(Paper paper, Infinity.Scribe.FontFile font)
     {
         Origami.Header(paper, "nav_agents_hdr", $"{EditorIcons.Compass}  Agent Types").Underline().Show();
 
@@ -192,7 +192,7 @@ public class NavigationSettings : ProjectSettingsBase
         }).Show();
     }
 
-    private static void DrawColumnHeader(Paper paper, string id, string label, UnitValue width, Prowl.Scribe.FontFile font)
+    private static void DrawColumnHeader(Paper paper, string id, string label, UnitValue width, Infinity.Scribe.FontFile font)
     {
         paper.Box(id)
             .Width(width).Height(18).Padding(4, 0, 0, 0)
@@ -224,7 +224,7 @@ public class NavigationSettings : ProjectSettingsBase
 
     // ── Areas tab ───────────────────────────────────────────────────────
 
-    private void DrawAreasTab(Paper paper, Prowl.Scribe.FontFile font)
+    private void DrawAreasTab(Paper paper, Infinity.Scribe.FontFile font)
     {
         Origami.Header(paper, "nav_areas_hdr", $"{EditorIcons.Compass}  Navigation Areas").Underline().Show();
 

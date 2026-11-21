@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Rosetta;
+using Infinity.Editor.Core;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
 
 using Color = System.Drawing.Color;
 
-namespace Prowl.Editor.GUI.Popups;
+namespace Infinity.Editor.GUI.Popups;
 
 /// <summary>
 /// Overlay dialog for exporting selected assets into a .prowlpackage file.
@@ -150,7 +150,7 @@ public static class PackageExportDialog
         }
     }
 
-    private static void DrawTitle(Paper paper, Prowl.Scribe.FontFile font)
+    private static void DrawTitle(Paper paper, Infinity.Scribe.FontFile font)
     {
         using (paper.Row("pkgexp_title")
             .Height(32)
@@ -172,7 +172,7 @@ public static class PackageExportDialog
         }
     }
 
-    private static void DrawFileTree(Paper paper, Prowl.Scribe.FontFile font)
+    private static void DrawFileTree(Paper paper, Infinity.Scribe.FontFile font)
     {
         float treeHeight = DialogHeight - 32 - 90 - 60; // title - options - bottom bar
 
@@ -341,7 +341,7 @@ public static class PackageExportDialog
         return result;
     }
 
-    private static void DrawOptions(Paper paper, Prowl.Scribe.FontFile font)
+    private static void DrawOptions(Paper paper, Infinity.Scribe.FontFile font)
     {
         using (paper.Column("pkgexp_options")
             .Height(90)
@@ -393,7 +393,7 @@ public static class PackageExportDialog
         }
     }
 
-    private static void DrawBottomBar(Paper paper, Prowl.Scribe.FontFile font)
+    private static void DrawBottomBar(Paper paper, Infinity.Scribe.FontFile font)
     {
         using (paper.Row("pkgexp_bottom")
             .Height(40)

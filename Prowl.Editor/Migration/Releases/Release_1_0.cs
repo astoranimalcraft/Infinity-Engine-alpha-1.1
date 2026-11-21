@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -7,9 +7,9 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-using Prowl.Echo;
+using Infinity.Echo;
 
-namespace Prowl.Editor.Migration.Releases;
+namespace Infinity.Editor.Migration.Releases;
 
 internal sealed partial class Release_1_0 : MigrationRelease
 {
@@ -38,7 +38,7 @@ internal sealed partial class Release_1_0 : MigrationRelease
         [CameraType] = Camel("Background", "Depth", "Target"),
     };
 
-    private const string GeneralSettingsType = "Prowl.Editor.Projects.Settings.GeneralSettings";
+    private const string GeneralSettingsType = "Infinity.Editor.Projects.Settings.GeneralSettings";
 
     // The one remembered scene path becomes a remembered setup holding that scene, loaded and active.
     internal static EchoObject? SceneSetupMemory(EchoObject settings)
@@ -64,9 +64,9 @@ internal sealed partial class Release_1_0 : MigrationRelease
         return settings;
     }
 
-    private const string CameraType = "Prowl.Runtime.Camera";
-    private const string VolumeProfileType = "Prowl.Runtime.Rendering.VolumeProfile";
-    private const string TonemappingType = "Prowl.Runtime.Rendering.Tonemapping";
+    private const string CameraType = "Infinity.Runtime.Camera";
+    private const string VolumeProfileType = "Infinity.Runtime.Rendering.VolumeProfile";
+    private const string TonemappingType = "Infinity.Runtime.Rendering.Tonemapping";
 
     // TonemappingMode.AgXPunchy, the camera's old default. The volume enum puts None first, one before the camera's values.
     private const long AgXPunchy = 3;
@@ -162,7 +162,7 @@ internal sealed partial class Release_1_0 : MigrationRelease
         parameter["Value"] = new EchoObject(mode);
         parameter["Override"] = new EchoObject(true);
         var tonemapping = EchoObject.NewCompound();
-        tonemapping["$type"] = new EchoObject(TonemappingType + ", Prowl.Runtime");
+        tonemapping["$type"] = new EchoObject(TonemappingType + ", Infinity.Runtime");
         tonemapping["Mode"] = parameter;
         tonemapping["Active"] = new EchoObject(true);
         list.ListAdd(tonemapping);
@@ -244,20 +244,20 @@ internal sealed partial class Release_1_0 : MigrationRelease
 
     private static readonly Dictionary<string, (string From, string To)[]> s_rendererRenames = new()
     {
-        ["Prowl.Runtime.MeshRenderer"] = Camel("Mesh", "Materials", "ShadowCasting", "ReceiveShadows"),
-        ["Prowl.Runtime.SpriteRenderer"] = Camel("Sprite", "Color", "FlipX", "FlipY", "Material", "SortingOrder", "ShadowCasting"),
-        ["Prowl.Runtime.TextMeshComponent"] = [("ShadowCasting", "_shadowCasting")],
+        ["Infinity.Runtime.MeshRenderer"] = Camel("Mesh", "Materials", "ShadowCasting", "ReceiveShadows"),
+        ["Infinity.Runtime.SpriteRenderer"] = Camel("Sprite", "Color", "FlipX", "FlipY", "Material", "SortingOrder", "ShadowCasting"),
+        ["Infinity.Runtime.TextMeshComponent"] = [("ShadowCasting", "_shadowCasting")],
     };
 
     private static readonly Dictionary<string, (string From, string To)[]> s_lightRenames = new()
     {
-        ["Prowl.Runtime.Light"] = Camel(
+        ["Infinity.Runtime.Light"] = Camel(
             "Type", "Color", "Intensity", "Range", "InnerAngle", "OuterAngle", "Width", "Height", "Length", "SourceRadius",
             "AngularRadius", "Cookie", "IesProfile", "LayerMask", "CastShadows", "ShadowStrength", "ShadowResolution",
             "ShadowFilter", "DepthBias", "NormalBias", "Cascades", "ShadowDistance", "CascadeBlend", "BakeMode"),
-        ["Prowl.Runtime.FogLight"] = Camel("IntensityMultiplier", "CastFogShadows", "UseOverrideColor", "OverrideColor", "ScatteringBias"),
-        ["Prowl.Runtime.Decal"] = Camel("Size", "Albedo", "Normal", "Mask", "Color", "NormalStrength", "AngleFade", "Priority", "LayerMask"),
-        ["Prowl.Runtime.ReflectionProbe"] = Camel(
+        ["Infinity.Runtime.FogLight"] = Camel("IntensityMultiplier", "CastFogShadows", "UseOverrideColor", "OverrideColor", "ScatteringBias"),
+        ["Infinity.Runtime.Decal"] = Camel("Size", "Albedo", "Normal", "Mask", "Color", "NormalStrength", "AngleFade", "Priority", "LayerMask"),
+        ["Infinity.Runtime.ReflectionProbe"] = Camel(
             "Mode", "RefreshMode", "TimeSlicing", "Importance", "Intensity", "BoxSize", "BoxOffset", "BlendDistance",
             "BoxProjection", "Resolution", "NearClip", "FarClip", "CullingMask"),
     };
@@ -360,8 +360,8 @@ internal sealed partial class Release_1_0 : MigrationRelease
         return null;
     }
 
-    private const string LightType = "Prowl.Runtime.Light";
-    private const string SceneType = "Prowl.Runtime.Resources.Scene";
+    private const string LightType = "Infinity.Runtime.Light";
+    private const string SceneType = "Infinity.Runtime.Resources.Scene";
 
     /// <summary>Old emission, ambient and fog brightness to nits: what an exposure of 1 showed, kept at EV100 14.</summary>
     internal const float LegacyLuminance = 1.2f * 16384f;
@@ -683,7 +683,7 @@ internal sealed partial class Release_1_0 : MigrationRelease
             foreach ((string name, EchoObject value) in kept) tag[name] = value;
             if (!tag.Contains("temperature")) tag["temperature"] = new EchoObject(OldKelvin);
             if (!tag.Contains("intensity")) tag["intensity"] = new EchoObject(OldIntensity);
-            tag["$type"] = new EchoObject($"Prowl.Runtime.{kind}Light, Prowl.Runtime");
+            tag["$type"] = new EchoObject($"Infinity.Runtime.{kind}Light, Infinity.Runtime");
             changed = true;
         });
         SplitLightOverrides(echo, kinds, ref changed);
@@ -761,16 +761,16 @@ internal sealed partial class Release_1_0 : MigrationRelease
         return found;
     }
 
-    private const string SceneContentType = "Prowl.Runtime.Resources.SceneContent, Prowl.Runtime";
+    private const string SceneContentType = "Infinity.Runtime.Resources.SceneContent, Infinity.Runtime";
 
     // Old type names inside a $type, then what they are now. The live scene's own name is now the asset's, so only a
     // file's root is ever read as a live scene.
     private static readonly (string Old, string Now)[] s_sceneTypeRenames =
     [
-        ("Prowl.Runtime.Resources.SceneAsset", "Prowl.Runtime.Resources.Scene"),
-        ("Prowl.Runtime.Resources.Scene+BakedLightingData", "Prowl.Runtime.Resources.SceneLighting"),
-        ("Prowl.Runtime.Resources.Scene+LightmapBakeSettings", "Prowl.Runtime.Resources.LightmapBakeSettings"),
-        ("Prowl.Runtime.Resources.Scene+LightmapPlacement", "Prowl.Runtime.Resources.LightmapPlacement"),
+        ("Infinity.Runtime.Resources.SceneAsset", "Infinity.Runtime.Resources.Scene"),
+        ("Infinity.Runtime.Resources.Scene+BakedLightingData", "Infinity.Runtime.Resources.SceneLighting"),
+        ("Infinity.Runtime.Resources.Scene+LightmapBakeSettings", "Infinity.Runtime.Resources.LightmapBakeSettings"),
+        ("Infinity.Runtime.Resources.Scene+LightmapPlacement", "Infinity.Runtime.Resources.LightmapPlacement"),
     ];
 
     /// <summary>

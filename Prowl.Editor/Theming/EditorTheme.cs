@@ -1,10 +1,10 @@
 using System;
 using System.Drawing;
 
-using Prowl.OrigamiUI;
-using Prowl.Scribe;
+using Infinity.OrigamiUI;
+using Infinity.Scribe;
 
-namespace Prowl.Editor.Theming;
+namespace Infinity.Editor.Theming;
 
 /// <summary>
 /// The editor's visual tokens. The editor uses Origami's default theme as the single
@@ -84,7 +84,7 @@ public static class EditorTheme
             return;
         }
 
-        OrigamiTheme = Prowl.OrigamiUI.OrigamiTheme.Lerp(_origamiStart, _origamiTarget, t);
+        OrigamiTheme = Infinity.OrigamiUI.OrigamiTheme.Lerp(_origamiStart, _origamiTarget, t);
     }
 
     /// <summary>
@@ -152,7 +152,7 @@ public static class EditorTheme
     {
         // EditorGlyphIcon resolves the font at draw time, so chrome icons never flash blank before the
         // editor font finishes loading.
-        Prowl.Editor.GUI.EditorGlyphIcon I(string glyph) => new(glyph, scale: 0.82f);
+        Infinity.Editor.GUI.EditorGlyphIcon I(string glyph) => new(glyph, scale: 0.82f);
         return new OrigamiIcons
         {
             ChevronDown = I(EditorIcons.ChevronDown), ChevronRight = I(EditorIcons.ChevronRight),
@@ -424,6 +424,6 @@ public static class EditorTheme
     public static Color WithAlpha(Color c, int a) => Color.FromArgb(a, c.R, c.G, c.B);
 
     /// <summary>A theme colour as a canvas colour, its alpha scaled.</summary>
-    public static Prowl.Vector.Color32 ToColor32(Color c, float alpha = 1f)
+    public static Infinity.Vector.Color32 ToColor32(Color c, float alpha = 1f)
         => new(c.R, c.G, c.B, (byte)Math.Clamp((int)(c.A * alpha), 0, 255));
 }

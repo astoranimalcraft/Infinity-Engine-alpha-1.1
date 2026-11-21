@@ -1,12 +1,12 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Editor.GUI.ScriptEditor;
-using Prowl.OrigamiUI;
+using Infinity.Editor.GUI.ScriptEditor;
+using Infinity.OrigamiUI;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 public class ScriptRenameTests : EditorTestHarness
 {
@@ -57,7 +57,7 @@ public class ScriptRenameTests : EditorTestHarness
 
         await ScriptRenames.RenameAsync(AssetAbsolutePath("Gun.cs"), AssetAbsolutePath("Rifle.cs"), "Gun", "Rifle");
 
-        Assert.Equal("namespace Game\n{\n    [Prowl.Echo.FormerlySerializedAs(\"Gun\")]\n    public class Rifle\n    {\n        public Rifle() { }\n        public static Rifle Make() => new Rifle();\n    }\n}\n",
+        Assert.Equal("namespace Game\n{\n    [Infinity.Echo.FormerlySerializedAs(\"Gun\")]\n    public class Rifle\n    {\n        public Rifle() { }\n        public static Rifle Make() => new Rifle();\n    }\n}\n",
             File.ReadAllText(AssetAbsolutePath("Rifle.cs")));
     }
 

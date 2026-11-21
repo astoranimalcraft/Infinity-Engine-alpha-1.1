@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -14,12 +14,12 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Prowl.Echo;
-using Prowl.Ember;
-using Prowl.Runtime.Diagnostics;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Ember;
+using Infinity.Runtime.Diagnostics;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>What the database knows about one asset's residency, for diagnostics.</summary>
 public readonly record struct AssetResidency(
@@ -942,7 +942,7 @@ public sealed class AssetWalker
     private static readonly ReloadCache<Type, Plan> s_plans = new(BuildPlan);
     private static readonly ReloadCache<Type, bool> s_canHold = new();
     private static readonly string[] s_skippedAssemblies =
-        ["System", "Microsoft", "Silk.NET", "Jitter2", "Prowl.Motion", "Prowl.Vector", "Prowl.Recast", "Prowl.Paper", "Prowl.Scribe", "Prowl.Echo", "Prowl.Quill", "Prowl.Ember", "Prowl.Graphite"];
+        ["System", "Microsoft", "Silk.NET", "Jitter2", "Infinity.Motion", "Infinity.Vector", "Infinity.Recast", "Infinity.Paper", "Infinity.Scribe", "Infinity.Echo", "Infinity.Quill", "Infinity.Ember", "Infinity.Graphite"];
 
     private const int ExpandsPerClockCheck = 256;
 

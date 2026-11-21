@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 
-using Prowl.Graphite.Rendering;
-using Prowl.Vector;
+using Infinity.Graphite.Rendering;
+using Infinity.Vector;
 
-using GTexture = Prowl.Graphite.Texture;
+using GTexture = Infinity.Graphite.Texture;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>One line of a <see cref="GizmoBatch"/>, already in world space.</summary>
 public readonly record struct GizmoLine(Float3 A, Float3 B, Color Color);

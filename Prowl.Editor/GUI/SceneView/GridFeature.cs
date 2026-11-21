@@ -1,15 +1,15 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Graphite;
-using Prowl.Graphite.Rendering;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Runtime;
+using Infinity.Graphite;
+using Infinity.Graphite.Rendering;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Runtime;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 /// <summary>
 /// The editor's ground grid: the plane y = 0 traced per pixel over the finished image, hidden behind geometry, with the
@@ -125,7 +125,7 @@ internal sealed class GridFeature : RenderFeature
     public override void Render(FeatureContext context)
     {
         _properties.SetTexture("_CameraDepthTexture", context.Depth!, _point);
-        _properties.SetFloat4("_GridColor", new Prowl.Vector.Float4(0.8f, 0.8f, 0.8f, 0.65f));
+        _properties.SetFloat4("_GridColor", new Infinity.Vector.Float4(0.8f, 0.8f, 0.8f, 0.65f));
         // The shader takes lines per unit: a line every cell, and a fainter one every four cells.
         float cell = _cellSize() is float c && float.IsFinite(c) && c > 1e-4f ? c : 1f;
         _properties.SetFloat("_PrimaryGridSize", 1f / cell);

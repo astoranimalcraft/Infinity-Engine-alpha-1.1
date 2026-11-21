@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -10,16 +10,16 @@ using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-using Prowl.Echo;
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Prefabs;
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Prefabs;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 /// <summary>
 /// The one addressing scheme every CLI command uses, and the summaries results are made of.

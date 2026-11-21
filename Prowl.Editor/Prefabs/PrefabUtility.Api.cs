@@ -1,18 +1,18 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.OrigamiUI;
-using Prowl.Rosetta;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.OrigamiUI;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor.Prefabs;
+namespace Infinity.Editor.Prefabs;
 
 /// <summary> Queries and operations that tools and custom editors need, which were previously worked out from instance data. </summary>
 public static partial class PrefabUtility

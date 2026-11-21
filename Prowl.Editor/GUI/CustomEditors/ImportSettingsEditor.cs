@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Echo;
-using Prowl.Editor.Projects;
-using Prowl.Runtime;
+using Infinity.Echo;
+using Infinity.Editor.Projects;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 /// <summary>
 /// Base for editors whose authored state is an asset's <c>.meta</c> import settings.

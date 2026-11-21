@@ -5,33 +5,33 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-using Prowl.Echo;
-using Prowl.Editor.Core.Diagnostics;
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.Panels;
-using Prowl.Editor.GUI.PropertyEditors;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Prefabs;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Editor.Projects.Settings;
-using Prowl.Editor.Theming;
-using Prowl.Editor.Thumbnails;
-using Prowl.Graphite.Debugger.Viewer;
-using Prowl.Editor.Utils;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Rosetta;
-using Prowl.Runtime;
-using Prowl.Runtime.Diagnostics;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Editor.Core.Diagnostics;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.Panels;
+using Infinity.Editor.GUI.PropertyEditors;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Prefabs;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Editor.Projects.Settings;
+using Infinity.Editor.Theming;
+using Infinity.Editor.Thumbnails;
+using Infinity.Graphite.Debugger.Viewer;
+using Infinity.Editor.Utils;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.Runtime.Diagnostics;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
 using Silk.NET.Core.Contexts;
 using Silk.NET.Maths;
 
-namespace Prowl.Editor.Core;
+namespace Infinity.Editor.Core;
 
 /// <summary> The editor application, the main entry point for the Prowl editor. Extends Game and manages the editor window, panels, play mode, asset pipeline, and UI lifecycle. </summary>
 public class EditorApplication : Game
@@ -125,8 +125,8 @@ public class EditorApplication : Game
         // Load Font Awesome as fallback fonts for icons. Keep the FontFile handles so icons can also
         // be drawn in a chosen weight directly (e.g. an outline vs filled star), independent of the
         // fallback resolution order.
-        EditorTheme.FontIconOutline = LoadFallbackFont("Prowl.Editor.Resources.fa-regular-400.ttf");
-        EditorTheme.FontIconSolid = LoadFallbackFont("Prowl.Editor.Resources.fa-solid-900.ttf");
+        EditorTheme.FontIconOutline = LoadFallbackFont("Infinity.Editor.Resources.fa-regular-400.ttf");
+        EditorTheme.FontIconSolid = LoadFallbackFont("Infinity.Editor.Resources.fa-solid-900.ttf");
 
         // Load CJK/international fallback fonts from system for localization support
         LoadSystemFallbackFonts();
@@ -183,12 +183,12 @@ public class EditorApplication : Game
         }
 
         // Initialize localization
-        Prowl.Rosetta.Loc.Configure(cfg => cfg
+        Infinity.Rosetta.Loc.Configure(cfg => cfg
             .SetFallbackLocale("en")
             .AddProvider(new EmbeddedResourceProvider(
-                System.Reflection.Assembly.GetExecutingAssembly(), "Prowl.Editor.Resources.Locale"))
+                System.Reflection.Assembly.GetExecutingAssembly(), "Infinity.Editor.Resources.Locale"))
             .SetLocale(EditorSettings.Instance.Locale)
-            .OnMissingKey(Prowl.Rosetta.MissingKeyBehavior.ReturnKey)
+            .OnMissingKey(Infinity.Rosetta.MissingKeyBehavior.ReturnKey)
         );
 
         EditorRegistries.Initialize();
@@ -491,7 +491,7 @@ public class EditorApplication : Game
         return font;
     }
 
-    private static Prowl.Scribe.FontFile? LoadBundledFont(string fileName)
+    private static Infinity.Scribe.FontFile? LoadBundledFont(string fileName)
     {
         using Stream? stream = GetEmbeddedResource(fileName);
         if (stream == null)
@@ -499,7 +499,7 @@ public class EditorApplication : Game
             Runtime.Debug.LogWarning($"Missing bundled font: {fileName}");
             return null;
         }
-        return new Prowl.Scribe.FontFile(stream);
+        return new Infinity.Scribe.FontFile(stream);
     }
 
     // The whole Paper frame is the editor's interface. The game's own UI, drawn inside the Game view, still counts as UI.
@@ -811,7 +811,7 @@ public class EditorApplication : Game
     }
 
     /// <summary>Centered rounded "pill" holding the play / pause / step transport buttons.</summary>
-    private void DrawPlayPill(Paper paper, float w, float band, Prowl.Scribe.FontFile font)
+    private void DrawPlayPill(Paper paper, float w, float band, Infinity.Scribe.FontFile font)
     {
         using (paper.Row("play_pill").PositionType(PositionType.SelfDirected)
             .Size(UnitValue.Auto).Rounded(EditorTheme.Roundness)
@@ -875,7 +875,7 @@ public class EditorApplication : Game
 
     /// <summary>Right-side status cluster: FPS, editor version and project name as themed chips,
     /// then a ghost cog that opens Project Settings.</summary>
-    private void DrawHeaderStatus(Paper paper, float w, float band, Prowl.Scribe.FontFile font)
+    private void DrawHeaderStatus(Paper paper, float w, float band, Infinity.Scribe.FontFile font)
     {
         float clH = HeaderChipHeight;
         float pad = EditorTheme.DockPadding;
@@ -930,7 +930,7 @@ public class EditorApplication : Game
     }
 
     // A themed glass chip that auto-sizes to its text (horizontal padding + Auto width, no MeasureText).
-    private static void StatusChip(Paper paper, string id, float hRect, string text, Prowl.Scribe.FontFile font)
+    private static void StatusChip(Paper paper, string id, float hRect, string text, Infinity.Scribe.FontFile font)
     {
         using (paper.Row(id).Width(UnitValue.Auto).Height(hRect).Padding(10, 10, 0, 0).Rounded(Origami.Current.Metrics.ContainerRounding)
             .BackdropBlur(EditorTheme.DockedBlur)
@@ -1265,12 +1265,12 @@ public class EditorApplication : Game
         return data;
     }
 
-    /// <summary> Opens a stream to an embedded resource in the Prowl.Editor.Resources namespace. </summary>
+    /// <summary> Opens a stream to an embedded resource in the Infinity.Editor.Resources namespace. </summary>
     public static Stream? GetEmbeddedResource(string resource)
     {
         var assembly = Assembly.GetExecutingAssembly();
 
-        string resourceName = "Prowl.Editor.Resources." + resource;
+        string resourceName = "Infinity.Editor.Resources." + resource;
 
         Stream? stream = assembly.GetManifestResourceStream(resourceName);
         return stream;
@@ -1281,7 +1281,7 @@ public class EditorApplication : Game
     {
         var assembly = Assembly.GetExecutingAssembly();
 
-        string resourceName = "Prowl.Editor.Resources." + resource;
+        string resourceName = "Infinity.Editor.Resources." + resource;
 
         string pathToFile = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) +
                           resourceName;
@@ -1308,7 +1308,7 @@ public class EditorApplication : Game
             .OnPostLayout((handle, rect) => paper.Draw(ref handle, (canvas, r) =>
             {
                 Scribe.FontFile? font = EditorTheme.FontLogo ?? EditorTheme.DefaultBoldFont;
-                Vector.Color black = Prowl.Vector.Color32.FromArgb(255, 8, 8, 10);
+                Vector.Color black = Infinity.Vector.Color32.FromArgb(255, 8, 8, 10);
                 float barH = (float)h / BarCount;
                 double time = _introTime;
                 float brandFade = 1f;
@@ -1362,7 +1362,7 @@ public class EditorApplication : Game
     // The intro brand lockup: the Prowl logo to the LEFT of the PROWL wordmark, the pair centered on (cx, cy).
     // The logo spins in about its vertical axis at the screen center, shrinks, then slides aside while the
     // wordmark fades in under a clearing blur that sits between the text and the logo.
-    private static void DrawIntroBrand(Prowl.Quill.Canvas canvas, float cx, float cy, float time, float fade, Scribe.FontFile? font)
+    private static void DrawIntroBrand(Infinity.Quill.Canvas canvas, float cx, float cy, float time, float fade, Scribe.FontFile? font)
     {
         const string word = "Infinity Engine";
         const float letterSpacing = 10f, gap = 8f;
@@ -1386,7 +1386,7 @@ public class EditorApplication : Game
         {
             float t = EaseOutCubic(Math.Clamp((time - TextStart) / (TextEnd - TextStart), 0f, 1f));
             float drift = (1f - t) * 16f;
-            Vector.Color textColor = Prowl.Vector.Color32.FromArgb((byte)(t * fade * 255), 230, 230, 230);
+            Vector.Color textColor = Infinity.Vector.Color32.FromArgb((byte)(t * fade * 255), 230, 230, 230);
             canvas.DrawText(word, textX + drift, cy, textColor, EditorTheme.FontSizeLogo, font,
                 letterSpacing, new Float2(0f, 0.5f), quality: Scribe.FontQuality.Ultra);
 
@@ -1396,7 +1396,7 @@ public class EditorApplication : Game
                 float pad = blur * 2f + 4f;
                 canvas.SetBackdropBlur(blur);
                 canvas.RectFilled(textX - pad, cy - lockupH / 2f - pad, textW + drift + pad * 2f, lockupH + pad * 2f,
-                    Prowl.Vector.Color32.FromArgb(0, 0, 0, 0));
+                    Infinity.Vector.Color32.FromArgb(0, 0, 0, 0));
                 canvas.ClearBackdropBlur();
             }
         }
@@ -1417,8 +1417,8 @@ public class EditorApplication : Game
         var tint = System.Drawing.Color.FromArgb((byte)(appear * fade * 255), (byte)shade, (byte)shade, (byte)shade);
 
         canvas.SaveState();
-        canvas.TransformBy(Prowl.Vector.Spatial.Transform2D.CreateTranslation(logoX, cy));
-        canvas.TransformBy(Prowl.Vector.Spatial.Transform2D.CreateScale(scale * width, scale));
+        canvas.TransformBy(Infinity.Vector.Spatial.Transform2D.CreateTranslation(logoX, cy));
+        canvas.TransformBy(Infinity.Vector.Spatial.Transform2D.CreateScale(scale * width, scale));
         EditorIcons.ProwlLogo.Draw(canvas, new Rect(-logoW / 2f, -logoH / 2f, logoW / 2f, logoH / 2f), tint, 1f);
         canvas.RestoreState();
     }
@@ -1496,7 +1496,7 @@ public class EditorApplication : Game
         {
             Scribe.FontFile? font = SystemFonts.FirstOrDefault(f =>
                 f.FamilyName.Equals(family, StringComparison.OrdinalIgnoreCase)
-                && f.Style == Prowl.Scribe.FontStyle.Regular);
+                && f.Style == Infinity.Scribe.FontStyle.Regular);
 
             if (font != null)
             {
@@ -1754,7 +1754,7 @@ public class EditorApplication : Game
         // Scan-based registries and type caches the hot-reload walk can't re-derive: reset them so they
         // re-scan the new assemblies (picking up newly-compiled types and dropping removed ones). Runs on
         // both the migrate and initial-load paths.
-        Prowl.Runtime.MeshFeatures.MeshFeatureRegistry.ClearCache();
+        Infinity.Runtime.MeshFeatures.MeshFeatureRegistry.ClearCache();
         AnimationNodeRegistry.Reset();
         EditorRegistries.Reinitialize();
         Inspector.GameObjectInspector.ClearAddComponentCache();

@@ -1,16 +1,16 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.IO;
 
-using Prowl.Echo;
-using Prowl.Motion;
+using Infinity.Echo;
+using Infinity.Motion;
 
-using MotionAvatar = Prowl.Motion.Avatar;
-using MotionSkeleton = Prowl.Motion.Skeleton;
+using MotionAvatar = Infinity.Motion.Avatar;
+using MotionSkeleton = Infinity.Motion.Skeleton;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>Whether a rig is played as authored, or through the humanoid muscle space.</summary>
 public enum AvatarRigType

@@ -1,15 +1,15 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Editor.Theming;
-using Prowl.PaperUI;
-using Prowl.Quill;
-using Prowl.Runtime;
-using Prowl.Vector;
+using Infinity.Editor.Theming;
+using Infinity.PaperUI;
+using Infinity.Quill;
+using Infinity.Runtime;
+using Infinity.Vector;
 
-namespace Prowl.Editor.GUI.SceneView;
+namespace Infinity.Editor.GUI.SceneView;
 
 /// <summary>
 /// A scene-view mode with its own handles, overlays and toolbar. Tools register controls with the

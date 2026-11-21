@@ -1,26 +1,26 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Linq;
 using System;
 using System.Collections.Generic;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.GUI.SceneView.Editors;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Runtime.Terrain;
-using Prowl.Vector;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.GUI.SceneView.Editors;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Runtime.Terrain;
+using Infinity.Vector;
 
-using PropertyGridUtils = Prowl.Editor.GUI.PropertyGridUtils;
+using PropertyGridUtils = Infinity.Editor.GUI.PropertyGridUtils;
 using SColor = System.Drawing.Color;
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 public enum TerrainTab { Height, Paint, Holes, Details, Trees, Settings }
 public enum HeightTool { Raise, Lower, Flatten, Smooth }
@@ -153,7 +153,7 @@ public class TerrainEditor : CustomEditor
     };
 
     /// <summary>Empty-state card shown when no TerrainData is assigned (design .tr-empty).</summary>
-    private static void DrawEmptyState(Paper paper, string id, Prowl.Scribe.FontFile font)
+    private static void DrawEmptyState(Paper paper, string id, Infinity.Scribe.FontFile font)
     {
         using (paper.Column(id).Width(UnitValue.StretchOne).Height(UnitValue.Auto)
             .Margin(8, 8, 8, 8).Padding(20, 20, 26, 24).Rounded(Origami.Current.Metrics.ContainerRounding)
@@ -171,7 +171,7 @@ public class TerrainEditor : CustomEditor
     }
 
     /// <summary>Amber "Unsaved edits" banner with an inline save-to-asset button (design .tr-dirty).</summary>
-    private void DrawDirtyBanner(Paper paper, string id, Prowl.Scribe.FontFile font, TerrainData data)
+    private void DrawDirtyBanner(Paper paper, string id, Infinity.Scribe.FontFile font, TerrainData data)
     {
         OrigamiMetrics m = Origami.Current.Metrics;
         using (paper.Row(id).Width(UnitValue.StretchOne).Height(UnitValue.Auto).MinHeight(34)
@@ -193,7 +193,7 @@ public class TerrainEditor : CustomEditor
     }
 
     /// <summary>Mode-title strip: active mode's icon + name over a bottom divider (design .tr-mode-title).</summary>
-    private static void DrawModeTitle(Paper paper, string id, Prowl.Scribe.FontFile font)
+    private static void DrawModeTitle(Paper paper, string id, Infinity.Scribe.FontFile font)
     {
         (IOrigamiIcon? icon, string? name) = ModeInfo(ActiveTab);
         Scribe.FontFile semi = EditorTheme.FontSemiBold ?? font;
@@ -213,7 +213,7 @@ public class TerrainEditor : CustomEditor
         }
     }
 
-    private void DrawSculpt(Paper paper, string id, Prowl.Scribe.FontFile font, TerrainData data)
+    private void DrawSculpt(Paper paper, string id, Infinity.Scribe.FontFile font, TerrainData data)
     {
         EditorGUI.SectionHeader(paper, $"{id}_h", "Sculpt Tool", first: true);
         EditorGUI.Row(paper, $"{id}_toolrow", "", () =>
@@ -229,7 +229,7 @@ public class TerrainEditor : CustomEditor
         DrawBrushBlock(paper, $"{id}_brush", font);
     }
 
-    private void DrawPaint(Paper paper, string id, Prowl.Scribe.FontFile font, TerrainData data)
+    private void DrawPaint(Paper paper, string id, Infinity.Scribe.FontFile font, TerrainData data)
     {
         OrigamiMetrics m = Origami.Current.Metrics;
 
@@ -317,13 +317,13 @@ public class TerrainEditor : CustomEditor
         DrawBrushBlock(paper, $"{id}_brush", font);
     }
 
-    private void DrawHoles(Paper paper, string id, Prowl.Scribe.FontFile font, TerrainData data)
+    private void DrawHoles(Paper paper, string id, Infinity.Scribe.FontFile font, TerrainData data)
     {
         HintPill(paper, $"{id}_hint", font, "Click to paint holes, Shift+click to fill");
         DrawBrushBlock(paper, $"{id}_brush", font);
     }
 
-    private void DrawDetails(Paper paper, string id, Prowl.Scribe.FontFile font, TerrainData data)
+    private void DrawDetails(Paper paper, string id, Infinity.Scribe.FontFile font, TerrainData data)
     {
         DrawSectionActions(paper, $"{id}_ph", "Detail Prototypes", () =>
         {
@@ -399,16 +399,16 @@ public class TerrainEditor : CustomEditor
                 Origami.Slider(paper, $"{id}_bend_v", dp.BendFactor, v => { dp.BendFactor = v; MarkDetailsDirty(); }, 0f, 1f).Format("F2").Show());
             EditorGUI.SettingsToggle(paper, $"{id}_atn", "Align To Normal", dp.AlignToNormal,
                 v => { dp.AlignToNormal = v; MarkDetailsDirty(); }, separator: false);
-            PropertyGridUtils.DrawField(paper, $"{id}_hc", "Healthy Color", typeof(Prowl.Vector.Color), dp.HealthyColor,
-                v => { dp.HealthyColor = (Prowl.Vector.Color)v!; MarkDetailsDirty(); }, 0);
-            PropertyGridUtils.DrawField(paper, $"{id}_dc", "Dry Color", typeof(Prowl.Vector.Color), dp.DryColor,
-                v => { dp.DryColor = (Prowl.Vector.Color)v!; MarkDetailsDirty(); }, 0);
+            PropertyGridUtils.DrawField(paper, $"{id}_hc", "Healthy Color", typeof(Infinity.Vector.Color), dp.HealthyColor,
+                v => { dp.HealthyColor = (Infinity.Vector.Color)v!; MarkDetailsDirty(); }, 0);
+            PropertyGridUtils.DrawField(paper, $"{id}_dc", "Dry Color", typeof(Infinity.Vector.Color), dp.DryColor,
+                v => { dp.DryColor = (Infinity.Vector.Color)v!; MarkDetailsDirty(); }, 0);
         }
 
         DrawBrushBlock(paper, $"{id}_brush", font);
     }
 
-    private void DrawTrees(Paper paper, string id, Prowl.Scribe.FontFile font, TerrainData data)
+    private void DrawTrees(Paper paper, string id, Infinity.Scribe.FontFile font, TerrainData data)
     {
         DrawSectionActions(paper, $"{id}_ph", "Tree Prototypes", () =>
         {
@@ -466,7 +466,7 @@ public class TerrainEditor : CustomEditor
         HintPill(paper, $"{id}_hint", font, "Click to place, Shift+click to erase");
     }
 
-    private void DrawSettings(Paper paper, string id, Prowl.Scribe.FontFile font, TerrainComponent terrain, TerrainData data)
+    private void DrawSettings(Paper paper, string id, Infinity.Scribe.FontFile font, TerrainComponent terrain, TerrainData data)
     {
         EditorGUI.SectionHeader(paper, $"{id}_mh", "Materials", first: true);
         PropertyGridUtils.DrawField(paper, $"{id}_mat", "Material", typeof(Material), terrain.Material,
@@ -564,7 +564,7 @@ public class TerrainEditor : CustomEditor
     }
 
     /// <summary>Size / Strength / Falloff sliders (design .tr-brushrow).</summary>
-    private static void DrawBrushBlock(Paper paper, string id, Prowl.Scribe.FontFile font, string title = "Brush")
+    private static void DrawBrushBlock(Paper paper, string id, Infinity.Scribe.FontFile font, string title = "Brush")
     {
         OrigamiMetrics m = Origami.Current.Metrics;
         EditorGUI.SectionHeader(paper, $"{id}_h", title);
@@ -608,7 +608,7 @@ public class TerrainEditor : CustomEditor
     }
 
     /// <summary>Blue info pill (design .tr-hint).</summary>
-    private static void HintPill(Paper paper, string id, Prowl.Scribe.FontFile font, string text)
+    private static void HintPill(Paper paper, string id, Infinity.Scribe.FontFile font, string text)
     {
         OrigamiMetrics m = Origami.Current.Metrics;
         using (paper.Row(id).Width(UnitValue.StretchOne).Height(UnitValue.Auto).MinHeight(32)
@@ -627,7 +627,7 @@ public class TerrainEditor : CustomEditor
 
     /// <summary>Auto-fill thumbnail grid of prototypes with a trailing "+" add tile (design .tr-protogrid).
     /// Draws the asset's real thumbnail when available, falling back to the vector icon.</summary>
-    private void DrawProtoGrid(Paper paper, string id, Prowl.Scribe.FontFile font, int count,
+    private void DrawProtoGrid(Paper paper, string id, Infinity.Scribe.FontFile font, int count,
         int selected, Action<int> onSelect, Func<int, string> getName, Func<int, IOrigamiIcon> getIcon,
         Action onAdd, Func<int, Guid> getThumbGuid)
     {
@@ -1014,7 +1014,7 @@ public class TerrainEditor : CustomEditor
                 Rotation = rotation,
                 WidthScale = scale,
                 HeightScale = scale,
-                Tint = Prowl.Vector.Color.White,
+                Tint = Infinity.Vector.Color.White,
             });
         }
     }

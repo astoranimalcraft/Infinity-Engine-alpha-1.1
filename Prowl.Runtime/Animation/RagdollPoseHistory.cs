@@ -1,12 +1,12 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Vector;
-using Prowl.Vector.Spatial;
+using Infinity.Vector;
+using Infinity.Vector.Spatial;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// The animation's recent frames by time: where the character was, and each part's pose within it. A

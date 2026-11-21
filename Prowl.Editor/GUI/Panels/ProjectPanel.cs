@@ -4,25 +4,25 @@ using System.IO;
 using System.Linq;
 using System.Text.Json.Nodes;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI.Popups;
-using Prowl.Editor.GUI.Registries;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Theming;
-using Prowl.Editor.Utils;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Rosetta;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI.Popups;
+using Infinity.Editor.GUI.Registries;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Theming;
+using Infinity.Editor.Utils;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using static Prowl.Editor.GUI.EditorGUI;
+using static Infinity.Editor.GUI.EditorGUI;
 
 using Color = System.Drawing.Color;
 
-namespace Prowl.Editor.GUI.Panels;
+namespace Infinity.Editor.GUI.Panels;
 
 public class ProjectPanel : DockPanel
 {
@@ -1371,11 +1371,11 @@ public class ProjectPanel : DockPanel
             }, icon: EditorIcons.ArrowsRotate);
 
             builder.Item(Loc.Get("menu.assets.reload_scripts"),
-                () => Prowl.Editor.Projects.Scripting.ScriptAssemblyManager.RequestRecompile(),
+                () => Infinity.Editor.Projects.Scripting.ScriptAssemblyManager.RequestRecompile(),
                 icon: EditorIcons.ArrowsRotate);
             builder.Item(Loc.Get("project.regenerate_project_files"),
-                () => Prowl.Editor.Projects.Scripting.ScriptCompiler.GenerateProjectFiles(Project.Current!),
-                enabled: !Prowl.Editor.Projects.Scripting.ScriptAssemblyManager.IsCompiling,
+                () => Infinity.Editor.Projects.Scripting.ScriptCompiler.GenerateProjectFiles(Project.Current!),
+                enabled: !Infinity.Editor.Projects.Scripting.ScriptAssemblyManager.IsCompiling,
                 icon: EditorIcons.FileCode);
         });
     }
@@ -1635,7 +1635,7 @@ public class ProjectPanel : DockPanel
                     {
                         float x = (float)r.Min.X, y = (float)r.Min.Y, w = (float)r.Size.X, h = (float)r.Size.Y;
                         canvas.DrawImageRounded(thumbTex, x, y, w, h, thumbRound);
-                        Vector.Color bd = Prowl.Vector.Color32.FromArgb(EditorTheme.BorderSoft.A, EditorTheme.BorderSoft.R, EditorTheme.BorderSoft.G, EditorTheme.BorderSoft.B);
+                        Vector.Color bd = Infinity.Vector.Color32.FromArgb(EditorTheme.BorderSoft.A, EditorTheme.BorderSoft.R, EditorTheme.BorderSoft.G, EditorTheme.BorderSoft.B);
                         canvas.SaveState();
                         canvas.SetStrokeColor(bd);
                         canvas.SetStrokeWidth(1f);
@@ -1723,7 +1723,7 @@ public class ProjectPanel : DockPanel
                     {
                         float x = (float)r.Min.X, y = (float)r.Min.Y, w = (float)r.Size.X, h = (float)r.Size.Y;
                         canvas.DrawImageRounded(thumbTex, x, y, w, h, cellRound);
-                        Vector.Color bd = Prowl.Vector.Color32.FromArgb(EditorTheme.BorderSoft.A, EditorTheme.BorderSoft.R, EditorTheme.BorderSoft.G, EditorTheme.BorderSoft.B);
+                        Vector.Color bd = Infinity.Vector.Color32.FromArgb(EditorTheme.BorderSoft.A, EditorTheme.BorderSoft.R, EditorTheme.BorderSoft.G, EditorTheme.BorderSoft.B);
                         canvas.SaveState();
                         canvas.SetStrokeColor(bd);
                         canvas.SetStrokeWidth(1f);
@@ -1795,7 +1795,7 @@ public class ProjectPanel : DockPanel
                 paper.Box("l")
                     .Width(UnitValue.Stretch()).Height(UnitValue.Auto)
                     .Margin(3, 3, 4, 6)
-                    .Wrap(Prowl.Scribe.TextWrapMode.Wrap)
+                    .Wrap(Infinity.Scribe.TextWrapMode.Wrap)
                     .Text(DisplayName(item), EditorTheme.FontMedium ?? font)
                     .TextColor(isSubAsset ? EditorTheme.AccentText : (isSelected ? EditorTheme.Ink500 : EditorTheme.Ink400))
                     .FontSize(EditorTheme.FontSizeSmall).Alignment(TextAlignment.Center);

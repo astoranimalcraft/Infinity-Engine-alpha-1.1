@@ -1,16 +1,16 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 
-using Prowl.Recast.Detour;
-using Prowl.Recast.Detour.TileCache;
+using Infinity.Recast.Detour;
+using Infinity.Recast.Detour.TileCache;
 
-using Prowl.Vector;
+using Infinity.Vector;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// A registered navmesh inside a <see cref="NavMeshWorld"/>: the instantiated Detour navmesh,

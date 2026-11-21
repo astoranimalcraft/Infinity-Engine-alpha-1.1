@@ -1,19 +1,19 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI.Panels;
-using Prowl.Editor.GUI.ScriptEditor;
-using Prowl.Editor.Theming;
-using Prowl.Editor.Utils;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Rosetta;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI.Panels;
+using Infinity.Editor.GUI.ScriptEditor;
+using Infinity.Editor.Theming;
+using Infinity.Editor.Utils;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
 
-namespace Prowl.Editor.GUI;
+namespace Infinity.Editor.GUI;
 
 /// <summary>
 /// The first launch setup: language, scale, script editor, theme and layout density, applied live as they are

@@ -1,17 +1,17 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Runtime.Resources;
-using Prowl.Unwrapper;
-using Prowl.Vector;
+using Infinity.Runtime.Resources;
+using Infinity.Unwrapper;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.AssetImporting;
+namespace Infinity.Runtime.AssetImporting;
 
 /// <summary>
-/// Generates a second UV set (UV2) suitable for lightmapping by running Prowl.Unwrapper over a
+/// Generates a second UV set (UV2) suitable for lightmapping by running Infinity.Unwrapper over a
 /// mesh and baking the resulting atlas UVs into <see cref="Mesh.UV2"/>.
 ///
 /// <para>The unwrapper produces <b>per-corner</b> UVs (one per triangle corner) with seams between

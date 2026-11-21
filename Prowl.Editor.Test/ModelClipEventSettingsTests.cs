@@ -1,10 +1,10 @@
-using Prowl.Echo;
-using Prowl.Editor.Importers;
-using Prowl.Runtime;
-using Prowl.Runtime.AssetImporting;
+using Infinity.Echo;
+using Infinity.Editor.Importers;
+using Infinity.Runtime;
+using Infinity.Runtime.AssetImporting;
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>A clip's events in a model's import settings, which is where the inspector edits them.</summary>
 public class ModelClipEventSettingsTests

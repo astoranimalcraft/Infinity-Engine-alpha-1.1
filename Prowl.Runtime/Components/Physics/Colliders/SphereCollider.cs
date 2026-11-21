@@ -1,12 +1,12 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using Jitter2.Collision.Shapes;
 
-using Prowl.Echo;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Vector;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 [AddComponentMenu("Physics/Colliders/Sphere Collider")]
 [ComponentIcon("\uf111")] // Circle

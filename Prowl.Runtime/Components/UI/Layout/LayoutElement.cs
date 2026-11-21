@@ -1,13 +1,13 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Collections.Generic;
 
-using Prowl.Echo;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.UI;
+namespace Infinity.Runtime.UI;
 
 /// <summary>
 /// Reports desired sizes to a parent <see cref="LayoutGroup"/> / <see cref="ContentSizeFitter"/>.

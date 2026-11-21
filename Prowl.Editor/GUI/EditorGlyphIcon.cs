@@ -1,16 +1,16 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.OrigamiUI;
-using Prowl.Quill;
-using Prowl.Scribe;
-using Prowl.Vector;
+using Infinity.OrigamiUI;
+using Infinity.Quill;
+using Infinity.Scribe;
+using Infinity.Vector;
 
 using Color = System.Drawing.Color;
 
-namespace Prowl.Editor.GUI;
+namespace Infinity.Editor.GUI;
 
 /// <summary>Which Font Awesome weight an <see cref="EditorGlyphIcon"/> renders in.</summary>
 public enum GlyphWeight

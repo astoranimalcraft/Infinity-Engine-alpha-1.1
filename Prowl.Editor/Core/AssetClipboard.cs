@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,10 +6,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using Prowl.Editor.GUI.Panels;
-using Prowl.Runtime;
+using Infinity.Editor.GUI.Panels;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Core;
+namespace Infinity.Editor.Core;
 
 /// <summary>
 /// Cut, copy, paste and duplicate for Project panel items. Copies get fresh GUIDs and keep their import settings, a cut moves the originals on paste, and the results are selected.

@@ -1,13 +1,13 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>
 /// A scene's link to Graphite must follow the GameObject lifecycle: a renderer joins its scene's
@@ -142,7 +142,7 @@ public class SceneRenderingTests : RuntimeTestBase
         scene.Add(go);
         MeshRenderer renderer = Settled(scene, go);
 
-        go.Transform.Position = new Prowl.Vector.Float3(1, 2, 3);
+        go.Transform.Position = new Infinity.Vector.Float3(1, 2, 3);
         Assert.False(scene.Rendering.IsParked(renderer));
     }
 
@@ -158,7 +158,7 @@ public class SceneRenderingTests : RuntimeTestBase
         grandchild.SetParent(child);
         MeshRenderer renderer = Settled(scene, grandchild);
 
-        parent.Transform.Position = new Prowl.Vector.Float3(0, 5, 0);
+        parent.Transform.Position = new Infinity.Vector.Float3(0, 5, 0);
         Assert.False(scene.Rendering.IsParked(renderer));
     }
 
@@ -215,7 +215,7 @@ public class SceneRenderingTests : RuntimeTestBase
         MeshRenderer moved = Settled(scene, first, mesh);
         MeshRenderer still = Settled(scene, second, mesh);
 
-        first.Transform.Position = new Prowl.Vector.Float3(1, 2, 3);
+        first.Transform.Position = new Infinity.Vector.Float3(1, 2, 3);
         Assert.False(scene.Rendering.IsParked(moved));
         scene.Rendering.Settle(moved);
         Assert.True(scene.Rendering.IsParked(moved));

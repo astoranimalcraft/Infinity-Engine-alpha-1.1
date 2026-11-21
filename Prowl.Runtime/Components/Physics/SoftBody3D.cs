@@ -7,12 +7,12 @@ using Jitter2.Dynamics.Constraints;
 using Jitter2.LinearMath;
 using Jitter2.SoftBodies;
 
-using Prowl.Echo;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 public enum SoftBodyType
 {

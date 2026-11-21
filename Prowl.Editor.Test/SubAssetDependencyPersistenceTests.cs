@@ -1,17 +1,17 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 
-using Prowl.Editor.Build;
-using Prowl.Editor.Importers;
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Editor.Projects.Settings;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Editor.Build;
+using Infinity.Editor.Importers;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Editor.Projects.Settings;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>
 /// Confirms a sub-asset's own dependency graph entry (e.g. a Sprite's reference to its Texture2D)
@@ -68,8 +68,8 @@ public class SubAssetDependencyPersistenceTests : EditorTestHarness
     private Guid AuthorSceneReferencingSprite(Guid spriteGuid)
     {
         File.WriteAllText(AssetAbsolutePath("PersistCheckComponent.cs"), """
-            using Prowl.Runtime;
-            using Prowl.Runtime.Resources;
+            using Infinity.Runtime;
+            using Infinity.Runtime.Resources;
 
             public class PersistCheckComponent : Component
             {

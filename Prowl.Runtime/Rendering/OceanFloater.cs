@@ -1,13 +1,13 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Vector;
+using Infinity.Vector;
 
-using G = Prowl.Graphite.Rendering;
+using G = Infinity.Graphite.Rendering;
 
-namespace Prowl.Runtime.Rendering;
+namespace Infinity.Runtime.Rendering;
 
 /// <summary>
 /// Floats a <see cref="Rigidbody3D"/> on the <see cref="Ocean"/>, each probe pushes straight

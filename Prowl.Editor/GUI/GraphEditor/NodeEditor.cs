@@ -1,16 +1,16 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Editor.GUI;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
 
-namespace Prowl.Editor.GraphEditor;
+namespace Infinity.Editor.GraphEditor;
 
 /// <summary>Marks a node editor as the one for a node type, and for the types deriving from it.</summary>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]

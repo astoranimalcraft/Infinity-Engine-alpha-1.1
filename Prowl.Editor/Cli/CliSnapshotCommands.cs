@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -7,15 +7,15 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.Core.Diagnostics;
-using Prowl.Editor.Projects;
-using Prowl.Graphite;
-using Prowl.Graphite.Debugger;
-using Prowl.Graphite.Debugger.Trace;
-using Prowl.Graphite.Debugging;
+using Infinity.Editor.Core;
+using Infinity.Editor.Core.Diagnostics;
+using Infinity.Editor.Projects;
+using Infinity.Graphite;
+using Infinity.Graphite.Debugger;
+using Infinity.Graphite.Debugger.Trace;
+using Infinity.Graphite.Debugging;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 /// <summary> Takes, saves, loads, dumps and replays Graphite frame snapshots, the same ones the render profiler panels show. </summary>
 public static class CliSnapshotCommands

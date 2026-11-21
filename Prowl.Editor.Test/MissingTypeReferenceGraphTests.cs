@@ -1,14 +1,14 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Echo;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 // A component that references another component and a GameObject. When this is the FIRST thing traversed
 // during serialization, Echo emits the FULL definitions of its targets inline in this component's data.

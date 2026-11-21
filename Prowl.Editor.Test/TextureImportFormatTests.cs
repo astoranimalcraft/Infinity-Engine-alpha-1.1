@@ -1,14 +1,14 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Echo;
-using Prowl.Editor.Importers;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Editor.Importers;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 public class TextureImportFormatTests
 {
@@ -130,7 +130,7 @@ public class TextureImportFormatTests
     {
         var texture = new Texture2D(64, 32);
         var settings = new SpriteImportSettings { Mode = SpriteMode.Multiple, PixelsPerUnit = 100f };
-        settings.Slices.Add(new SpriteSliceData { Id = System.Guid.NewGuid(), Name = "a", Rect = new SpriteRect(16, 16, 32, 32), Border = new Prowl.Vector.Float4(4, 8, 4, 8) });
+        settings.Slices.Add(new SpriteSliceData { Id = System.Guid.NewGuid(), Name = "a", Rect = new SpriteRect(16, 16, 32, 32), Border = new Infinity.Vector.Float4(4, 8, 4, 8) });
 
         Sprite sprite = Assert.Single(SpriteBuilder.Build(texture, settings, 128, 64, null)).sprite;
 

@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 //
@@ -26,14 +26,14 @@
 //   F1          Hide the HUD
 //
 
-using Prowl.PaperUI;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Samples;
-using Prowl.Scribe;
-using Prowl.Vector;
+using Infinity.PaperUI;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Samples;
+using Infinity.Scribe;
+using Infinity.Vector;
 
-using static Prowl.Samples.Sample;
+using static Infinity.Samples.Sample;
 
 namespace VehicleShowcase;
 
@@ -435,7 +435,7 @@ public sealed partial class VehicleShowcaseGame : StationGame
             paper.Draw((canvas, rect) => DrawSpeedometer(canvas, rect, font));
     }
 
-    private void DrawSpeedometer(Prowl.Quill.Canvas canvas, Rect rect, FontFile font)
+    private void DrawSpeedometer(Infinity.Quill.Canvas canvas, Rect rect, FontFile font)
     {
         float cx = rect.Min.X + rect.Size.X * 0.5f, cy = rect.Min.Y + rect.Size.Y * 0.56f;
         float radius = MathF.Min(rect.Size.X * 0.5f, rect.Size.Y * 0.56f) - 6f;
@@ -484,7 +484,7 @@ public sealed partial class VehicleShowcaseGame : StationGame
         canvas.LineTo(cx + MathF.Cos(needle) * (radius - 20f), cy + MathF.Sin(needle) * (radius - 20f));
         canvas.SetStrokeColor(new Color(1f, 0.3f, 0.2f, 1f));
         canvas.SetStrokeWidth(3f);
-        canvas.SetStrokeJoint(Prowl.Quill.JointStyle.Round);
+        canvas.SetStrokeJoint(Infinity.Quill.JointStyle.Round);
         canvas.Stroke();
         canvas.CircleFilled(cx, cy, 7f, new Color(0.9f, 0.9f, 0.92f, 1f));
 

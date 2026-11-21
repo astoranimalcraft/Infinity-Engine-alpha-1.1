@@ -2,21 +2,21 @@ using System;
 using System.IO;
 using System.Linq;
 
-using Prowl.Echo;
-using Prowl.Editor.Core;
-using Prowl.Editor.Core.Tasks;
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.Panels;
-using Prowl.Editor.GUI.Popups;
-using Prowl.Editor.Prefabs;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.Rosetta;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Editor.Core;
+using Infinity.Editor.Core.Tasks;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.Panels;
+using Infinity.Editor.GUI.Popups;
+using Infinity.Editor.Prefabs;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 /// <summary> Provides methods to create project assets (folders, shaders, assembly definitions, prefabs, and arbitrary typed assets) with automatic unique naming and folder index invalidation. </summary>
 public static class AssetCreateMenu
@@ -87,7 +87,7 @@ public static class AssetCreateMenu
     private static CreateAssetTask.Writer AssetWriter(AssetMenuEntry entry) => (path, _) =>
     {
         object? instance = entry.Factory != null ? entry.Factory() : Activator.CreateInstance(entry.Type);
-        EchoObject? echo = Prowl.Echo.Serializer.Serialize(typeof(object), instance);
+        EchoObject? echo = Infinity.Echo.Serializer.Serialize(typeof(object), instance);
         if (echo == null) return false;
         File.WriteAllText(path, echo.WriteToString());
         return true;

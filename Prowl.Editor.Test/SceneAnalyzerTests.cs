@@ -1,12 +1,12 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Analyzers;
-using Prowl.Editor.Projects.Scripting;
+using Infinity.Analyzers;
+using Infinity.Editor.Projects.Scripting;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>
 /// The analyzer that refuses comparing a live world with a scene asset, and warns on a component field holding a
@@ -17,7 +17,7 @@ public class SceneAnalyzerTests : EditorTestHarness
 {
     private ScriptCompiler.CompileResult Compile(string members)
     {
-        WriteScript("Comp.cs", $"using Prowl.Runtime;\nusing Prowl.Runtime.Resources;\npublic class Comp : Component {{ {members} }}");
+        WriteScript("Comp.cs", $"using Infinity.Runtime;\nusing Infinity.Runtime.Resources;\npublic class Comp : Component {{ {members} }}");
         return ScriptCompiler.CompileAll(Project);
     }
 
@@ -36,7 +36,7 @@ public class SceneAnalyzerTests : EditorTestHarness
 
     [Theory]
     [InlineData("public Scene? NextLevel;")]
-    [InlineData("[Prowl.Echo.SerializeField] private Scene? _next;")]
+    [InlineData("[Infinity.Echo.SerializeField] private Scene? _next;")]
     [InlineData("public Scene[] Levels = [];")]
     [InlineData("public System.Collections.Generic.List<Scene> Levels = [];")]
     public void WarnsOnAComponentFieldHoldingASceneAsset(string members)

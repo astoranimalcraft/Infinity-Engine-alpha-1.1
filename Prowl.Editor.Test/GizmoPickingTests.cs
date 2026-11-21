@@ -1,16 +1,16 @@
 using System;
 using System.Linq;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI.Panels;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI.Panels;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>Draws an always shown marker and an outline, and a gizmo only while selected.</summary>
 public sealed class HitboxProbe : Component

@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,9 +6,9 @@ using System.Runtime.CompilerServices;
 
 using Echo.Logging;
 
-using Prowl.Echo;
+using Infinity.Echo;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// Routes Echo's serializer diagnostics into <see cref="Debug"/>.
@@ -32,15 +32,15 @@ public static class EchoLogBridge
     /// </summary>
     private sealed class ProwlEchoLogger : IEchoLogger
     {
-        public void Debug(string message) => Prowl.Runtime.Debug.Log($"[Echo] {message}");
+        public void Debug(string message) => Infinity.Runtime.Debug.Log($"[Echo] {message}");
 
-        public void Info(string message) => Prowl.Runtime.Debug.Log($"[Echo] {message}");
+        public void Info(string message) => Infinity.Runtime.Debug.Log($"[Echo] {message}");
 
         public void Warning(string message)
-            => Prowl.Runtime.Debug.LogWarningOnce($"Echo.{message}", $"[Echo] {message}");
+            => Infinity.Runtime.Debug.LogWarningOnce($"Echo.{message}", $"[Echo] {message}");
 
         public void Error(string message, Exception? exception = null)
-            => Prowl.Runtime.Debug.LogErrorOnce($"Echo.{message}", exception == null
+            => Infinity.Runtime.Debug.LogErrorOnce($"Echo.{message}", exception == null
                 ? $"[Echo] {message}"
                 : $"[Echo] {message} - {exception.GetType().Name}: {exception.Message}");
     }

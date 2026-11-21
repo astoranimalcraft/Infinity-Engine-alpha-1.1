@@ -1,15 +1,15 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Echo;
-using Prowl.Editor.Importers;
-using Prowl.Runtime;
-using Prowl.Runtime.Audio;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Editor.Importers;
+using Infinity.Runtime;
+using Infinity.Runtime.Audio;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>
 /// Audio that has to go through the asset database: importing clips with their settings, and mixers
@@ -18,7 +18,7 @@ namespace Prowl.Editor.Test;
 /// <remarks>
 /// The importer decodes for real through the native decoder here, which needs no output device, so
 /// these assert what a clip actually came out as rather than what the settings asked for. The runtime
-/// side of audio lives in Prowl.Runtime.Test's AudioTests; this file is only what needs an editor.
+/// side of audio lives in Infinity.Runtime.Test's AudioTests; this file is only what needs an editor.
 /// </remarks>
 public class AudioAssetTests : EditorTestHarness
 {

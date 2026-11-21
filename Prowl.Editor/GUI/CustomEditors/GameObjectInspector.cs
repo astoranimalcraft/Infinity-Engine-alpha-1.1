@@ -3,36 +3,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.Panels;
-using Prowl.Editor.Prefabs;
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Editor.Theming;
-using Prowl.Editor.Utils;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Rosetta;
-using Prowl.Runtime;
-using Prowl.Vector;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.Panels;
+using Infinity.Editor.Prefabs;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Editor.Theming;
+using Infinity.Editor.Utils;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.Vector;
 
 using Color = System.Drawing.Color;
-using PropertyGridUtils = Prowl.Editor.GUI.PropertyGridUtils;
-namespace Prowl.Editor.Inspector;
+using PropertyGridUtils = Infinity.Editor.GUI.PropertyGridUtils;
+namespace Infinity.Editor.Inspector;
 
 /// <summary>
 /// Draws the inspector for a selected GameObject: header, transform, components, add component button.
 /// </summary>
 public static class GameObjectInspector
 {
-    public static void Draw(Paper paper, Prowl.Scribe.FontFile font, GameObject go)
+    public static void Draw(Paper paper, Infinity.Scribe.FontFile font, GameObject go)
         => Draw(paper, font, go, null, null);
 
     /// <param name="viewportRect">The visible bounds a component drop is hit-tested against.</param>
     /// <param name="layout">The calling panel's own layout state; pass the same instance every frame.</param>
-    public static void Draw(Paper paper, Prowl.Scribe.FontFile font, GameObject go, Rect? viewportRect, ComponentLayout? layout)
+    public static void Draw(Paper paper, Infinity.Scribe.FontFile font, GameObject go, Rect? viewportRect, ComponentLayout? layout)
     {
         // Prefab header bar (if this GO is a prefab instance)
         if (go.IsPrefabInstance)
@@ -78,7 +78,7 @@ public static class GameObjectInspector
         return s_menuSection == id;
     }
 
-    private static bool SectionHeader(Paper paper, Prowl.Scribe.FontFile font, string id,
+    private static bool SectionHeader(Paper paper, Infinity.Scribe.FontFile font, string id,
         string glyph, string title, Color titleColor, Action? trailing = null, Action? onDragStart = null,
         Action<ContextBuilder>? contextMenu = null)
     {
@@ -129,7 +129,7 @@ public static class GameObjectInspector
     /// type is present on every selected object; fields that differ across the selection are flagged as
     /// mixed, and edits apply to all.
     /// </summary>
-    public static void DrawMulti(Paper paper, Prowl.Scribe.FontFile font, IReadOnlyList<GameObject> gos)
+    public static void DrawMulti(Paper paper, Infinity.Scribe.FontFile font, IReadOnlyList<GameObject> gos)
     {
         if (gos.Count == 0) return;
         if (gos.Count == 1) { Draw(paper, font, gos[0]); return; }
@@ -145,7 +145,7 @@ public static class GameObjectInspector
 
     private static string MixLabel(string label, bool mixed) => mixed ? $"{label}  (mixed)" : label;
 
-    private static void DrawMultiHeader(Paper paper, Prowl.Scribe.FontFile font, IReadOnlyList<GameObject> gos)
+    private static void DrawMultiHeader(Paper paper, Infinity.Scribe.FontFile font, IReadOnlyList<GameObject> gos)
     {
         using (paper.Row("gim_header").Height(EditorTheme.RowHeight).Margin(0, 6).Gap(6).Enter())
         {
@@ -202,7 +202,7 @@ public static class GameObjectInspector
         }
     }
 
-    private static void DrawMultiTransform(Paper paper, Prowl.Scribe.FontFile font, IReadOnlyList<GameObject> gos)
+    private static void DrawMultiTransform(Paper paper, Infinity.Scribe.FontFile font, IReadOnlyList<GameObject> gos)
     {
         paper.Box("gim_transform_header").Height(22).PaddingLeft(8)
             .Text($"{EditorIcons.ArrowsUpDownLeftRight}  {Loc.Get("inspector.transform")}", font)
@@ -236,7 +236,7 @@ public static class GameObjectInspector
             }).Show());
     }
 
-    private static void DrawMultiComponents(Paper paper, Prowl.Scribe.FontFile font, IReadOnlyList<GameObject> gos)
+    private static void DrawMultiComponents(Paper paper, Infinity.Scribe.FontFile font, IReadOnlyList<GameObject> gos)
     {
         // Component types in the first object's order, kept only if present on every selected object.
         var orderedTypes = new List<Type>();
@@ -405,7 +405,7 @@ public static class GameObjectInspector
     /// fixed-width LabelWidth gutter.
     /// </summary>
     private static void DrawInlineLabeled(Paper paper, string id, string label,
-        Prowl.Scribe.FontFile font, Action drawControl)
+        Infinity.Scribe.FontFile font, Action drawControl)
     {
         using (paper.Row(id).Width(UnitValue.Stretch()).Height(EditorTheme.RowHeight).Gap(4).Enter())
         {
@@ -426,7 +426,7 @@ public static class GameObjectInspector
     //  Transform
     // ================================================================
 
-    private static void DrawTransform(Paper paper, Prowl.Scribe.FontFile font, GameObject go)
+    private static void DrawTransform(Paper paper, Infinity.Scribe.FontFile font, GameObject go)
     {
         Transform t = go.Transform;
         Guid goId = go.Identifier;
@@ -477,7 +477,7 @@ public static class GameObjectInspector
     private static bool ApproxEq(Float2 a, Float2 b)
         => System.Math.Abs(a.X - b.X) < 1e-4f && System.Math.Abs(a.Y - b.Y) < 1e-4f;
 
-    private static void DrawRectTransform(Paper paper, Prowl.Scribe.FontFile font, GameObject go)
+    private static void DrawRectTransform(Paper paper, Infinity.Scribe.FontFile font, GameObject go)
     {
         RectTransform rt = go.RectTransform!;
         Transform t = go.Transform;
@@ -832,7 +832,7 @@ public static class GameObjectInspector
     private readonly record struct ComponentDrop(
         Component? Moving, AssetDragPayload? Asset, int Slot, int InsertIndex, bool IsNoOp);
 
-    private static void DrawComponents(Paper paper, Prowl.Scribe.FontFile font, GameObject go, Rect? viewportRect, ComponentLayout layout)
+    private static void DrawComponents(Paper paper, Infinity.Scribe.FontFile font, GameObject go, Rect? viewportRect, ComponentLayout layout)
     {
         List<Component> components = go.GetComponents<Component>().ToList();
 
@@ -892,7 +892,7 @@ public static class GameObjectInspector
             ApplyComponentDrop(go, components, drop);
     }
 
-    private static void DrawComponentEntry(Paper paper, Prowl.Scribe.FontFile font, GameObject go, Component comp, int rawIndex)
+    private static void DrawComponentEntry(Paper paper, Infinity.Scribe.FontFile font, GameObject go, Component comp, int rawIndex)
     {
         string compId = $"gi_comp_{comp.Identifier}";
         string compName = comp.GetType().Name;
@@ -1031,7 +1031,7 @@ public static class GameObjectInspector
         }
     }
 
-    private static void DrawInsertionIndicator(Prowl.Quill.Canvas canvas, Rect area, Rect[] rects, int slot)
+    private static void DrawInsertionIndicator(Infinity.Quill.Canvas canvas, Rect area, Rect[] rects, int slot)
     {
         double y;
         if (rects.Length == 0)
@@ -1208,7 +1208,7 @@ public static class GameObjectInspector
     //  Add Component
     // ================================================================
 
-    private static void DrawAddComponentButton(Paper paper, Prowl.Scribe.FontFile font, GameObject go)
+    private static void DrawAddComponentButton(Paper paper, Infinity.Scribe.FontFile font, GameObject go)
     {
         using (paper.Row("gi_add_comp_row").Height(28).PaddingLeft(20).PaddingRight(20).Enter())
         {
@@ -1251,7 +1251,7 @@ public static class GameObjectInspector
     //  Prefab Header
     // ================================================================
 
-    private static void DrawPrefabHeader(Paper paper, Prowl.Scribe.FontFile font, GameObject go)
+    private static void DrawPrefabHeader(Paper paper, Infinity.Scribe.FontFile font, GameObject go)
     {
         GameObject? root = PrefabUtility.GetPrefabInstanceRoot(go);
         bool isRoot = PrefabUtility.IsInstanceRoot(go);
@@ -1352,7 +1352,7 @@ public static class GameObjectInspector
         s_overridesPopupTarget = null;
     }
 
-    private static void DrawOverridesButton(Paper paper, Prowl.Scribe.FontFile font, GameObject go)
+    private static void DrawOverridesButton(Paper paper, Infinity.Scribe.FontFile font, GameObject go)
     {
         int count = PrefabUtility.CountOverrides(go);
 
@@ -1385,7 +1385,7 @@ public static class GameObjectInspector
         }
     }
 
-    private static void RenderOverridesPopover(Paper paper, Prowl.Scribe.FontFile font, GameObject go, ElementHandle trigger)
+    private static void RenderOverridesPopover(Paper paper, Infinity.Scribe.FontFile font, GameObject go, ElementHandle trigger)
     {
         const float width = 420f, padding = 5f, maxHeight = 420f;
         float triggerHeight = trigger.Data.LayoutRect.Size.Y > 0 ? (float)trigger.Data.LayoutRect.Size.Y : 24f;
@@ -1418,7 +1418,7 @@ public static class GameObjectInspector
     /// The stored path is three source identifiers, which is the right thing to write down and
     /// unreadable to anyone looking at it, so nothing here shows the path itself.
     /// </summary>
-    private static void DrawOverridesContent(Paper paper, Prowl.Scribe.FontFile font, GameObject go)
+    private static void DrawOverridesContent(Paper paper, Infinity.Scribe.FontFile font, GameObject go)
     {
         // Overrides for the whole prefab instance are stored on its root.
         GameObject? prefabRoot = PrefabUtility.GetPrefabInstanceRoot(go);
@@ -1451,7 +1451,7 @@ public static class GameObjectInspector
     /// Something the instance has that the prefab does not. A refresh keeps it and an apply leaves it
     /// behind, both correctly, and neither said it was there.
     /// </summary>
-    private static void DrawAdditionRow(Paper paper, Prowl.Scribe.FontFile font, GameObject root,
+    private static void DrawAdditionRow(Paper paper, Infinity.Scribe.FontFile font, GameObject root,
         PrefabUtility.AdditionDescription addition, bool canApply, int key)
     {
         float fs = EditorTheme.FontSize;
@@ -1479,7 +1479,7 @@ public static class GameObjectInspector
     }
 
     /// <summary>One heading per object, or per component of one, with the actions for all of it.</summary>
-    private static void DrawOverrideGroupHeader(Paper paper, Prowl.Scribe.FontFile font, GameObject root,
+    private static void DrawOverrideGroupHeader(Paper paper, Infinity.Scribe.FontFile font, GameObject root,
         string title, PrefabUtility.OverrideDescription first, bool canApply, int key)
     {
         using (paper.Row($"gi_ovg_{key}").Height(EditorTheme.RowHeight).Gap(4).Enter())
@@ -1506,7 +1506,7 @@ public static class GameObjectInspector
         }
     }
 
-    private static void DrawOverrideRow(Paper paper, Prowl.Scribe.FontFile font, GameObject root,
+    private static void DrawOverrideRow(Paper paper, Infinity.Scribe.FontFile font, GameObject root,
         PrefabUtility.OverrideDescription entry, bool canApply, int key)
     {
         float fs = EditorTheme.FontSize;

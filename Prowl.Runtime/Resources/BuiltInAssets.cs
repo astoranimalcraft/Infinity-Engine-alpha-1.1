@@ -4,10 +4,10 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-using Prowl.Runtime.AssetImporting;
-using Prowl.Runtime.Resources;
+using Infinity.Runtime.AssetImporting;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// Assets embedded in the runtime assembly, with deterministic GUIDs so they are referenced like any other asset.

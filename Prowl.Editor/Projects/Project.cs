@@ -3,9 +3,9 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-using Prowl.Editor.Migration;
+using Infinity.Editor.Migration;
 
-namespace Prowl.Editor.Projects;
+namespace Infinity.Editor.Projects;
 
 /// <summary>
 /// Represents a Prowl project on disk.
@@ -224,7 +224,7 @@ public class Project
     {
         JsonObject data = (File.Exists(ProwlFilePath) ? TryParse(File.ReadAllText(ProwlFilePath)) : null) ?? [];
         data["name"] = Name;
-        data["engine"] = "Prowl";
+        data["engine"] = "Infinity Engine";
         data["version"] = Version.ToString();
         data["appliedSteps"] = AppliedSteps;
         data["created"] ??= DateTime.UtcNow.ToString("o");

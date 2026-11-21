@@ -1,17 +1,17 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.IO;
 using System.Linq;
 
-using Prowl.Graphite.ShaderDef;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Graphite.ShaderDef;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>
 /// The asset database's shader catalog: the <c>Shader "Some/Path"</c> declaration each shader
@@ -149,7 +149,7 @@ public class ShaderCatalogTests : EditorTestHarness
     {
         string relative = AssetCreateMenu.CreateShader("")!;
         ShaderDefinition definition = ShaderParser.Parse(File.ReadAllText(AssetAbsolutePath(relative)));
-        ShaderDefinition expanded = new Prowl.Graphite.Rendering.Shader(definition, Graphics.Compiler).Definition;
+        ShaderDefinition expanded = new Infinity.Graphite.Rendering.Shader(definition, Graphics.Compiler).Definition;
 
         Assert.NotEmpty(expanded.Passes!);
         foreach (ShaderPass pass in expanded.Passes!)

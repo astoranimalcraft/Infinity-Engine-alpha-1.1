@@ -1,12 +1,12 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Echo;
+using Infinity.Echo;
 
-namespace Prowl.Runtime.MeshFeatures;
+namespace Infinity.Runtime.MeshFeatures;
 
 /// <summary>
-/// Marker interface for generated data that extends a <see cref="Prowl.Runtime.Resources.Mesh"/>.
+/// Marker interface for generated data that extends a <see cref="Infinity.Runtime.Resources.Mesh"/>.
 /// Implementations (SDF, BVH, Prism shells, ...) are produced by the asset pipeline
 /// from a source mesh and stored as read-only sub-assets of the mesh's parent asset.
 /// </summary>

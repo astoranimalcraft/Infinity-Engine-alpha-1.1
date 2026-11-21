@@ -4,26 +4,26 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using Prowl.Echo;
-using Prowl.Editor.Core;
-using Prowl.Editor.GraphEditor;
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.Panels;
-using Prowl.Editor.GUI.Registries;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Importers;
-using Prowl.Editor.Inspector;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Projects.Settings;
-using Prowl.Editor.Theming;
-using Prowl.Editor.Thumbnails;
-using Prowl.Editor.Utils;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Editor.Core;
+using Infinity.Editor.GraphEditor;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.Panels;
+using Infinity.Editor.GUI.Registries;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Importers;
+using Infinity.Editor.Inspector;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Projects.Settings;
+using Infinity.Editor.Theming;
+using Infinity.Editor.Thumbnails;
+using Infinity.Editor.Utils;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 /// <summary> Describes an entry in the asset creation menu, defining the type, display name, file extension, icon, sort order, and optional factory for creating a new instance. </summary>
 public struct AssetMenuEntry
@@ -699,7 +699,7 @@ public static class EditorRegistries
         string path = Path.Combine(project.ProjectSettingsPath, $"{entry.Name}.yaml");
         try
         {
-            EchoObject echo = Prowl.Echo.Serializer.Serialize(entry.Instance, TypeMode.Auto);
+            EchoObject echo = Infinity.Echo.Serializer.Serialize(entry.Instance, TypeMode.Auto);
             File.WriteAllText(path, echo.WriteToYaml());
         }
         catch (Exception ex) { Debug.LogError($"Failed to save settings '{entry.Name}': {ex.Message}"); }
@@ -727,7 +727,7 @@ public static class EditorRegistries
                 try
                 {
                     var serialized = EchoObject.ReadFromYaml(File.ReadAllText(yamlPath));
-                    var data = (ProjectSettingsBase?)Prowl.Echo.Serializer.Deserialize(serialized, entry.Type);
+                    var data = (ProjectSettingsBase?)Infinity.Echo.Serializer.Deserialize(serialized, entry.Type);
                     if (data != null)
                     {
                         CopySettingsFields(data, entry.Instance);

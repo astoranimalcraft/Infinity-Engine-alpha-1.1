@@ -1,30 +1,30 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Echo;
-using Prowl.Editor.GraphEditor;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.Runtime;
-using Prowl.Runtime.AnimationNodes;
-using Prowl.Vector;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Echo;
+using Infinity.Editor.GraphEditor;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.Runtime;
+using Infinity.Runtime.AnimationNodes;
+using Infinity.Vector;
 
-using AnimationValueType = Prowl.Motion.AnimationValueType;
+using AnimationValueType = Infinity.Motion.AnimationValueType;
 using Color = System.Drawing.Color;
-using GraphNodeInstance = Prowl.Motion.GraphNodeInstance;
-using IBlendWeights = Prowl.Motion.IBlendWeights;
-using IStateMachineState = Prowl.Motion.IStateMachineState;
-using MotionGraphInstance = Prowl.Motion.AnimationGraphInstance;
-using ParameterValue = Prowl.Motion.ParameterValue;
-using PoseNodeInstance = Prowl.Motion.PoseNodeInstance;
-using SceneInstance = Prowl.Runtime.Resources.SceneInstance;
+using GraphNodeInstance = Infinity.Motion.GraphNodeInstance;
+using IBlendWeights = Infinity.Motion.IBlendWeights;
+using IStateMachineState = Infinity.Motion.IStateMachineState;
+using MotionGraphInstance = Infinity.Motion.AnimationGraphInstance;
+using ParameterValue = Infinity.Motion.ParameterValue;
+using PoseNodeInstance = Infinity.Motion.PoseNodeInstance;
+using SceneInstance = Infinity.Runtime.Resources.SceneInstance;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 /// <summary>
 /// An animation graph asset as the graph editor works on it. Positional pins are ports "in0", "in1" and on,

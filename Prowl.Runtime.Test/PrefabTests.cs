@@ -1,17 +1,17 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Echo;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>
 /// Tests for the Runtime prefab surface: <see cref="GameObject.InstantiateDetached"/> (cloning, prefab-id
 /// stamping, nested-prefab boundaries), GameObject prefab tracking, and prefab-data serialization.
-/// The editor-side override engine (apply/revert/detect) lives in Prowl.Editor and is out of scope here.
+/// The editor-side override engine (apply/revert/detect) lives in Infinity.Editor and is out of scope here.
 /// </summary>
 public class PrefabTests : RuntimeTestBase
 {

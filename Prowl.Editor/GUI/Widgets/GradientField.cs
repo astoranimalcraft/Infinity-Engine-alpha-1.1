@@ -1,23 +1,23 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Quill;
-using Prowl.Runtime;
-using Prowl.Scribe;
-using Prowl.Vector;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Quill;
+using Infinity.Runtime;
+using Infinity.Scribe;
+using Infinity.Vector;
 
 using Color = System.Drawing.Color;
-using Gradient = Prowl.Vector.Gradient;
-using VColor = Prowl.Vector.Color;
+using Gradient = Infinity.Vector.Gradient;
+using VColor = Infinity.Vector.Color;
 
-namespace Prowl.Editor.GUI.Widgets;
+namespace Infinity.Editor.GUI.Widgets;
 
 /// <summary>
 /// Fluent builder for a Gradient editor field.

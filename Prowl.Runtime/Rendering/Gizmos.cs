@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-using Prowl.Runtime;
+using Infinity.Runtime;
 
-namespace Prowl.Graphite.Rendering;
+namespace Infinity.Graphite.Rendering;
 
 /// <summary>
 /// The render feature a view draws gizmos with. It holds the batches the scene hands it and runs in the overlay slot,

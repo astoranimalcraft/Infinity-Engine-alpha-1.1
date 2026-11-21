@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -10,12 +10,12 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-using Prowl.Echo;
-using Prowl.Editor.GUI;
-using Prowl.PaperUI;
-using Prowl.Runtime;
+using Infinity.Echo;
+using Infinity.Editor.GUI;
+using Infinity.PaperUI;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Theming;
+namespace Infinity.Editor.Theming;
 
 /// <summary>Registers a class as a section of the Preferences window. The class must derive from <see cref="EditorPreferences"/>.</summary>
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
@@ -77,7 +77,7 @@ public static class Preferences
 
     /// <summary>The folder the section files are saved in.</summary>
     public static string FolderPath { get; internal set; } = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Prowl", "Preferences");
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Infinity", "Preferences");
 
     /// <summary>The live instance of a section.</summary>
     public static T Get<T>() where T : EditorPreferences

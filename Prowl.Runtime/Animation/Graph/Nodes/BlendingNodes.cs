@@ -1,12 +1,12 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Collections.Generic;
 
-using Prowl.Motion;
-using Prowl.Vector;
+using Infinity.Motion;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.AnimationNodes;
+namespace Infinity.Runtime.AnimationNodes;
 
 public sealed class Blend1DNode : AnimationGraphNode
 {

@@ -1,16 +1,16 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Collections.Generic;
 
-using Prowl.Echo;
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using GLightType = Prowl.Graphite.Rendering.LightType;
+using GLightType = Infinity.Graphite.Rendering.LightType;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>Parallel light from infinitely far away, like the sun. Only its rotation matters. Its intensity is in lux.</summary>
 [AddComponentMenu("Rendering/Lights/Directional Light")]

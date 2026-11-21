@@ -1,21 +1,21 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-using Prowl.Recast.Core;
-using Prowl.Recast.Detour;
+using Infinity.Recast.Core;
+using Infinity.Recast.Detour;
 
-using Prowl.Echo;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
 using Xunit;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 public class NavMeshBuildTests : RuntimeTestBase
 {
@@ -697,7 +697,7 @@ public class NavMeshBuildTests : RuntimeTestBase
 
             // The sink posts to the engine loop when one exists and this is not its thread, so
             // whether these arrive synchronously depends on what else has run. Drain it either way.
-            Prowl.Runtime.Tasks.MainThreadContext.Current?.Pump();
+            Infinity.Runtime.Tasks.MainThreadContext.Current?.Pump();
 
             string[] warned, errored;
             lock (gate) { warned = [.. warnings]; errored = [.. errors]; }

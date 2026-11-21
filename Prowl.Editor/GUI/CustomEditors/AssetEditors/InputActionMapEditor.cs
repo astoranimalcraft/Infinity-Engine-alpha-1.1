@@ -2,18 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.Echo;
-using Prowl.Editor.GUI;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
+using Infinity.Echo;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
 
 using Color = System.Drawing.Color;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 [CustomAssetEditor(typeof(InputActionMap))]
 public class InputActionMapEditor : AssetImporterEditor
@@ -191,7 +191,7 @@ public class InputActionMapEditor : AssetImporterEditor
             if (kind == ActionKind.PassThrough)
                 InputBindingDisplay.Segmented(paper, $"{id}_out", [new("float"), new("Float2")],
                     InputBindingDisplay.OutputsVector(action) ? 1 : 0,
-                    i => action.ExpectedValueType = i == 1 ? typeof(Prowl.Vector.Float2) : typeof(float));
+                    i => action.ExpectedValueType = i == 1 ? typeof(Infinity.Vector.Float2) : typeof(float));
 
             InputBindingDisplay.Hint(paper, $"{id}_kind_hint", InputBindingDisplay.KindDescription(kind));
 

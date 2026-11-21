@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -9,11 +9,11 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 
-using Prowl.OrigamiUI;
-using Prowl.Runtime;
-using Prowl.Vector;
+using Infinity.OrigamiUI;
+using Infinity.Runtime;
+using Infinity.Vector;
 
-namespace Prowl.Editor.GUI.ScriptEditor;
+namespace Infinity.Editor.GUI.ScriptEditor;
 
 /// <summary>
 /// A code editor colour scheme: a base palette with some colours and token styles replaced. Colours are keyed by
@@ -58,7 +58,7 @@ public static class CodeColorSchemes
 {
     /// <summary>The folder user schemes are saved in, one JSON file each.</summary>
     public static string FolderPath { get; } = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Prowl", "ColorSchemes");
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Infinity", "ColorSchemes");
 
     public const string FileExtension = ".prowlcolors";
 

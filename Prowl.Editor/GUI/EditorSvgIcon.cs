@@ -1,16 +1,16 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.OrigamiUI;
-using Prowl.Quill;
-using Prowl.Vector;
-using Prowl.Vector.Spatial;
+using Infinity.OrigamiUI;
+using Infinity.Quill;
+using Infinity.Vector;
+using Infinity.Vector.Spatial;
 
 using Color = System.Drawing.Color;
 
-namespace Prowl.Editor.GUI;
+namespace Infinity.Editor.GUI;
 
 /// <summary>
 /// An <see cref="IOrigamiIcon"/> that paints an SVG path through Quill's SVG parser/renderer. The path

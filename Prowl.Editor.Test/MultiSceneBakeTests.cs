@@ -1,18 +1,18 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Diagnostics;
 
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Lightmapping;
-using Prowl.Editor.Navigation;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Lightmapping;
+using Infinity.Editor.Navigation;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>One bake over every loaded scene, with each scene keeping its own output and its own dirty mark.</summary>
 public class MultiSceneBakeTests : EditorTestHarness

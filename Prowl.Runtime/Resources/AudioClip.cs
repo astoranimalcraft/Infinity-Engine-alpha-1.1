@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -7,11 +7,11 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 
-using Prowl.Echo;
-using Prowl.Runtime.Audio;
-using Prowl.Runtime.Audio.Native;
+using Infinity.Echo;
+using Infinity.Runtime.Audio;
+using Infinity.Runtime.Audio.Native;
 
-namespace Prowl.Runtime.Resources;
+namespace Infinity.Runtime.Resources;
 
 /// <summary>
 /// Represents audio data that can be played back or streamed by an AudioSource. Supported file types are WAV/MP3/FlAC/OGG.

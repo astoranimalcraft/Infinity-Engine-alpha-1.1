@@ -1,21 +1,21 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-using Prowl.Motion;
-using Prowl.Runtime.AnimationNodes;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
-using Prowl.Vector.Spatial;
+using Infinity.Motion;
+using Infinity.Runtime.AnimationNodes;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
+using Infinity.Vector.Spatial;
 
-using MotionAvatar = Prowl.Motion.Avatar;
-using MotionClip = Prowl.Motion.AnimationClipBase;
-using MotionSkeleton = Prowl.Motion.Skeleton;
+using MotionAvatar = Infinity.Motion.Avatar;
+using MotionClip = Infinity.Motion.AnimationClipBase;
+using MotionSkeleton = Infinity.Motion.Skeleton;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>Plays clips with cross fades, or an animation graph, on a rig. Runs between Update and LateUpdate.</summary>
 [AddComponentMenu("Animation/Animator")]

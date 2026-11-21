@@ -1,11 +1,11 @@
 using System;
 
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.Widgets;
-using Prowl.PaperUI;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.Widgets;
+using Infinity.PaperUI;
 
-using Gradient = Prowl.Vector.Gradient;
-namespace Prowl.Editor.Inspector;
+using Gradient = Infinity.Vector.Gradient;
+namespace Infinity.Editor.Inspector;
 
 // ================================================================
 //  Gradient Property Editor

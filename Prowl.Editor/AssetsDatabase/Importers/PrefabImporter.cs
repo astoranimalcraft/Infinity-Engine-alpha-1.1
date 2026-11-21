@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Echo;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor.Importers;
+namespace Infinity.Editor.Importers;
 
 /// <summary>
 /// Imports .prefab files serialized GameObject hierarchies wrapped in PrefabAsset.

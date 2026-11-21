@@ -1,13 +1,13 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Runtime.Resources;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Runtime.AssetImporting;
+namespace Infinity.Runtime.AssetImporting;
 
 public struct ModelImporterSettings
 {
@@ -102,7 +102,7 @@ public struct ModelImporterSettings
     /// </summary>
     public float AnimationSampleRate = 30f;
 
-    /// <summary>Generate a lightmap UV set (UV2) for every mesh via Prowl.Unwrapper. Off by default
+    /// <summary>Generate a lightmap UV set (UV2) for every mesh via Infinity.Unwrapper. Off by default
     /// (it's slow and some models ship their own UV2); the built-in default models force it on.</summary>
     public bool GenerateLightmapUVs = false;
 
@@ -217,7 +217,7 @@ public enum ModelRigType
 
 /// <summary>
 /// Loads .gltf / .glb / .obj into a fully-baked <see cref="ModelImportResult"/>. Backed by the
-/// Prowl.Clay library (the previous in-tree GltfImporter / ObjImporter were retired in favor of
+/// Infinity.Clay library (the previous in-tree GltfImporter / ObjImporter were retired in favor of
 /// this single unified path).
 /// </summary>
 public class ModelImporter

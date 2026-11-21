@@ -1,17 +1,17 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.PropertyEditors;
-using Prowl.Editor.Navigation;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.PropertyEditors;
+using Infinity.Editor.Navigation;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 /// <summary>
 /// Inspector for <see cref="NavMeshSurface"/>: the default property grid plus an editor bake

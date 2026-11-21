@@ -1,9 +1,9 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Vector;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.Rendering;
+namespace Infinity.Runtime.Rendering;
 
 /// <summary>The colour of a black body at a temperature, the warm orange of a candle at 1900 K to the blue of a clear sky past 10000 K.</summary>
 public static class ColorTemperature

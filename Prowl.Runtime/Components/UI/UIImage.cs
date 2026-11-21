@@ -1,15 +1,15 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Echo;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
-using Prowl.Vector.Geometry;
+using Infinity.Echo;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
+using Infinity.Vector.Geometry;
 
-namespace Prowl.Runtime.UI;
+namespace Infinity.Runtime.UI;
 
 /// <summary>How a <see cref="UIImage"/> stretches its texture across the rect.</summary>
 public enum ImageType

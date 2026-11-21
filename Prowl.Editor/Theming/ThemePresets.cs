@@ -1,4 +1,4 @@
-namespace Prowl.Editor.Theming;
+namespace Infinity.Editor.Theming;
 
 /// <summary>
 /// A built-in color theme. Stops override a ramp's computed offsets, for themes the dark defaults can't be

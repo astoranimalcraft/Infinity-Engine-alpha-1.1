@@ -5,25 +5,25 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json.Nodes;
 
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Echo;
-using Prowl.Editor.Core;
-using Prowl.Editor.Importers;
-using Prowl.Editor.Inspector;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Rosetta;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
-using Prowl.Vector.Geometry;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Echo;
+using Infinity.Editor.Core;
+using Infinity.Editor.Importers;
+using Infinity.Editor.Inspector;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
+using Infinity.Vector.Geometry;
 
 using Color = System.Drawing.Color;
-namespace Prowl.Editor.GUI.Panels;
+namespace Infinity.Editor.GUI.Panels;
 
 public class InspectorPanel : DockPanel
 {

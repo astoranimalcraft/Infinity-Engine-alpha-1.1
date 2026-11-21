@@ -1,13 +1,13 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Runtime.Resources;
-using Prowl.Scribe;
-using Prowl.Vector;
+using Infinity.Runtime.Resources;
+using Infinity.Scribe;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.UI;
+namespace Infinity.Runtime.UI;
 
 /// <summary>
 /// Owns the Scribe <see cref="FontSystem"/> and its glyph atlas <see cref="Texture2D"/>

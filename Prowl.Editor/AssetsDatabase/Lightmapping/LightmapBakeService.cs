@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -7,22 +7,22 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-using Prowl.Aperture;
-using Prowl.Echo;
-using Prowl.Editor.Importers;
+using Infinity.Aperture;
+using Infinity.Echo;
+using Infinity.Editor.Importers;
 
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Projects;
-using Prowl.Photonic;
-using Prowl.Runtime;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Projects;
+using Infinity.Photonic;
+using Infinity.Runtime;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-namespace Prowl.Editor.Lightmapping;
+namespace Infinity.Editor.Lightmapping;
 
 /// <summary>
-/// Drives one lightmap bake over every loaded scene of the edit world with Prowl.Photonic, so shadows and bounced light
+/// Drives one lightmap bake over every loaded scene of the edit world with Infinity.Photonic, so shadows and bounced light
 /// cross between scenes. Each scene gets its own atlas pages in a SceneName_lightmaps folder beside its file, its own
 /// placements and its own light probes, and is marked dirty. A bake never saves a scene.
 /// </summary>

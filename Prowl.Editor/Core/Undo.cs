@@ -3,15 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.Echo;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Prefabs;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Runtime.Tasks;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Prefabs;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Runtime.Tasks;
+using Infinity.Vector;
 
-namespace Prowl.Editor.Core;
+namespace Infinity.Editor.Core;
 
 /// <summary>What a record changes, for dirty marks and for dropping steps.</summary>
 public readonly struct UndoOwner : IEquatable<UndoOwner>

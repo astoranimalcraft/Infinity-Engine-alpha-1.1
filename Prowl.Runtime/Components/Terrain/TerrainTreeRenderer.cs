@@ -1,19 +1,19 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using GMaterial = Prowl.Graphite.Rendering.Material;
-using Material = Prowl.Runtime.Resources.Material;
-using Mesh = Prowl.Runtime.Resources.Mesh;
+using GMaterial = Infinity.Graphite.Rendering.Material;
+using Material = Infinity.Runtime.Resources.Material;
+using Mesh = Infinity.Runtime.Resources.Mesh;
 
-namespace Prowl.Runtime.Terrain;
+namespace Infinity.Runtime.Terrain;
 
 /// <summary>
 /// Places a terrain's trees in the world once, when they or the terrain change, and lets each view draw the ones

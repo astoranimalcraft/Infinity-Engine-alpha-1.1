@@ -1,13 +1,13 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Buffers.Binary;
 
-using Prowl.Graphite;
-using Prowl.Graphite.Debugging;
+using Infinity.Graphite;
+using Infinity.Graphite.Debugging;
 
-namespace Prowl.Editor.Core.Diagnostics;
+namespace Infinity.Editor.Core.Diagnostics;
 
 /// <summary> Turns the texels of a recorded or replayed copy into 8 bit RGBA, so a pass output can be written as a PNG. </summary>
 internal static class SnapshotImages

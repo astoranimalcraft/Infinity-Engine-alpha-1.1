@@ -1,4 +1,4 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,11 +6,11 @@ using System.Collections.Generic;
 
 using System.Runtime.CompilerServices;
 
-using Prowl.Echo;
-using Prowl.Runtime;
-using Prowl.Runtime.Tasks;
+using Infinity.Echo;
+using Infinity.Runtime;
+using Infinity.Runtime.Tasks;
 
-namespace Prowl.Vector;
+namespace Infinity.Vector;
 
 public class Transform : ISerializationCallbackReceiver
 {
@@ -272,7 +272,7 @@ public class Transform : ISerializationCallbackReceiver
     // Wakes the renderers and colliders of this object and every descendant, walking at most once a scene sync and once a physics sync.
     private void WakeDependents()
     {
-        uint renderEpoch = Prowl.Runtime.Rendering.SceneRendering.Epoch;
+        uint renderEpoch = Infinity.Runtime.Rendering.SceneRendering.Epoch;
         uint physicsEpoch = PhysicsWorld.SyncEpoch;
         bool wakeRendering = _wokeRenderEpoch != renderEpoch;
         bool wakeColliders = _wokePhysicsEpoch != physicsEpoch;

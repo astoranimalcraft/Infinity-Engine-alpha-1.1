@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,27 +6,27 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-using Prowl.Editor.Build;
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.Popups;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Editor.Projects.Settings;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Rosetta;
-using Prowl.Runtime;
-using Prowl.Scribe;
+using Infinity.Editor.Build;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.Popups;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Editor.Projects.Settings;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.Scribe;
 
-using static Prowl.Editor.GUI.EditorGUI;
+using static Infinity.Editor.GUI.EditorGUI;
 
-using TextAlignment = Prowl.PaperUI.TextAlignment;
+using TextAlignment = Infinity.PaperUI.TextAlignment;
 
 
-namespace Prowl.Editor.GUI.Panels;
+namespace Infinity.Editor.GUI.Panels;
 
 public class BuildSettingsPanel : DockPanel
 {
@@ -335,7 +335,7 @@ public class BuildSettingsPanel : DockPanel
                     if (profile != null)
                     {
                         EditorGUI.SectionHeader(paper, "bp_prof_h", _buildPlatforms[_selectedIndex].Name, first: true);
-                        Prowl.Editor.Build.BuildProfileDrawers.Draw(paper, profile);
+                        Infinity.Editor.Build.BuildProfileDrawers.Draw(paper, profile);
                     }
                 }
 

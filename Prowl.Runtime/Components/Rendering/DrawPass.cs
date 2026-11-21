@@ -1,11 +1,11 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Echo;
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Rendering;
+using Infinity.Echo;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Rendering;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>When a <see cref="DrawPass"/> draws in each camera's frame.</summary>
 public enum DrawPassStage

@@ -1,4 +1,4 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 //  Verblib version 0.5 - 2022-10-25
@@ -11,10 +11,10 @@
 
 using System;
 using System.Runtime.CompilerServices;
-using Prowl.Runtime.Audio.Native;
-using Prowl.Vector;
+using Infinity.Runtime.Audio.Native;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.Audio.Effects;
+namespace Infinity.Runtime.Audio.Effects;
 
 public class Reverb
 {

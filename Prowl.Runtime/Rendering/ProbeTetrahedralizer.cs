@@ -1,13 +1,13 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Threading;
 
-using Prowl.Vector;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.Rendering;
+namespace Infinity.Runtime.Rendering;
 
 /// <summary>
 /// 3D Delaunay tetrahedralization (Bowyer-Watson) of light-probe positions. Produces the tetra

@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -7,15 +7,15 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.Json.Nodes;
 
-using Prowl.Editor.Core.Diagnostics;
-using Prowl.Editor.GUI.Panels;
-using Prowl.Runtime.Diagnostics;
+using Infinity.Editor.Core.Diagnostics;
+using Infinity.Editor.GUI.Panels;
+using Infinity.Runtime.Diagnostics;
 
 using Xunit;
 
-using History = Prowl.Editor.GUI.Panels.FrameStatsPanel.History;
+using History = Infinity.Editor.GUI.Panels.FrameStatsPanel.History;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 // Frame stats are static and record one thread, so these never run alongside each other.
 [CollectionDefinition(nameof(FrameStatsPanelTests), DisableParallelization = true)]

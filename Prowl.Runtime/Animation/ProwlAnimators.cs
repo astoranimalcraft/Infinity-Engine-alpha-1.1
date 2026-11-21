@@ -1,15 +1,15 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Motion;
-using Prowl.Vector;
-using Prowl.Vector.Spatial;
+using Infinity.Motion;
+using Infinity.Vector;
+using Infinity.Vector.Spatial;
 
-using MotionAvatar = Prowl.Motion.Avatar;
-using MotionGraph = Prowl.Motion.AnimationGraph;
-using MotionSkeleton = Prowl.Motion.Skeleton;
+using MotionAvatar = Infinity.Motion.Avatar;
+using MotionGraph = Infinity.Motion.AnimationGraph;
+using MotionSkeleton = Infinity.Motion.Skeleton;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>Plays clips with cross fades, for an animator with no graph.</summary>
 internal sealed class ProwlClipAnimator : SimpleAnimator

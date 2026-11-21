@@ -1,13 +1,13 @@
 using System;
 
-using Prowl.Editor.GUI;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.Runtime;
-using Prowl.Runtime.MeshFeatures.Generation;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.Runtime;
+using Infinity.Runtime.MeshFeatures.Generation;
 
-namespace Prowl.Editor.Projects.Settings;
+namespace Infinity.Editor.Projects.Settings;
 
 /// <summary>
 /// How long assets nothing uses stay loaded, how much memory a built game lets loaded assets take before

@@ -1,14 +1,14 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-using Prowl.Runtime;
+using Infinity.Runtime;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 // WARNING: These tests capture line numbers are so are sensitive to the addition or removal of source lines.
 // If you modify this file, make sure to re-run every test as the line numbers may have changed!
@@ -22,11 +22,11 @@ public class DebugStackTraceTests
         Assert.NotNull(st);
         Assert.Equal(nameof(DebugStackTraceTests), st.TypeName);
         Assert.True(st.LineCount >= 1);
-        Assert.StartsWith($"at Prowl.Editor.Test.DebugStackTraceTests.{nameof(FromStackTrace_HasExpectedProperties)}()", st.GetLine(0));
+        Assert.StartsWith($"at Infinity.Editor.Test.DebugStackTraceTests.{nameof(FromStackTrace_HasExpectedProperties)}()", st.GetLine(0));
         Assert.NotNull(st.GetLine(st.LineCount - 1));
         Assert.Null(st.GetAssetSourceLocation("Z:\\NonExistentDirectory\\"));
         Assert.Equal((Path: GetSourcePath(), Line: 21, Column: 9), st.GetAssetSourceLocation(Path.GetDirectoryName(GetSourcePath())!));
-        Assert.StartsWith($"   at Prowl.Editor.Test.DebugStackTraceTests.{nameof(FromStackTrace_HasExpectedProperties)}()", st.ToString());
+        Assert.StartsWith($"   at Infinity.Editor.Test.DebugStackTraceTests.{nameof(FromStackTrace_HasExpectedProperties)}()", st.ToString());
     }
 
     [Fact]
@@ -36,10 +36,10 @@ public class DebugStackTraceTests
         Assert.NotNull(st);
         Assert.Equal(nameof(DebugStackTraceTests), st.TypeName);
         Assert.True(st.LineCount >= 1);
-        Assert.StartsWith($"at Prowl.Editor.Test.DebugStackTraceTests.{nameof(FromStackTrace_WithoutFileInfo)}()", st.GetLine(0));
+        Assert.StartsWith($"at Infinity.Editor.Test.DebugStackTraceTests.{nameof(FromStackTrace_WithoutFileInfo)}()", st.GetLine(0));
         Assert.NotNull(st.GetLine(st.LineCount - 1));
         Assert.Null(st.GetAssetSourceLocation(Path.GetDirectoryName(GetSourcePath())!));
-        Assert.StartsWith($"   at Prowl.Editor.Test.DebugStackTraceTests.{nameof(FromStackTrace_WithoutFileInfo)}()", st.ToString());
+        Assert.StartsWith($"   at Infinity.Editor.Test.DebugStackTraceTests.{nameof(FromStackTrace_WithoutFileInfo)}()", st.ToString());
     }
 
     [Fact]
@@ -59,13 +59,13 @@ public class DebugStackTraceTests
         Assert.NotNull(st);
         Assert.Equal(nameof(DebugStackTraceTests), st.TypeName);
         Assert.True(st.LineCount >= 1);
-        Assert.StartsWith($"at Prowl.Editor.Test.DebugStackTraceTests.{nameof(FromException_HasExpectedProperties)}()", st.GetLine(0));
+        Assert.StartsWith($"at Infinity.Editor.Test.DebugStackTraceTests.{nameof(FromException_HasExpectedProperties)}()", st.GetLine(0));
         Assert.NotNull(st.GetLine(st.LineCount - 1));
         Assert.Null(st.GetAssetSourceLocation("Z:\\NonExistentDirectory\\"));
         Assert.Equal((Path: GetSourcePath(), Line: 52, Column: 13), st.GetAssetSourceLocation(Path.GetDirectoryName(GetSourcePath())!));
         Assert.StartsWith($"""
             System.InvalidOperationException: Test message
-               at Prowl.Editor.Test.DebugStackTraceTests.{nameof(FromException_HasExpectedProperties)}()
+               at Infinity.Editor.Test.DebugStackTraceTests.{nameof(FromException_HasExpectedProperties)}()
             """, st.ToString());
     }
 
@@ -96,12 +96,12 @@ public class DebugStackTraceTests
         Assert.NotNull(st);
         Assert.Equal(nameof(DebugStackTraceTests), st.TypeName);
         Assert.True(st.LineCount >= 1);
-        Assert.StartsWith($"at Prowl.Editor.Test.DebugStackTraceTests.{nameof(FromException_HandlesNestedExceptions)}()", st.GetLine(0));
+        Assert.StartsWith($"at Infinity.Editor.Test.DebugStackTraceTests.{nameof(FromException_HandlesNestedExceptions)}()", st.GetLine(0));
         Assert.NotNull(st.GetLine(st.LineCount - 1));
         Assert.StartsWith($"""
             System.NotImplementedException: Wrapping
              ---> System.InvalidOperationException: Test message
-               at Prowl.Editor.Test.DebugStackTraceTests.{nameof(FromException_HandlesNestedExceptions)}()
+               at Infinity.Editor.Test.DebugStackTraceTests.{nameof(FromException_HandlesNestedExceptions)}()
             """, st.ToString());
     }
 

@@ -1,11 +1,11 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Runtime.Resources;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>
 /// A component that records how many times each per-frame callback ran, and the order they ran in.

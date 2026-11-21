@@ -1,10 +1,10 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using Jitter2.Collision;
 using Jitter2.LinearMath;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// A triangle shape used for collision detection with terrain heightmaps.

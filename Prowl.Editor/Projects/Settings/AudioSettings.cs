@@ -1,11 +1,11 @@
-using Prowl.Editor.GUI;
-using Prowl.Editor.Inspector;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.Runtime;
-using Prowl.Runtime.Audio;
-namespace Prowl.Editor.Projects.Settings;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Inspector;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.Runtime;
+using Infinity.Runtime.Audio;
+namespace Infinity.Editor.Projects.Settings;
 
 /// <summary> Project settings for audio output, including master volume, sample rate, channel count, and buffer size. </summary>
 [ProjectSettings("Audio", EditorIcons.VolumeHigh, order: 25)]

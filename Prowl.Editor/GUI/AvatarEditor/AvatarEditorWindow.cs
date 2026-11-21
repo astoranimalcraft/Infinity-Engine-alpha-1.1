@@ -1,29 +1,29 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Echo;
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI;
-using Prowl.Editor.Importers;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Theming;
-using Prowl.Motion;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Importers;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Theming;
+using Infinity.Motion;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using Canvas = Prowl.Quill.Canvas;
-using MotionAvatar = Prowl.Motion.Avatar;
-using MotionSkeleton = Prowl.Motion.Skeleton;
+using Canvas = Infinity.Quill.Canvas;
+using MotionAvatar = Infinity.Motion.Avatar;
+using MotionSkeleton = Infinity.Motion.Skeleton;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 /// <summary>
 /// Maps a model's skeleton onto the human body by hand: pick a humanoid slot, then click its bone in the

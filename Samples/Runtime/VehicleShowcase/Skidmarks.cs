@@ -1,14 +1,14 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Runtime;
-using Prowl.Runtime.ParticleSystem;
-using Prowl.Runtime.ParticleSystem.Modules;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Runtime;
+using Infinity.Runtime.ParticleSystem;
+using Infinity.Runtime.ParticleSystem.Modules;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using Gradient = Prowl.Vector.Gradient;
+using Gradient = Infinity.Vector.Gradient;
 
 namespace VehicleShowcase;
 

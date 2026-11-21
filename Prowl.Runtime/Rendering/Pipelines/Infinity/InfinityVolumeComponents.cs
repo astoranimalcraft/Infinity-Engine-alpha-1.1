@@ -1,11 +1,11 @@
-using Prowl.Echo;
-using Prowl.Runtime;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
-using G = Prowl.Graphite.Rendering;
+using Infinity.Echo;
+using Infinity.Runtime;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
+using G = Infinity.Graphite.Rendering;
 
-namespace Prowl.Runtime.Rendering.Pipelines.Infinity;
+namespace Infinity.Runtime.Rendering.Pipelines.Infinity;
 
 public enum InfinityToneMappingMode
 {

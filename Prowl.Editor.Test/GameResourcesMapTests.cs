@@ -1,14 +1,14 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Editor.Build;
-using Prowl.Editor.Importers;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Editor.Build;
+using Infinity.Editor.Importers;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>
 /// The Resources map the editor and a build publish covers sub assets, answers to the path the project

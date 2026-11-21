@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 
-using Prowl.Editor.Core;
-using Prowl.Runtime;
+using Infinity.Editor.Core;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Theming;
+namespace Infinity.Editor.Theming;
 
 /// <summary>
 /// Global editor settings. Saved to AppData/Prowl/EditorSettings.json.

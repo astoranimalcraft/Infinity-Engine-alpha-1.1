@@ -1,20 +1,20 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Editor;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
+using Infinity.Editor;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
 
 using Color = System.Drawing.Color;
-using TextAlign = Prowl.Runtime.UI.TextAlignment;
-using VColor = Prowl.Vector.Color;
+using TextAlign = Infinity.Runtime.UI.TextAlignment;
+using VColor = Infinity.Vector.Color;
 
-namespace Prowl.Editor.GUI;
+namespace Infinity.Editor.GUI;
 
 /// <summary>
 /// Shared immediate-mode building blocks for the editor's own panels and inspectors
@@ -529,9 +529,9 @@ public static class EditorGUI
                     float cx = (float)(r.Min.X + r.Size.X / 2), cy = (float)(r.Min.Y + r.Size.Y / 2);
                     const float sw = 20f;
                     canvas.RoundedRectFilled(cx - sw / 2, cy - sw / 2, sw, sw, round,
-                        Prowl.Vector.Color32.FromArgb(255, col.R, col.G, col.B));
+                        Infinity.Vector.Color32.FromArgb(255, col.R, col.G, col.B));
                     canvas.RoundedRect(cx - sw / 2, cy - sw / 2, sw, sw, round);
-                    canvas.SetStrokeColor(Prowl.Vector.Color32.FromArgb(30, 255, 255, 255));
+                    canvas.SetStrokeColor(Infinity.Vector.Color32.FromArgb(30, 255, 255, 255));
                     canvas.SetStrokeWidth(1f);
                     canvas.Stroke();
                     if (on)
@@ -539,7 +539,7 @@ public static class EditorGUI
                         Color acc = EditorTheme.Accent;
                         const float ring = 27f;
                         canvas.RoundedRect(cx - ring / 2, cy - ring / 2, ring, ring, ringRound);
-                        canvas.SetStrokeColor(Prowl.Vector.Color32.FromArgb(255, acc.R, acc.G, acc.B));
+                        canvas.SetStrokeColor(Infinity.Vector.Color32.FromArgb(255, acc.R, acc.G, acc.B));
                         canvas.SetStrokeWidth(2f);
                         canvas.Stroke();
                     }

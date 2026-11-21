@@ -5,24 +5,24 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.Theming;
-using Prowl.Editor.Utils;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Quill;
-using Prowl.Rosetta;
-using Prowl.Runtime;
-using Prowl.Scribe;
-using Prowl.Vector;
+using Infinity.Editor.Core;
+using Infinity.Editor.Theming;
+using Infinity.Editor.Utils;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Quill;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.Scribe;
+using Infinity.Vector;
 
-using static Prowl.Editor.GUI.EditorGUI;
+using static Infinity.Editor.GUI.EditorGUI;
 
 using Color = System.Drawing.Color;
-using TextAlignment = Prowl.PaperUI.TextAlignment;
+using TextAlignment = Infinity.PaperUI.TextAlignment;
 
-namespace Prowl.Editor.GUI.Panels;
+namespace Infinity.Editor.GUI.Panels;
 
 /// <summary>How the Console panel shows logs.</summary>
 [EditorPreferences("Console", EditorIcons.Terminal, order: 20)]

@@ -1,12 +1,12 @@
 using System;
 
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.Widgets;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-namespace Prowl.Editor.Inspector;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.Widgets;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+namespace Infinity.Editor.Inspector;
 
 // ================================================================
 //  MinMaxCurve Property Editor

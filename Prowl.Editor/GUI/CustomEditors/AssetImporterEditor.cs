@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
 
-using Prowl.Echo;
-using Prowl.Editor.GUI;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
+using Infinity.Echo;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 /// <summary>
 /// Attribute to register a custom asset editor for a specific EngineObject type.
@@ -161,7 +161,7 @@ public abstract class AssetImporterEditor
         {
             paper.Box($"{id}_savebar_spacer").Height(1).IsNotInteractable();
 
-            Origami.Button(paper, $"{id}_revert", Prowl.Rosetta.Loc.Get("dialog.revert"), () =>
+            Origami.Button(paper, $"{id}_revert", Infinity.Rosetta.Loc.Get("dialog.revert"), () =>
             {
                 Core.Undo.RecordObject(asset, "Revert Asset");
                 db.RevertToSaved(asset);
@@ -169,7 +169,7 @@ public abstract class AssetImporterEditor
                 Core.EditorUtility.ClearAssetDirty(asset.AssetID);
             }).Height(30).Show();
 
-            Origami.Button(paper, $"{id}_save", $"{EditorIcons.FloppyDisk}  {Prowl.Rosetta.Loc.Get("dialog.save")}", () =>
+            Origami.Button(paper, $"{id}_save", $"{EditorIcons.FloppyDisk}  {Infinity.Rosetta.Loc.Get("dialog.save")}", () =>
             {
                 if (db.SaveAsset(asset)) Core.EditorUtility.ClearAssetDirty(asset.AssetID);
             }).Primary().Height(30).Show();
@@ -194,10 +194,10 @@ public abstract class AssetImporterEditor
             // Pushes both buttons to the right.
             paper.Box($"{id}_applybar_spacer").Height(1).IsNotInteractable();
 
-            Origami.Button(paper, $"{id}_revert", Prowl.Rosetta.Loc.Get("dialog.revert"),
+            Origami.Button(paper, $"{id}_revert", Infinity.Rosetta.Loc.Get("dialog.revert"),
                 () => RevertPendingChanges(entry, asset)).Height(30).Show();
 
-            Origami.Button(paper, $"{id}_apply", $"{EditorIcons.FloppyDisk}  {Prowl.Rosetta.Loc.Get("dialog.apply")}",
+            Origami.Button(paper, $"{id}_apply", $"{EditorIcons.FloppyDisk}  {Infinity.Rosetta.Loc.Get("dialog.apply")}",
                 () => ApplyPendingChanges(entry, asset)).Primary().Height(30).Show();
         }
     }

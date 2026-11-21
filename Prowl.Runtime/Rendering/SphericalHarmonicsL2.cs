@@ -1,18 +1,18 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Vector;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.Rendering;
+namespace Infinity.Runtime.Rendering;
 
 /// <summary>
 /// Order-2 (9-coefficient) RGB spherical harmonics the light-probe representation for ambient
-/// GI on dynamic objects. Layout matches <c>Prowl.Photonic.Sh9Rgb</c> (the editor copies the baked
+/// GI on dynamic objects. Layout matches <c>Infinity.Photonic.Sh9Rgb</c> (the editor copies the baked
 /// coefficients straight across). Serialized as plain public fields.
 /// </summary>
 public struct SphericalHarmonicsL2
 {
-    // Real-SH basis constants (must match Prowl.Photonic.Sh9Rgb).
+    // Real-SH basis constants (must match Infinity.Photonic.Sh9Rgb).
     private const float K0 = 0.2820947918f;
     private const float K1 = 0.4886025119f;
     private const float K2a = 1.0925484306f;

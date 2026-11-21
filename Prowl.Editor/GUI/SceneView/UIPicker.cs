@@ -1,16 +1,16 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Linq;
 using System.Collections.Generic;
 
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Runtime.UI;
-using Prowl.Vector;
-using Prowl.Vector.Geometry;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Runtime.UI;
+using Infinity.Vector;
+using Infinity.Vector.Geometry;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 internal static class UIPicker
 {

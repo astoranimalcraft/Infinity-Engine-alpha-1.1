@@ -1,17 +1,17 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Echo;
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
 using Xunit;
 
-using Material = Prowl.Runtime.Resources.Material;
+using Material = Infinity.Runtime.Resources.Material;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 public class SceneEnvironmentTests
 {
@@ -22,7 +22,7 @@ public class SceneEnvironmentTests
 
         Material? sky = scene.Environment.SkyMaterial;
         Assert.True(sky.IsValid());
-        Assert.Same(Prowl.Runtime.Resources.Shader.LoadDefault(DefaultShader.ProceduralSky), sky.Shader);
+        Assert.Same(Infinity.Runtime.Resources.Shader.LoadDefault(DefaultShader.ProceduralSky), sky.Shader);
         Assert.True(sky.HasProperty("_SunSize"));
         Assert.True(scene.Rendering.HasSky);
     }
@@ -53,15 +53,15 @@ public class SceneEnvironmentTests
         EnvironmentDesc desc = new() { Sky = null };
         environment.ApplyTo(desc);
 
-        Assert.Equal(Prowl.Graphite.Rendering.AmbientMode.Hemisphere, desc.Ambient);
+        Assert.Equal(Infinity.Graphite.Rendering.AmbientMode.Hemisphere, desc.Ambient);
         Assert.Equal(0.5f, desc.AmbientIntensity);
         Assert.Equal(new Float4(1, 0, 0, 1), desc.AmbientColor);
         Assert.Equal(new Float4(0, 1, 0, 1), desc.AmbientSky);
         Assert.Equal(new Float4(0, 0, 1, 1), desc.AmbientGround);
-        Assert.Equal(new FogDesc { Mode = Prowl.Graphite.Rendering.FogMode.Linear, Color = new Float4(400f, 400f, 400f, 1), Density = 0.03f, Start = 2, End = 30, UseSky = true }, desc.Fog);
+        Assert.Equal(new FogDesc { Mode = Infinity.Graphite.Rendering.FogMode.Linear, Color = new Float4(400f, 400f, 400f, 1), Density = 0.03f, Start = 2, End = 30, UseSky = true }, desc.Fog);
         Assert.Equal(new Float4(0.1f, 0.2f, 0.3f, 1), desc.SkyColor);
         Assert.Null(desc.Sky);
-        Assert.Equal(Prowl.Graphite.Rendering.SkyCaptureMode.EveryFrame, desc.SkyCapture);
+        Assert.Equal(Infinity.Graphite.Rendering.SkyCaptureMode.EveryFrame, desc.SkyCapture);
         Assert.Equal(128u, desc.SkyProbeResolution);
         Assert.Equal(1, desc.SkyCaptureInterval);
     }
@@ -103,7 +103,7 @@ public class SceneEnvironmentTests
         environment.Fog.Mode = FogMode.Off;
 
         SceneEnvironment loaded = Serializer.Deserialize<SceneEnvironment>(Serializer.Serialize(environment))!;
-        Assert.Same(Prowl.Runtime.Resources.Shader.LoadDefault(DefaultShader.GradientSky), loaded.SkyMaterial!.Shader);
+        Assert.Same(Infinity.Runtime.Resources.Shader.LoadDefault(DefaultShader.GradientSky), loaded.SkyMaterial!.Shader);
         Assert.Equal(3f, loaded.SkyMaterial.GetFloat("_Exponent"));
         Assert.Equal(FogMode.Off, loaded.Fog.Mode);
 

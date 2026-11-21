@@ -1,12 +1,12 @@
 using System;
 
-using Prowl.Editor.Theming;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
+using Infinity.Editor.Theming;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
 
-using static Prowl.PaperUI.ElementBuilder;
+using static Infinity.PaperUI.ElementBuilder;
 
-namespace Prowl.Editor.GUI.Popups;
+namespace Infinity.Editor.GUI.Popups;
 
 /// <summary>
 /// The editor's one inline rename. A caller starts it with <see cref="Begin"/> and draws it with <see cref="Draw"/> in

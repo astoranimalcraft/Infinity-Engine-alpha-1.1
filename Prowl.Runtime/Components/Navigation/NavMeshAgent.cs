@@ -1,19 +1,19 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Buffers;
 using System.Collections.Generic;
 
-using Prowl.Echo;
-using Prowl.Recast.Core.Numerics;
-using Prowl.Recast.Detour;
-using Prowl.Recast.Detour.Crowd;
+using Infinity.Echo;
+using Infinity.Recast.Core.Numerics;
+using Infinity.Recast.Detour;
+using Infinity.Recast.Detour.Crowd;
 
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// Moves a character along the navmesh using crowd simulation: give it a

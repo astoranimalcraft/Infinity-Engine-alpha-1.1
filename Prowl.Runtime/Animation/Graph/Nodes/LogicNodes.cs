@@ -1,11 +1,11 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Collections.Generic;
 
-using Prowl.Motion;
+using Infinity.Motion;
 
-namespace Prowl.Runtime.AnimationNodes;
+namespace Infinity.Runtime.AnimationNodes;
 
 public sealed class ConditionSelectorNode : AnimationGraphNode
 {

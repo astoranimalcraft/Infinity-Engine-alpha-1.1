@@ -1,19 +1,19 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Editor.GUI;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
-using Prowl.Vector.Spatial;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
+using Infinity.Vector.Spatial;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 /// <summary>
 /// Inspector for a <see cref="Sprite"/> sub-asset: a preview of its sub-rect in the source texture, its
@@ -76,7 +76,7 @@ public class SpriteAssetEditor : AssetImporterEditor
                 .FontSize(EditorTheme.FontSizeSmall).Alignment(TextAlignment.MiddleLeft));
     }
 
-    private static void DrawPreview(Prowl.Quill.Canvas canvas, float minX, float minY, float w, float h, Sprite sprite, Texture2D? tex)
+    private static void DrawPreview(Infinity.Quill.Canvas canvas, float minX, float minY, float w, float h, Sprite sprite, Texture2D? tex)
     {
         // Checkerboard so alpha reads clearly.
         const float cell = 10f;

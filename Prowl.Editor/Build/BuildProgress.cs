@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Prowl.Editor.Build;
+namespace Infinity.Editor.Build;
 
 /// <summary>One line of build output, which the progress modal shows above the bar.</summary>
 public sealed record BuildState(string Message);

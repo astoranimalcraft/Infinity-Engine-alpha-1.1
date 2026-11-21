@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 
-using Prowl.Editor.GUI;
-using Prowl.Editor.Inspector;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-namespace Prowl.Editor.Projects.Settings;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Inspector;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+namespace Infinity.Editor.Projects.Settings;
 
 /// <summary> Project settings for configuring tags and layers used in the project. </summary>
 [ProjectSettings("Tags & Layers", EditorIcons.Tags, order: 10)]

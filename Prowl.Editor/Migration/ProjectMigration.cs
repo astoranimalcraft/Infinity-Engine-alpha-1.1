@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -8,11 +8,11 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-using Prowl.Echo;
-using Prowl.Editor.Projects;
-using Prowl.Runtime;
+using Infinity.Echo;
+using Infinity.Editor.Projects;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Migration;
+namespace Infinity.Editor.Migration;
 
 /// <summary>
 /// Brings a project saved with an older engine version up to <see cref="Project.CurrentVersion"/>.

@@ -1,11 +1,11 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Echo;
-using Prowl.Vector;
-using Prowl.Vector.Geometry;
+using Infinity.Echo;
+using Infinity.Vector;
+using Infinity.Vector.Geometry;
 
-namespace Prowl.Runtime.UI;
+namespace Infinity.Runtime.UI;
 
 /// <summary>
 /// Clips descendant graphics to this element's rectangle. The clip is evaluated per-fragment in the

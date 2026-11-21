@@ -1,6 +1,6 @@
 using System;
 
-namespace Prowl.Editor.GUI;
+namespace Infinity.Editor.GUI;
 
 /// <summary> Attribute applied to a method that generates a script template. Provides metadata for the template entry displayed in the editor. </summary>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]

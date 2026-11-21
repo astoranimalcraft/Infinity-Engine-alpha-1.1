@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -11,10 +11,10 @@ using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Prowl.Editor.GUI;
-using Prowl.Runtime;
+using Infinity.Editor.GUI;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Projects.Scripting;
+namespace Infinity.Editor.Projects.Scripting;
 
 /// <summary>
 /// Resolves `.cs` script assets (and <see cref="AssetDragPayload"/> instances) to compiled

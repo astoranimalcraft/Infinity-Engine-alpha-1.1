@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Runtime;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Importers;
+namespace Infinity.Editor.Importers;
 
 /// <summary>
 /// How a sub-asset's GUID is derived. Every saved reference to a sub-asset is keyed on this, so it has to

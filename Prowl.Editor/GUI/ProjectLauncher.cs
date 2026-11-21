@@ -2,23 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.Migration;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Theming;
-using Prowl.Editor.Utils;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Quill;
-using Prowl.Rosetta;
-using Prowl.Vector;
+using Infinity.Editor.Core;
+using Infinity.Editor.Migration;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Theming;
+using Infinity.Editor.Utils;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Quill;
+using Infinity.Rosetta;
+using Infinity.Vector;
 
-using static Prowl.Editor.GUI.EditorGUI;
+using static Infinity.Editor.GUI.EditorGUI;
 
 using Color = System.Drawing.Color;
 
-namespace Prowl.Editor.GUI;
+namespace Infinity.Editor.GUI;
 
 /// <summary>
 /// Full-screen project launcher shown at startup before the editor loads.

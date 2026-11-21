@@ -1,11 +1,11 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Runtime;
+using Infinity.Runtime;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>Smoke test proving the headless editor harness writes an authored prefab under Assets.</summary>
 public class EditorHarnessSmokeTests : EditorTestHarness

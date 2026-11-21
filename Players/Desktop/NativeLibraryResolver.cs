@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -8,7 +8,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 
-namespace Prowl.Player;
+namespace Infinity.Player;
 
 /// <summary>
 /// Finds managed and native dependencies in a published player layout.

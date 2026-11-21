@@ -1,12 +1,12 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Threading;
 
-using Prowl.Editor.Core.Tasks;
-using Prowl.Editor.GUI.Panels;
-using Prowl.Runtime;
-using Prowl.Runtime.Tasks;
+using Infinity.Editor.Core.Tasks;
+using Infinity.Editor.GUI.Panels;
+using Infinity.Runtime;
+using Infinity.Runtime.Tasks;
 
 using Xunit;
 
@@ -14,7 +14,7 @@ using Xunit;
 // which could resume on another thread.
 #pragma warning disable xUnit1031
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>
 /// The editor's side of the main thread model: logs arriving from other threads, and editor waits that must

@@ -1,4 +1,4 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -8,15 +8,15 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Prowl.Echo;
-using Prowl.PaperUI;
-using Prowl.Runtime.Diagnostics;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Tasks;
-using Prowl.Runtime.UI;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.PaperUI;
+using Infinity.Runtime.Diagnostics;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Tasks;
+using Infinity.Runtime.UI;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.Resources;
+namespace Infinity.Runtime.Resources;
 
 /// <summary>What kind of world a <see cref="SceneInstance"/> is.</summary>
 public enum SceneMode

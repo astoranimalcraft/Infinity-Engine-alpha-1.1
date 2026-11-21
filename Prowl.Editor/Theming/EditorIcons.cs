@@ -7,10 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using Prowl.Editor.GUI;
-using Prowl.OrigamiUI;
+using Infinity.Editor.GUI;
+using Infinity.OrigamiUI;
 
-namespace Prowl.Editor.Theming;
+namespace Infinity.Editor.Theming;
 
 public class EditorIcons
 {

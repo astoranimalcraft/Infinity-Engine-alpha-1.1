@@ -1,8 +1,8 @@
 using System;
 
-using Prowl.Runtime;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.GUI;
+namespace Infinity.Editor.GUI;
 
 /// <summary>
 /// Listens for the next key/mouse/gamepad input and reports it as an InputBinding.

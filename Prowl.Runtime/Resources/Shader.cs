@@ -1,17 +1,17 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-using Prowl.Echo;
-using Prowl.Graphite.Rendering;
-using Prowl.Graphite.ShaderDef;
+using Infinity.Echo;
+using Infinity.Graphite.Rendering;
+using Infinity.Graphite.ShaderDef;
 
-using GShader = Prowl.Graphite.Rendering.Shader;
+using GShader = Infinity.Graphite.Rendering.Shader;
 
-namespace Prowl.Runtime.Resources;
+namespace Infinity.Runtime.Resources;
 
 /// <summary>
 /// A shader in Graphite's ShaderDef format: its source, the parsed definition, and the Graphite shader materials draw

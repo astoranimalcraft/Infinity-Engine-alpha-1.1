@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -7,9 +7,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using Prowl.Echo;
+using Infinity.Echo;
 
-namespace Prowl.Editor.Projects.Scripting;
+namespace Infinity.Editor.Projects.Scripting;
 
 /// <summary>
 /// A managed or native plugin discovered under a <c>Plugins/</c> folder. Managed plugins are
@@ -101,7 +101,7 @@ public sealed class PluginInfo
 /// normal type-keyed inspector. The plugin's settings live in its .meta (a binary DLL can't carry
 /// them like a text .asmdef does). Editor-only; never shipped as a runtime asset.
 /// </summary>
-public sealed class PluginAsset : Prowl.Runtime.Asset { }
+public sealed class PluginAsset : Infinity.Runtime.Asset { }
 
 /// <summary>Scans a project for plugins and applies the Plugins-folder convention.</summary>
 public static class PluginScanner

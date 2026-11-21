@@ -1,14 +1,14 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Runtime.CompilerServices;
 
-using Prowl.Echo;
-using Prowl.Runtime.Audio.Native;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Runtime.Audio.Native;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.Audio.Effects;
+namespace Infinity.Runtime.Audio.Effects;
 
 /// <summary>Soft clipping waveshaper, blended against the untouched signal.</summary>
 public sealed class DistortionEffect : AudioEffect

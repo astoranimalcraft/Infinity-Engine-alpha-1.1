@@ -1,6 +1,6 @@
 using System.Threading;
 
-namespace Prowl.Runtime.Rendering.Pipelines.Infinity;
+namespace Infinity.Runtime.Rendering.Pipelines.Infinity;
 
 /// <summary>
 /// Selects which VolumeComponent family the cameras collect.

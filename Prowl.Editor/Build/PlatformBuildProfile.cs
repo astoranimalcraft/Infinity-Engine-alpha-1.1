@@ -1,6 +1,6 @@
 using System;
 
-namespace Prowl.Editor.Build;
+namespace Infinity.Editor.Build;
 
 /// <summary>
 /// The per-platform settings a build pipeline keeps. A pipeline that needs its own options declares a subclass and

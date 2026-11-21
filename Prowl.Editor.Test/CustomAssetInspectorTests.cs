@@ -1,11 +1,11 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Runtime;
+using Infinity.Runtime;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>A user-style custom asset: an Asset with a create menu entry and plain fields.</summary>
 [CreateAssetMenu("Test Custom Asset", Extension = ".customtest", Order = 9000)]

@@ -5,16 +5,16 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 
-using Prowl.Echo;
-using Prowl.Editor.Importers;
-using Prowl.Editor.Prefabs;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Editor.Thumbnails;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Editor.Importers;
+using Infinity.Editor.Prefabs;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Editor.Thumbnails;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 /// <summary>
 /// Central asset database for the editor. Manages the full asset lifecycle: scanning, importing,

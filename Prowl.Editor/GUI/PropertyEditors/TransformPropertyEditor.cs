@@ -1,20 +1,20 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI.Popups;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.Runtime;
-using Prowl.Vector;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI.Popups;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.Runtime;
+using Infinity.Vector;
 
-namespace Prowl.Editor.GUI.PropertyEditors;
+namespace Infinity.Editor.GUI.PropertyEditors;
 
 /// <summary>
 /// PropertyEditor for Transform fields. Shows a reference picker that lets

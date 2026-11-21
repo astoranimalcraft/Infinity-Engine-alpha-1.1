@@ -1,13 +1,13 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.Graphite.Rendering;
+using Infinity.Graphite.Rendering;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>The standard surfaces' shading: every lobe, or the mobile tier that lights coat and fuzz from ambient light only and drops thin film and anisotropy.</summary>
 public enum PbrTier

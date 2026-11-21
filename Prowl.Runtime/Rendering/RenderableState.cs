@@ -1,18 +1,18 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using GLightmapBinding = Prowl.Graphite.Rendering.LightmapBinding;
-using GMaterial = Prowl.Graphite.Rendering.Material;
-using Material = Prowl.Runtime.Resources.Material;
-using Shader = Prowl.Runtime.Resources.Shader;
+using GLightmapBinding = Infinity.Graphite.Rendering.LightmapBinding;
+using GMaterial = Infinity.Graphite.Rendering.Material;
+using Material = Infinity.Runtime.Resources.Material;
+using Shader = Infinity.Runtime.Resources.Shader;
 
-namespace Prowl.Runtime.Rendering;
+namespace Infinity.Runtime.Rendering;
 
 /// <summary>
 /// One renderable a component keeps in a world, and what it last pushed, so a frame where nothing changed costs a few

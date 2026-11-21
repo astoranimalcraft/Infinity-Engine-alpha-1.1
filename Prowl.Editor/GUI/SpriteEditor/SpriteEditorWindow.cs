@@ -1,23 +1,23 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI;
-using Prowl.Editor.Importers;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Importers;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using Canvas = Prowl.Quill.Canvas;
+using Canvas = Infinity.Quill.Canvas;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 /// <summary>
 /// Dock window for editing a texture's sprites. Sprite config lives in the texture's <c>.meta</c>
@@ -829,8 +829,8 @@ public class SpriteEditorWindow : DockPanel
         float imgW = texW * _view.Zoom, imgH = texH * _view.Zoom;
         canvas.SetBrushTexture(tex);
         canvas.SetBrushTextureTransform(
-            Prowl.Vector.Spatial.Transform2D.CreateTranslation(imgTL.X, imgTL.Y + imgH) *
-            Prowl.Vector.Spatial.Transform2D.CreateScale(imgW, -imgH));
+            Infinity.Vector.Spatial.Transform2D.CreateTranslation(imgTL.X, imgTL.Y + imgH) *
+            Infinity.Vector.Spatial.Transform2D.CreateScale(imgW, -imgH));
         canvas.RectFilled(imgTL.X, imgTL.Y, imgW, imgH, new Color32(255, 255, 255, 255));
         canvas.ClearBrushTexture();
 
@@ -1060,8 +1060,8 @@ public class SpriteEditorWindow : DockPanel
 
         public void ApplyTransform(Canvas canvas)
         {
-            canvas.TransformBy(Prowl.Vector.Spatial.Transform2D.CreateTranslation(_pan.X, _pan.Y));
-            canvas.TransformBy(Prowl.Vector.Spatial.Transform2D.CreateScale(_zoom, _zoom));
+            canvas.TransformBy(Infinity.Vector.Spatial.Transform2D.CreateTranslation(_pan.X, _pan.Y));
+            canvas.TransformBy(Infinity.Vector.Spatial.Transform2D.CreateScale(_zoom, _zoom));
         }
 
         public void PanBy(Float2 deltaCanvasPixels) => _pan += deltaCanvasPixels;

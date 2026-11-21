@@ -1,9 +1,9 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using G = Prowl.Graphite.Rendering;
+using G = Infinity.Graphite.Rendering;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 // Prowl's names for the rendering settings everyday code touches, so it needs no Graphite namespace. Each matches its
 // Graphite counterpart value for value, and converts with a cast at the boundary.

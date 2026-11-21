@@ -1,13 +1,13 @@
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Scribe;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Scribe;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 // ================================================================
 //  Skinned Mesh Renderer Component Editor

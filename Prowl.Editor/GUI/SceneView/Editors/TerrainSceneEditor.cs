@@ -1,21 +1,21 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Core;
-using Prowl.Editor.Inspector;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Runtime.Terrain;
-using Prowl.Vector;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Core;
+using Infinity.Editor.Inspector;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Runtime.Terrain;
+using Infinity.Vector;
 
-namespace Prowl.Editor.GUI.SceneView.Editors;
+namespace Infinity.Editor.GUI.SceneView.Editors;
 
 /// <summary>
 /// Scene view editor for terrain provides toolbar with terrain brush tools

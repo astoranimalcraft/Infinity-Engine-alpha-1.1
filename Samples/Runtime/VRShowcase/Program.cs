@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 //
@@ -43,16 +43,16 @@
 //   WASD  walk    Shift  sprint    Space  jump    C  crouch    Right Mouse  look    R  respawn    F1  hide the HUD
 //
 
-using Prowl.PaperUI;
-using Prowl.Runtime;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Runtime.UI;
-using Prowl.Samples;
-using Prowl.Scribe;
-using Prowl.Vector;
+using Infinity.PaperUI;
+using Infinity.Runtime;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Runtime.UI;
+using Infinity.Samples;
+using Infinity.Scribe;
+using Infinity.Vector;
 
-using static Prowl.Samples.Sample;
+using static Infinity.Samples.Sample;
 
 namespace VRShowcase;
 
@@ -406,7 +406,7 @@ public sealed partial class VRShowcaseGame : StationGame
         canvasObject.Transform.LocalScale = new Float3(scale);
         canvasObject.Transform.Position = center - rotation * new Float3(size.X * scale * 0.5f, size.Y * scale * 0.5f, 0f);
         GameCanvas canvas = canvasObject.AddComponent<GameCanvas>();
-        canvas.RenderMode = Prowl.Runtime.UI.RenderMode.WorldSpace;
+        canvas.RenderMode = Infinity.Runtime.UI.RenderMode.WorldSpace;
         canvas.ReferenceResolution = size;
 
         UIElement(canvasObject, "Background", Float2.Zero, size).AddComponent<UIImage>().Color = new Color(0.05f, 0.06f, 0.08f, 1f);
@@ -449,7 +449,7 @@ public sealed partial class VRShowcaseGame : StationGame
         return go;
     }
 
-    private static TextComponent MenuLabel(GameObject parent, string text, Float2 corner, Float2 size, int fontSize, Prowl.Runtime.UI.TextAlignment alignment = Prowl.Runtime.UI.TextAlignment.CenterLeft)
+    private static TextComponent MenuLabel(GameObject parent, string text, Float2 corner, Float2 size, int fontSize, Infinity.Runtime.UI.TextAlignment alignment = Infinity.Runtime.UI.TextAlignment.CenterLeft)
     {
         TextComponent label = UIElement(parent, "Label", corner, size).AddComponent<TextComponent>();
         label.Text = text;
@@ -522,7 +522,7 @@ public sealed partial class VRShowcaseGame : StationGame
         UIButton button = go.AddComponent<UIButton>();
         button.TargetGraphic = image;
         button.Colors = Tints(new Color(0.25f, 0.27f, 0.32f, 1f));
-        label = MenuLabel(go, text, Float2.Zero, size, 24, Prowl.Runtime.UI.TextAlignment.CenterMiddle);
+        label = MenuLabel(go, text, Float2.Zero, size, 24, Infinity.Runtime.UI.TextAlignment.CenterMiddle);
         return button;
     }
 

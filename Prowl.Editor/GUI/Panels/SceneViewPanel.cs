@@ -2,28 +2,28 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.Core.Diagnostics;
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Prefabs;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.OrigamiUI.Gizmo;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Rosetta;
-using Prowl.Runtime;
-using Prowl.Runtime.Diagnostics;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
-using Prowl.Vector.Spatial;
+using Infinity.Editor.Core;
+using Infinity.Editor.Core.Diagnostics;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Prefabs;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.OrigamiUI.Gizmo;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.Runtime.Diagnostics;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
+using Infinity.Vector.Spatial;
 
 using Color = System.Drawing.Color;
-using DebugViewMode = Prowl.Runtime.Rendering.DebugViewMode;
-using Gizmo = Prowl.OrigamiUI.Gizmo;
+using DebugViewMode = Infinity.Runtime.Rendering.DebugViewMode;
+using Gizmo = Infinity.OrigamiUI.Gizmo;
 
-namespace Prowl.Editor.GUI.Panels;
+namespace Infinity.Editor.GUI.Panels;
 
 public class SceneViewPanel : DockPanel
 {

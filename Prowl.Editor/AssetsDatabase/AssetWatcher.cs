@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 /// <summary> Types of file system changes that the asset watcher can detect. </summary>
 public enum FileEventType { Created, Modified, Deleted, Renamed }

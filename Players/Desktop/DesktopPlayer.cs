@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,11 +6,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using Prowl.PaperUI;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.PaperUI;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Player;
+namespace Infinity.Player;
 
 /// <summary>The game loop of a built desktop player, configured entirely from its manifest.</summary>
 public sealed class DesktopPlayer : Game, IDisposable

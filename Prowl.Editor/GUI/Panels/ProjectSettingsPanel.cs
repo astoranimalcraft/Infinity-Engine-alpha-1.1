@@ -2,18 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.Projects.Settings;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Rosetta;
-using Prowl.Runtime;
+using Infinity.Editor.Core;
+using Infinity.Editor.Projects.Settings;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
+using Infinity.Runtime;
 
 using Color = System.Drawing.Color;
 
-namespace Prowl.Editor.GUI.Panels;
+namespace Infinity.Editor.GUI.Panels;
 
 public class ProjectSettingsPanel : DockPanel
 {

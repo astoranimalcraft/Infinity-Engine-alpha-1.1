@@ -1,20 +1,20 @@
 using System;
 using System.Collections.Generic;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.Registries;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.Registries;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
-using static Prowl.Editor.GUI.EditorGUI;
+using static Infinity.Editor.GUI.EditorGUI;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 /// <summary>
 /// Inspector for a Scene asset: shows what the scene references as a searchable, virtualized
@@ -108,7 +108,7 @@ public class SceneAssetEditor : AssetImporterEditor
         }
     }
 
-    private static void DrawDepCell(Paper paper, Prowl.Scribe.FontFile font, Prowl.Scribe.FontFile mono,
+    private static void DrawDepCell(Paper paper, Infinity.Scribe.FontFile font, Infinity.Scribe.FontFile mono,
         float rowH, Guid guid, int col, EditorAssetBackend db)
     {
         string? path = db.GuidToPath(guid);

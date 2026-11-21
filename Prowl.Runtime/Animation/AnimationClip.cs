@@ -1,17 +1,17 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Echo;
-using Prowl.Motion;
+using Infinity.Echo;
+using Infinity.Motion;
 
-using MotionAvatar = Prowl.Motion.Avatar;
-using MotionClip = Prowl.Motion.AnimationClipBase;
+using MotionAvatar = Infinity.Motion.Avatar;
+using MotionClip = Infinity.Motion.AnimationClipBase;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>What a clip stores, which decides which rigs can play it.</summary>
 public enum AnimationClipKind

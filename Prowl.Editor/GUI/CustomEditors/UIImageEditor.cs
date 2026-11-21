@@ -1,24 +1,24 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Scribe;
-using Prowl.Vector;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Scribe;
+using Infinity.Vector;
 
-using FillMethod = Prowl.Runtime.UI.FillMethod;
-using ImageType = Prowl.Runtime.UI.ImageType;
-using UIImage = Prowl.Runtime.UI.UIImage;
+using FillMethod = Infinity.Runtime.UI.FillMethod;
+using ImageType = Infinity.Runtime.UI.ImageType;
+using UIImage = Infinity.Runtime.UI.UIImage;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 [CustomEditor(typeof(UIImage))]
 public class UIImageEditor : CustomEditor
@@ -155,8 +155,8 @@ public class UIImageEditor : CustomEditor
                 float tx = x - u0 * sx, ty = (y + h) - v0 * sy;
                 canvas.SetBrushTexture(tex);
                 canvas.SetBrushTextureTransform(
-                    Prowl.Vector.Spatial.Transform2D.CreateTranslation(tx, ty) *
-                    Prowl.Vector.Spatial.Transform2D.CreateScale(sx, sy));
+                    Infinity.Vector.Spatial.Transform2D.CreateTranslation(tx, ty) *
+                    Infinity.Vector.Spatial.Transform2D.CreateScale(sx, sy));
                 canvas.RectFilled(x, y, w, h, tint);
                 canvas.ClearBrushTexture();
             }));

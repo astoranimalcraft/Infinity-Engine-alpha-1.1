@@ -1,16 +1,16 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Echo;
-using Prowl.Runtime;
-using Prowl.Runtime.AssetImporting;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Runtime;
+using Infinity.Runtime.AssetImporting;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor.Importers;
+namespace Infinity.Editor.Importers;
 
 /// <summary>The import settings blocks the model inspector writes and the importer reads back.</summary>
 public static class ModelImportKeys

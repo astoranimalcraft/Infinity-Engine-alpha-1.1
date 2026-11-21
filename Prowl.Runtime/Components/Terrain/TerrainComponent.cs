@@ -1,24 +1,24 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Threading;
 
-using Prowl.Graphite.ShaderDef;
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Graphite.ShaderDef;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using GMaterial = Prowl.Graphite.Rendering.Material;
-using GShader = Prowl.Graphite.Rendering.Shader;
-using GTexture = Prowl.Graphite.Texture;
-using SamplerDescription = Prowl.Graphite.SamplerDescription;
-using Material = Prowl.Runtime.Resources.Material;
-using Mesh = Prowl.Runtime.Resources.Mesh;
+using GMaterial = Infinity.Graphite.Rendering.Material;
+using GShader = Infinity.Graphite.Rendering.Shader;
+using GTexture = Infinity.Graphite.Texture;
+using SamplerDescription = Infinity.Graphite.SamplerDescription;
+using Material = Infinity.Runtime.Resources.Material;
+using Mesh = Infinity.Runtime.Resources.Mesh;
 
-namespace Prowl.Runtime.Terrain;
+namespace Infinity.Runtime.Terrain;
 
 /// <summary>
 /// Quadtree LOD terrain drawn through a render provider. Every view picks its own chunk LODs, grass cascades and
@@ -680,7 +680,7 @@ internal sealed class TerrainMaterial
     {
         GMaterial? parent = TerrainComponent.GpuMaterialOf(source);
         // A material still waiting for its shader draws the Invalid stand in, which has none of the terrain's properties
-        if (parent == null || parent.IsDisposed || parent.Shader == Prowl.Runtime.Resources.Shader.GetDefault(DefaultShader.Invalid).GpuIfLoaded)
+        if (parent == null || parent.IsDisposed || parent.Shader == Infinity.Runtime.Resources.Shader.GetDefault(DefaultShader.Invalid).GpuIfLoaded)
         {
             Release();
             return null;

@@ -1,19 +1,19 @@
 using System;
 using System.Collections.Generic;
 
-using Prowl.PaperUI;
-using Prowl.Runtime;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.PaperUI;
+using Infinity.Runtime;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using Canvas = Prowl.Quill.Canvas;
-using MotionAvatar = Prowl.Motion.Avatar;
-using MotionSkeleton = Prowl.Motion.Skeleton;
-using MotionClip = Prowl.Motion.AnimationClipBase;
-using MotionPose = Prowl.Motion.Pose;
+using Canvas = Infinity.Quill.Canvas;
+using MotionAvatar = Infinity.Motion.Avatar;
+using MotionSkeleton = Infinity.Motion.Skeleton;
+using MotionClip = Infinity.Motion.AnimationClipBase;
+using MotionPose = Infinity.Motion.Pose;
 
-namespace Prowl.Editor.GUI;
+namespace Infinity.Editor.GUI;
 
 /// <summary>
 /// Renders 3D previews of assets (models, materials, meshes) to a RenderTexture.
@@ -260,7 +260,7 @@ public class PreviewRenderer : IDisposable
         _camera.Render(new CameraRenderOptions
         {
             FallbackTarget = _rt,
-            Kind = Prowl.Graphite.Rendering.ViewKind.Preview,
+            Kind = Infinity.Graphite.Rendering.ViewKind.Preview,
             Features = ShowGrid ? GridFeature.List : null,
         });
     }
@@ -293,7 +293,7 @@ public class PreviewRenderer : IDisposable
         }
 
         if (_rt.IsNotValid() || _rt.MainTexture.IsNotValid()) return;
-        float round = Prowl.OrigamiUI.Origami.Current.Metrics.ContainerRounding;
+        float round = Infinity.OrigamiUI.Origami.Current.Metrics.ContainerRounding;
 
         ElementBuilder box = paper.Box(id)
             .Size(width, height)
@@ -329,8 +329,8 @@ public class PreviewRenderer : IDisposable
 
                 canvas.SetBrushTexture(_rt.MainTexture);
                 canvas.SetBrushTextureTransform(
-                    Prowl.Vector.Spatial.Transform2D.CreateTranslation(rx, ry + rh) *
-                    Prowl.Vector.Spatial.Transform2D.CreateScale(rw, -rh));
+                    Infinity.Vector.Spatial.Transform2D.CreateTranslation(rx, ry + rh) *
+                    Infinity.Vector.Spatial.Transform2D.CreateScale(rw, -rh));
                 canvas.RoundedRectFilled(rx, ry, rw, rh, round, round, round, round, new Color32(255, 255, 255, 255));
                 canvas.ClearBrushTexture();
 

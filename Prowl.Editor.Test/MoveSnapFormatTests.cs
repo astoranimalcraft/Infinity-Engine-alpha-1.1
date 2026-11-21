@@ -1,10 +1,10 @@
 using System.Globalization;
 
-using Prowl.Editor.GUI.SceneView;
+using Infinity.Editor.GUI.SceneView;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 public class MoveSnapFormatTests
 {

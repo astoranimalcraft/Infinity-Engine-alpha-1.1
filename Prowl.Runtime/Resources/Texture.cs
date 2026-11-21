@@ -1,15 +1,15 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
 
-using GTexture = Prowl.Graphite.Texture;
-using GTextureDescription = Prowl.Graphite.TextureDescription;
-using GTextureView = Prowl.Graphite.TextureView;
+using GTexture = Infinity.Graphite.Texture;
+using GTextureDescription = Infinity.Graphite.TextureDescription;
+using GTextureView = Infinity.Graphite.TextureView;
 
-namespace Prowl.Runtime.Resources;
+namespace Infinity.Runtime.Resources;
 
 /// <summary>
 /// The base of every texture: its format, mip levels, sampling settings, and the Graphite texture holding its texels.

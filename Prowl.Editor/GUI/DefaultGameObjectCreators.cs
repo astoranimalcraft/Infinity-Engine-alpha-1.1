@@ -1,19 +1,19 @@
 using System.Linq;
 
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI.Panels;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Theming;
-using Prowl.Runtime;
-using Prowl.Runtime.ParticleSystem;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Runtime.Terrain;
-using Prowl.Runtime.UI;
-using Prowl.Vector;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI.Panels;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Theming;
+using Infinity.Runtime;
+using Infinity.Runtime.ParticleSystem;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Runtime.Terrain;
+using Infinity.Runtime.UI;
+using Infinity.Vector;
 
-namespace Prowl.Editor.GUI;
+namespace Infinity.Editor.GUI;
 
 internal static class DefaultGameObjectCreators
 {

@@ -4,16 +4,16 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Rosetta;
+using Infinity.Editor.Core;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
 
 using Color = System.Drawing.Color;
 
-namespace Prowl.Editor.GUI.Popups;
+namespace Infinity.Editor.GUI.Popups;
 
 /// <summary>
 /// Modal for creating a new C# script. A file name is required (C# identifiers only) and

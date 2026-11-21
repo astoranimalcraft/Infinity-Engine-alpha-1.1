@@ -1,23 +1,23 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Clay;
-using Prowl.Motion;
-using Prowl.Vector;
-using Prowl.Vector.Spatial;
+using Infinity.Clay;
+using Infinity.Motion;
+using Infinity.Vector;
+using Infinity.Vector.Spatial;
 
-using ClayAnim = Prowl.Clay.AnimationClip;
-using MotionClip = Prowl.Motion.AnimationClip;
-using MotionSkeleton = Prowl.Motion.Skeleton;
+using ClayAnim = Infinity.Clay.AnimationClip;
+using MotionClip = Infinity.Motion.AnimationClip;
+using MotionSkeleton = Infinity.Motion.Skeleton;
 
-namespace Prowl.Runtime.AssetImporting;
+namespace Infinity.Runtime.AssetImporting;
 
 /// <summary>
 /// Turns a Clay model's node hierarchy and animation curves into the skeleton and sampled clips
-/// Prowl.Motion plays.
+/// Infinity.Motion plays.
 /// </summary>
 /// <remarks>
 /// Clips are stored sampled and compressed rather than as curves. Curves are cheap to author and
@@ -83,7 +83,7 @@ internal static class ModelRigBuilder
 
         for (int m = 0; m < model.Meshes.Count; m++)
         {
-            Prowl.Clay.Mesh mesh = model.Meshes[m];
+            Infinity.Clay.Mesh mesh = model.Meshes[m];
             if (mesh.BlendShapes is not { Length: > 0 }) continue;
 
             for (int s = 0; s < mesh.BlendShapes.Length; s++)
@@ -225,7 +225,7 @@ internal static class ModelRigBuilder
         return moving >= 0 ? moving : keyed;
     }
 
-    private static bool Moves(Prowl.Vector.AnimationCurve curve)
+    private static bool Moves(Infinity.Vector.AnimationCurve curve)
     {
         for (int i = 1; i < curve.Count; i++)
             if (Float3.LengthSquared(curve[i].Value3 - curve[0].Value3) > 1e-10f) return true;

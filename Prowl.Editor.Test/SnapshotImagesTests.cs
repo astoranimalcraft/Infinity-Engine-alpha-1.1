@@ -1,13 +1,13 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Editor.Core.Diagnostics;
-using Prowl.Graphite;
-using Prowl.Graphite.Debugging;
+using Infinity.Editor.Core.Diagnostics;
+using Infinity.Graphite;
+using Infinity.Graphite.Debugging;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 public class SnapshotImagesTests
 {

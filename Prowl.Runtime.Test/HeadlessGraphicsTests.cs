@@ -1,21 +1,21 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.Graphite;
-using Prowl.Graphite.Rendering;
-using Prowl.Graphite.ShaderDef;
-using Prowl.Runtime.Resources;
+using Infinity.Graphite;
+using Infinity.Graphite.Rendering;
+using Infinity.Graphite.ShaderDef;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 
-using Material = Prowl.Runtime.Resources.Material;
-using Mesh = Prowl.Runtime.Resources.Mesh;
-using Shader = Prowl.Runtime.Resources.Shader;
+using Material = Infinity.Runtime.Resources.Material;
+using Mesh = Infinity.Runtime.Resources.Mesh;
+using Shader = Infinity.Runtime.Resources.Shader;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>
 /// GPU backed resources must work without a device (headless or dedicated server): their CPU state works and the
@@ -265,7 +265,7 @@ public class HeadlessGraphicsTests
     private static HashSet<string> PropertyNames(Shader shader)
     {
         HashSet<string> names = [];
-        foreach (Prowl.Graphite.Rendering.MaterialProperty p in shader.Properties)
+        foreach (Infinity.Graphite.Rendering.MaterialProperty p in shader.Properties)
             names.Add(p.Name.Text());
         return names;
     }

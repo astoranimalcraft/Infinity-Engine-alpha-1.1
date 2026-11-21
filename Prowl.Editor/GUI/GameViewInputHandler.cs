@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-using Prowl.PaperUI;
-using Prowl.Runtime;
-using Prowl.Vector;
+using Infinity.PaperUI;
+using Infinity.Runtime;
+using Infinity.Vector;
 
-namespace Prowl.Editor.GUI;
+namespace Infinity.Editor.GUI;
 
 /// <summary>
 /// Input handler for play mode that only forwards keyboard/mouse input

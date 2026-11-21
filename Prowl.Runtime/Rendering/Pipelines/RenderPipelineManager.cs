@@ -1,10 +1,10 @@
 ﻿
 using System;
 
-using Prowl.Runtime.Rendering.Pipelines.Legacy;
-using Prowl.Runtime.Rendering.Pipelines.Infinity;
+using Infinity.Runtime.Rendering.Pipelines.Legacy;
+using Infinity.Runtime.Rendering.Pipelines.Infinity;
 
-namespace Prowl.Runtime.Rendering.Pipelines;
+namespace Infinity.Runtime.Rendering.Pipelines;
 
 public static class RenderPipelineManager
 {

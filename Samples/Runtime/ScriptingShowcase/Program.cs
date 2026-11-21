@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 //
@@ -20,14 +20,14 @@
 //   The panel on the right holds each station's own controls.
 //
 
-using Prowl.PaperUI;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Samples;
-using Prowl.Scribe;
-using Prowl.Vector;
+using Infinity.PaperUI;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Samples;
+using Infinity.Scribe;
+using Infinity.Vector;
 
-using static Prowl.Samples.Sample;
+using static Infinity.Samples.Sample;
 
 namespace ScriptingShowcase;
 

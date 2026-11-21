@@ -1,9 +1,9 @@
-using Prowl.Motion;
-using Prowl.Runtime;
-using Prowl.Vector;
+using Infinity.Motion;
+using Infinity.Runtime;
+using Infinity.Vector;
 using Xunit;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>The ragdoll generator's layout: which parts it makes, how heavy, and which way the joints bend.</summary>
 public class RagdollBuilderTests
@@ -119,7 +119,7 @@ public class RagdollBuilderTests
     [Fact]
     public void WithAnAvatar_KneesAndElbowsStopAtStraight()
     {
-        (Prowl.Motion.Skeleton skeleton, GameObject root) = TestHumanoid.Build();
+        (Infinity.Motion.Skeleton skeleton, GameObject root) = TestHumanoid.Build();
         Avatar avatar = Avatar.CreateAutomatic(skeleton, out _, "Character");
         Dictionary<HumanBodyBone, Transform> bones = TestHumanoid.Bones(root);
         RagdollBuilder.Build(root.Transform, bones, new RagdollBuilder.Settings { Avatar = avatar });

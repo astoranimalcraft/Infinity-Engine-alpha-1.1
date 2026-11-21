@@ -1,4 +1,4 @@
-namespace Prowl.Editor.Importers;
+namespace Infinity.Editor.Importers;
 
 /// <summary>
 /// Fallback importer for unrecognized file types.

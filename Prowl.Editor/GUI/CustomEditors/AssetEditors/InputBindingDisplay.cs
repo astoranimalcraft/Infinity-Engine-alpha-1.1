@@ -2,16 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Vector;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Vector;
 
 using Color = System.Drawing.Color;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 internal enum InputDevice { Keyboard, Mouse, Gamepad, XR }
 

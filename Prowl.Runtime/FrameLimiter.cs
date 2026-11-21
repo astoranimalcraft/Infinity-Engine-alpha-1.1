@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// Paces a loop to a target frame rate. <see cref="NextWait"/> is the whole schedule and takes the

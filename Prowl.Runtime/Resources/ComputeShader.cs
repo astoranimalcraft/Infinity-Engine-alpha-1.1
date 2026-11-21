@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -7,12 +7,12 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using Prowl.Echo;
-using Prowl.Graphite;
-using Prowl.Graphite.ShaderDef;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Graphite;
+using Infinity.Graphite.ShaderDef;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.Resources;
+namespace Infinity.Runtime.Resources;
 
 /// <summary>One entry point of a <see cref="ComputeShader"/> and the size of its thread groups.</summary>
 public struct ComputeKernel

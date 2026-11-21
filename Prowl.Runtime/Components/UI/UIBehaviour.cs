@@ -1,16 +1,16 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Collections.Generic;
 
-using Prowl.Echo;
-using Prowl.Vector;
-using Prowl.Vector.Geometry;
-using Prowl.PaperUI;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Vector;
+using Infinity.Vector.Geometry;
+using Infinity.PaperUI;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Runtime.UI;
+namespace Infinity.Runtime.UI;
 
 /// <summary>
 /// Abstract base class for every retained-mode UI component.

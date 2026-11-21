@@ -1,14 +1,14 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 // ================================================================
 //  Text Mesh Component Custom Editor
@@ -47,7 +47,7 @@ public class TextMeshComponentEditor : CustomEditor
         paper.Box($"{id}_sp0.15").Height(6);
 
         EditorGUI.Row(paper, $"{id}_quality", "Quality", () =>
-            Origami.EnumDropdown<Prowl.Scribe.FontQuality>(paper, $"{id}_quality_v", text.Quality, v => Edit(text, "Change Quality", () => text.Quality = v)).Show());
+            Origami.EnumDropdown<Infinity.Scribe.FontQuality>(paper, $"{id}_quality_v", text.Quality, v => Edit(text, "Change Quality", () => text.Quality = v)).Show());
 
         paper.Box($"{id}_sp0.18").Height(6);
 

@@ -1,17 +1,17 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Runtime.Audio;
-using Prowl.Runtime.Audio.Native;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Runtime.Audio;
+using Infinity.Runtime.Audio.Native;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
 
 // TODO: Camera-Relative Audio Listener
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// A point in 3D space where audio is heard. Only listeners in <see cref="SceneInstance.Main"/> are heard, so spatial

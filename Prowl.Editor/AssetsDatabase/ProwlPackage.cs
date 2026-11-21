@@ -8,13 +8,13 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
-using Prowl.Editor.GUI.Popups;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Thumbnails;
-using Prowl.Editor.Utils;
-using Prowl.Runtime;
+using Infinity.Editor.GUI.Popups;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Thumbnails;
+using Infinity.Editor.Utils;
+using Infinity.Runtime;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 public class PackageAssetEntry
 {

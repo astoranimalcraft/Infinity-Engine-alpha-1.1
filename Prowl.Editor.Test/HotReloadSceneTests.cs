@@ -1,16 +1,16 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Reflection;
 
-using Prowl.Echo;
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>Full-system hot reload tests: real scripts, a real scene, a real recompile, migrated onto the new types.</summary>
 [Trait("Category", "Build")]
@@ -27,7 +27,7 @@ public class HotReloadSceneTests : EditorTestHarness
     public void RealRecompile_MigratesLiveScene_ToNewTypes_PreservingStateAndIdentity()
     {
         Assembly v1 = CompileGameAssembly("Enemy.cs",
-            "using Prowl.Runtime; public class Enemy : Component { public int Hp; public Enemy Target; }");
+            "using Infinity.Runtime; public class Enemy : Component { public int Hp; public Enemy Target; }");
         Type enemyV1 = v1.GetType("Enemy")!;
         Assert.Null(enemyV1.GetField("Shield")); // v1 has no Shield yet
 
@@ -43,7 +43,7 @@ public class HotReloadSceneTests : EditorTestHarness
         scene.Add(goB);
 
         Assembly v2 = CompileGameAssembly("Enemy.cs",
-            "using Prowl.Runtime; public class Enemy : Component { public int Hp; public Enemy Target; public int Shield; }");
+            "using Infinity.Runtime; public class Enemy : Component { public int Hp; public Enemy Target; public int Shield; }");
         Type enemyV2 = v2.GetType("Enemy")!;
         Assert.NotSame(v1, v2);
 
@@ -60,7 +60,7 @@ public class HotReloadSceneTests : EditorTestHarness
 
         var cctorFailures = logs.Where(m => m.Contains("TypeInitialization", StringComparison.OrdinalIgnoreCase)).ToList();
         Assert.True(cctorFailures.Count == 0,
-            $"Walking Prowl.Editor forced {cctorFailures.Count} static constructor failure(s):\n{string.Join("\n", cctorFailures)}");
+            $"Walking Infinity.Editor forced {cctorFailures.Count} static constructor failure(s):\n{string.Join("\n", cctorFailures)}");
 
         Component newA = goA.GetComponents().Single();
         Component newB = goB.GetComponents().Single();
@@ -79,7 +79,7 @@ public class HotReloadSceneTests : EditorTestHarness
     public void RealRecompile_MigratesEveryWorld_IncludingADormantOne()
     {
         Assembly v1 = CompileGameAssembly("Lantern.cs",
-            "using Prowl.Runtime; public class Lantern : Component { public int Lit; }");
+            "using Infinity.Runtime; public class Lantern : Component { public int Lit; }");
         Type lanternV1 = v1.GetType("Lantern")!;
 
         var running = new SceneInstance(SceneMode.Edit);
@@ -92,7 +92,7 @@ public class HotReloadSceneTests : EditorTestHarness
         Assert.Single(running.GetAll<Component>().Where(c => c.GetType() == lanternV1));
 
         Assembly v2 = CompileGameAssembly("Lantern.cs",
-            "using Prowl.Runtime; public class Lantern : Component { public int Lit; public int Added; }");
+            "using Infinity.Runtime; public class Lantern : Component { public int Lit; public int Added; }");
         Type lanternV2 = v2.GetType("Lantern")!;
 
         SceneHotReload.Migrate([running, dormant], [(v1, v2)]);
@@ -111,7 +111,7 @@ public class HotReloadSceneTests : EditorTestHarness
         using PlayModeScope play = EnterPlayMode();
 
         Assembly v1 = CompileGameAssembly("Ticker.cs",
-            "using Prowl.Runtime; public class Ticker : Component { public int Ticks; public override void Update() { Ticks++; } }");
+            "using Infinity.Runtime; public class Ticker : Component { public int Ticks; public override void Update() { Ticks++; } }");
         Type tickerV1 = v1.GetType("Ticker")!;
 
         var scene = new SceneInstance();
@@ -124,7 +124,7 @@ public class HotReloadSceneTests : EditorTestHarness
         Assert.Equal(3, tickerV1.GetField("Ticks")!.GetValue(comp)); // old code, +1 per frame
 
         Assembly v2 = CompileGameAssembly("Ticker.cs",
-            "using Prowl.Runtime; public class Ticker : Component { public int Ticks; public int Extra; public override void Update() { Ticks += 10; } }");
+            "using Infinity.Runtime; public class Ticker : Component { public int Ticks; public int Extra; public override void Update() { Ticks += 10; } }");
         Type tickerV2 = v2.GetType("Ticker")!;
 
         SceneHotReload.Migrate(scene, v1, v2);
@@ -144,7 +144,7 @@ public class HotReloadSceneTests : EditorTestHarness
     public void EchoRoundTrip_BindsComponentToLoadedTypeByName_AndCarriesFields()
     {
         Assembly asm = CompileGameAssembly("Loot.cs",
-            "using Prowl.Runtime; public class Loot : Component { public int Gold; }");
+            "using Infinity.Runtime; public class Loot : Component { public int Gold; }");
         Type lootType = asm.GetType("Loot")!;
 
         var scene = new SceneInstance(SceneMode.Edit);
@@ -165,7 +165,7 @@ public class HotReloadSceneTests : EditorTestHarness
         Assert.Equal(777, lootType.GetField("Gold")!.GetValue(restoredLoot));
     }
 
-    // ---- engine + editor integration (through Prowl.Ember) ----
+    // ---- engine + editor integration (through Infinity.Ember) ----
 
     // A newly added FixedUpdate override must start firing after a reload, not be dropped.
     [Fact]
@@ -174,7 +174,7 @@ public class HotReloadSceneTests : EditorTestHarness
         using PlayModeScope play = EnterPlayMode();
 
         Assembly v1 = CompileGameAssembly("Cb.cs",
-            "using Prowl.Runtime; public class C : Component { public int U; public override void Update() { U++; } }");
+            "using Infinity.Runtime; public class C : Component { public int U; public override void Update() { U++; } }");
         Type cV1 = v1.GetType("C")!;
 
         var scene = new SceneInstance();
@@ -185,7 +185,7 @@ public class HotReloadSceneTests : EditorTestHarness
         UpdateScene(scene, 1);
 
         Assembly v2 = CompileGameAssembly("Cb.cs",
-            "using Prowl.Runtime; public class C : Component { public int U; public int F; public override void Update() { U++; } public override void FixedUpdate() { F++; } }");
+            "using Infinity.Runtime; public class C : Component { public int U; public int F; public override void Update() { U++; } public override void FixedUpdate() { F++; } }");
         SceneHotReload.Migrate(scene, v1, v2);
 
         Type cV2 = v2.GetType("C")!;
@@ -204,7 +204,7 @@ public class HotReloadSceneTests : EditorTestHarness
         using PlayModeScope play = EnterPlayMode();
 
         Assembly v1 = CompileGameAssembly("First.cs",
-            "using Prowl.Runtime; public class C : Component { public int Data; }");
+            "using Infinity.Runtime; public class C : Component { public int Data; }");
         Type cV1 = v1.GetType("C")!;
 
         var scene = new SceneInstance();
@@ -216,7 +216,7 @@ public class HotReloadSceneTests : EditorTestHarness
         UpdateScene(scene, 1);
 
         Assembly v2 = CompileGameAssembly("First.cs",
-            "using Prowl.Runtime; public class C : Component { public int Data; public int U; public override void Update() { U++; } }");
+            "using Infinity.Runtime; public class C : Component { public int Data; public int U; public override void Update() { U++; } }");
         SceneHotReload.Migrate(scene, v1, v2);
 
         Type cV2 = v2.GetType("C")!;
@@ -235,7 +235,7 @@ public class HotReloadSceneTests : EditorTestHarness
         using PlayModeScope play = EnterPlayMode();
 
         Assembly v1 = CompileGameAssembly("Last.cs",
-            "using Prowl.Runtime; public class C : Component { public int U; public override void Update() { U++; } }");
+            "using Infinity.Runtime; public class C : Component { public int U; public override void Update() { U++; } }");
         Type cV1 = v1.GetType("C")!;
 
         var scene = new SceneInstance();
@@ -246,7 +246,7 @@ public class HotReloadSceneTests : EditorTestHarness
         UpdateScene(scene, 1);
 
         Assembly v2 = CompileGameAssembly("Last.cs",
-            "using Prowl.Runtime; public class C : Component { public int U; }");
+            "using Infinity.Runtime; public class C : Component { public int U; }");
         SceneHotReload.Migrate(scene, v1, v2);
 
         Type cV2 = v2.GetType("C")!;
@@ -262,7 +262,7 @@ public class HotReloadSceneTests : EditorTestHarness
     public void Migrate_Scene_ReloadHooks_FireOnComponents()
     {
         Assembly v1 = CompileGameAssembly("Hook.cs",
-            "using System.Collections.Generic; using Prowl.Runtime; using Prowl.Ember; " +
+            "using System.Collections.Generic; using Infinity.Runtime; using Infinity.Ember; " +
             "public class Net : Component, IReloadAware { public int Setups; " +
             "public void OnReloadDetach(ReloadState s) { s.Set(\"n\", Setups); } " +
             "public void OnReloadAttach(ReloadState s) { Setups = s.GetOrDefault<int>(\"n\") + 1; } }");
@@ -275,7 +275,7 @@ public class HotReloadSceneTests : EditorTestHarness
         scene.Add(go);
 
         Assembly v2 = CompileGameAssembly("Hook.cs",
-            "using System.Collections.Generic; using Prowl.Runtime; using Prowl.Ember; " +
+            "using System.Collections.Generic; using Infinity.Runtime; using Infinity.Ember; " +
             "public class Net : Component, IReloadAware { public int Setups; public int Extra; " +
             "public void OnReloadDetach(ReloadState s) { s.Set(\"n\", Setups); } " +
             "public void OnReloadAttach(ReloadState s) { Setups = s.GetOrDefault<int>(\"n\") + 1; } }");
@@ -291,7 +291,7 @@ public class HotReloadSceneTests : EditorTestHarness
     public void Migrate_Scene_RemovedComponentType_IsDroppedFromGameObject()
     {
         Assembly v1 = CompileGameAssembly("Two.cs",
-            "using Prowl.Runtime; public class Keeper : Component { public int X; } public class Doomed : Component { public int Y; }");
+            "using Infinity.Runtime; public class Keeper : Component { public int X; } public class Doomed : Component { public int Y; }");
         Type keeperV1 = v1.GetType("Keeper")!;
         Type doomedV1 = v1.GetType("Doomed")!;
 
@@ -303,7 +303,7 @@ public class HotReloadSceneTests : EditorTestHarness
         Assert.Equal(2, go.GetComponents().Count());
 
         Assembly v2 = CompileGameAssembly("Two.cs",
-            "using Prowl.Runtime; public class Keeper : Component { public int X; public int Extra; }");
+            "using Infinity.Runtime; public class Keeper : Component { public int X; public int Extra; }");
         SceneHotReload.Migrate(scene, v1, v2);
 
         Type keeperV2 = v2.GetType("Keeper")!;
@@ -321,7 +321,7 @@ public class HotReloadSceneTests : EditorTestHarness
         Assert.NotNull(loaded);
 
         Assembly v1 = CompileGameAssembly("Sub.cs",
-            "using Prowl.Runtime; using Prowl.Runtime.Resources; public class Sub : Component { public int Pings; public void OnPing(SceneInstance a, SceneInstance b){ Pings++; } }");
+            "using Infinity.Runtime; using Infinity.Runtime.Resources; public class Sub : Component { public int Pings; public void OnPing(SceneInstance a, SceneInstance b){ Pings++; } }");
         Type subV1 = v1.GetType("Sub")!;
 
         var scene = new SceneInstance(SceneMode.Edit);
@@ -334,7 +334,7 @@ public class HotReloadSceneTests : EditorTestHarness
         try
         {
             Assembly v2 = CompileGameAssembly("Sub.cs",
-                "using Prowl.Runtime; using Prowl.Runtime.Resources; public class Sub : Component { public int Pings; public int Extra; public void OnPing(SceneInstance a, SceneInstance b){ Pings++; } }");
+                "using Infinity.Runtime; using Infinity.Runtime.Resources; public class Sub : Component { public int Pings; public int Extra; public void OnPing(SceneInstance a, SceneInstance b){ Pings++; } }");
 
             SceneHotReload.Migrate(scene, v1, v2);
             Component newSub = go.GetComponents().Single();
@@ -354,7 +354,7 @@ public class HotReloadSceneTests : EditorTestHarness
     public void RealRecompile_MigratesThePrefabComparisonBaseline_SoOverridesKeepBeingRecorded()
     {
         Assembly v1 = CompileGameAssembly("Knob.cs",
-            "using Prowl.Runtime; public class Knob : Component { public int Value; }");
+            "using Infinity.Runtime; public class Knob : Component { public int Value; }");
         Type knobV1 = v1.GetType("Knob")!;
 
         var authored = new GameObject("Root");
@@ -370,7 +370,7 @@ public class HotReloadSceneTests : EditorTestHarness
         Prefabs.PrefabUtility.ReconcileInstance(instance);
 
         Assembly v2 = CompileGameAssembly("Knob.cs",
-            "using Prowl.Runtime; public class Knob : Component { public int Value; public int Added; }");
+            "using Infinity.Runtime; public class Knob : Component { public int Value; public int Added; }");
         Type knobV2 = v2.GetType("Knob")!;
 
         SceneHotReload.Migrate(SceneInstance.Main!, v1, v2);
@@ -397,7 +397,7 @@ public class HotReloadSceneTests : EditorTestHarness
     public void RealRecompile_ChangedFields_AreComparedOnPrefabInstances(string typeName, string v2Fields)
     {
         Assembly v1 = CompileGameAssembly($"{typeName}.cs",
-            $"using Prowl.Runtime; public class {typeName} : Component {{ public int Value; public int Old; }}");
+            $"using Infinity.Runtime; public class {typeName} : Component {{ public int Value; public int Old; }}");
         Type typeV1 = v1.GetType(typeName)!;
 
         var authored = new GameObject("Root");
@@ -413,7 +413,7 @@ public class HotReloadSceneTests : EditorTestHarness
         Prefabs.PrefabUtility.ReconcileInstance(instance);
 
         Assembly v2 = CompileGameAssembly($"{typeName}.cs",
-            $"using Prowl.Runtime; public class {typeName} : Component {{ {v2Fields} }}");
+            $"using Infinity.Runtime; public class {typeName} : Component {{ {v2Fields} }}");
         Type typeV2 = v2.GetType(typeName)!;
 
         SceneHotReload.Migrate(SceneInstance.Main!, v1, v2);

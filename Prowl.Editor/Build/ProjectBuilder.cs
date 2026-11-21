@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Prowl.Editor.Build;
+namespace Infinity.Editor.Build;
 
 /// <summary>Starts player builds and hands back the progress the editor and the CLI follow.</summary>
 public static class ProjectBuilder
@@ -15,7 +15,7 @@ public static class ProjectBuilder
     /// </summary>
     public static IEnumerable<BuildPipeline> DiscoverPipelines()
     {
-        foreach (Type type in Prowl.Editor.Utils.EditorUtils.GetAllTypes())
+        foreach (Type type in Infinity.Editor.Utils.EditorUtils.GetAllTypes())
         {
             if (type.IsAbstract || !typeof(BuildPipeline).IsAssignableFrom(type)) continue;
             if (Activator.CreateInstance(type) is BuildPipeline pipeline) yield return pipeline;
@@ -85,15 +85,15 @@ public static class BuildProfileDrawers
     /// Draws <paramref name="profile"/>. A profile with no drawer of its own shows nothing, which is why pipelines
     /// that need fields register one through <see cref="Register{T}"/>.
     /// </summary>
-    public static void Draw(Prowl.PaperUI.Paper paper, PlatformBuildProfile profile)
+    public static void Draw(Infinity.PaperUI.Paper paper, PlatformBuildProfile profile)
     {
-        if (Drawers.TryGetValue(profile.GetType(), out Action<Prowl.PaperUI.Paper, PlatformBuildProfile>? drawer))
+        if (Drawers.TryGetValue(profile.GetType(), out Action<Infinity.PaperUI.Paper, PlatformBuildProfile>? drawer))
             drawer(paper, profile);
     }
 
-    private static readonly System.Collections.Generic.Dictionary<Type, Action<Prowl.PaperUI.Paper, PlatformBuildProfile>> Drawers = [];
+    private static readonly System.Collections.Generic.Dictionary<Type, Action<Infinity.PaperUI.Paper, PlatformBuildProfile>> Drawers = [];
 
     /// <summary>Registers the drawer for a profile type, which replaces any drawer already registered for it.</summary>
-    public static void Register<T>(Action<Prowl.PaperUI.Paper, T> drawer) where T : PlatformBuildProfile
+    public static void Register<T>(Action<Infinity.PaperUI.Paper, T> drawer) where T : PlatformBuildProfile
         => Drawers[typeof(T)] = (paper, profile) => drawer(paper, (T)profile);
 }

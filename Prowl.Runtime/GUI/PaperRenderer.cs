@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,17 +6,17 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-using Prowl.Graphite;
-using Prowl.Graphite.ShaderDef;
-using Prowl.Quill;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Graphite;
+using Infinity.Graphite.ShaderDef;
+using Infinity.Quill;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using GTexture = Prowl.Graphite.Texture;
-using RenderTexture = Prowl.Runtime.Resources.RenderTexture;
-using IndexFormat = Prowl.Graphite.IndexFormat;
+using GTexture = Infinity.Graphite.Texture;
+using RenderTexture = Infinity.Runtime.Resources.RenderTexture;
+using IndexFormat = Infinity.Graphite.IndexFormat;
 
-namespace Prowl.Runtime.GUI;
+namespace Infinity.Runtime.GUI;
 
 /// <summary>
 /// Draws Paper's canvas through Graphite. Each frame's geometry and draw calls are copied when Paper hands them over,

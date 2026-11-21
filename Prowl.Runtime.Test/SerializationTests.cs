@@ -1,13 +1,13 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Vector;
-using Prowl.Echo;
-using Prowl.Runtime.Resources;
+using Infinity.Vector;
+using Infinity.Echo;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 #region Test types
 
@@ -48,7 +48,7 @@ public sealed class LifecycleCounter : Component
 #endregion
 
 /// <summary>
-/// Tests for Prowl's wiring on top of Prowl.Echo - the hand-written ISerializable implementations
+/// Tests for Prowl's wiring on top of Infinity.Echo - the hand-written ISerializable implementations
 /// (GameObject, AssetRef, AnimationClip) and the ISerializationCallbackReceiver logic on Scene.
 /// Echo's own field/format serialization is covered by Echo's test suite and not re-tested here.
 /// </summary>

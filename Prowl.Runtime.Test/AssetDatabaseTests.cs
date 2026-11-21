@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,12 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Prowl.Echo;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>An asset for residency tests, with the kinds of field the walk has to follow.</summary>
 public sealed class Crate : Asset

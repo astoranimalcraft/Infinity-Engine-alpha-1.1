@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Echo;
-using Prowl.Runtime.Audio;
-using Prowl.Runtime.Rendering.Pipelines;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Runtime.Audio;
+using Infinity.Runtime.Rendering.Pipelines;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// Loads and applies project settings from Echo YAML files in the built player.

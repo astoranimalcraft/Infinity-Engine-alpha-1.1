@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 
-using Prowl.Editor.GUI;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.Runtime;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Projects.Settings;
+namespace Infinity.Editor.Projects.Settings;
 
 /// <summary>
 /// The project's rendering quality levels and the one in use, applied to the editor and written to QualitySettings.yaml

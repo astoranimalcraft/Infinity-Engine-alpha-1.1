@@ -1,19 +1,19 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-using Prowl.Graphite.Rendering;
-using Prowl.Graphite.ShaderDef;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Graphite.Rendering;
+using Infinity.Graphite.ShaderDef;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using Material = Prowl.Runtime.Resources.Material;
-using Shader = Prowl.Runtime.Resources.Shader;
+using Material = Infinity.Runtime.Resources.Material;
+using Shader = Infinity.Runtime.Resources.Shader;
 
-namespace Prowl.Runtime.Rendering;
+namespace Infinity.Runtime.Rendering;
 
 /// <summary>The skies Graphite ships, each a shader a sky material can use.</summary>
 public enum BuiltInSky

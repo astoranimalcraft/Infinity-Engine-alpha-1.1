@@ -5,4 +5,4 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "IDE0017:Simplify object initialization", Justification = "<Pending>", Scope = "member", Target = "~M:Prowl.Editor.Test.PrefabTests.NestedPrefabRoot_Detection")]
+[assembly: SuppressMessage("Style", "IDE0017:Simplify object initialization", Justification = "<Pending>", Scope = "member", Target = "~M:Infinity.Editor.Test.PrefabTests.NestedPrefabRoot_Detection")]

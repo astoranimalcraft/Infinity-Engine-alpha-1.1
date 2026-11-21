@@ -1,6 +1,6 @@
 using System;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 /// <summary> When placed on a parameterless static void method, that method is called every time a scene is saved in the editor. </summary>
 [AttributeUsage(AttributeTargets.Method)]

@@ -1,12 +1,12 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Analyzers;
-using Prowl.Editor.Projects.Scripting;
+using Infinity.Analyzers;
+using Infinity.Editor.Projects.Scripting;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>
 /// Verifies the analyzer that warns about blocking the main thread on a task, which never returns for
@@ -42,7 +42,7 @@ public class BlockingWaitAnalyzerTests : EditorTestHarness
     [InlineData("var t = Loader.Load(); if (!t.IsCompleted) { } int v = t.Result;")]
     public void WarnsOnEachWayOfBlockingInAComponent(string body)
     {
-        ScriptCompiler.CompileResult result = Compile($"public class Comp : Prowl.Runtime.Component {{ public override void Start() {{ {body} }} }}");
+        ScriptCompiler.CompileResult result = Compile($"public class Comp : Infinity.Runtime.Component {{ public override void Start() {{ {body} }} }}");
 
         Assert.True(result.Success, result.Errors); // a warning, so the compile still succeeds
         Assert.Contains(BlockingWaitAnalyzer.BlockingWaitId, result.Output);
@@ -61,7 +61,7 @@ public class BlockingWaitAnalyzerTests : EditorTestHarness
     [InlineData("static int Local(System.Threading.Tasks.Task<int> t) => t.Result; Local(Loader.Load());")]
     public void SaysNothingAboutAReadThatCannotBlock(string body)
     {
-        ScriptCompiler.CompileResult result = Compile($"public class Comp : Prowl.Runtime.Component {{ public override void Start() {{ {body} }} }}");
+        ScriptCompiler.CompileResult result = Compile($"public class Comp : Infinity.Runtime.Component {{ public override void Start() {{ {body} }} }}");
 
         Assert.True(result.Success, result.Errors);
         Assert.DoesNotContain(BlockingWaitAnalyzer.BlockingWaitId, result.Output);
@@ -71,7 +71,7 @@ public class BlockingWaitAnalyzerTests : EditorTestHarness
     [Fact]
     public void SaysNothingInAStaticMethod()
     {
-        ScriptCompiler.CompileResult result = Compile("public class Comp : Prowl.Runtime.Component { static int Get() => Loader.Load().Result; }");
+        ScriptCompiler.CompileResult result = Compile("public class Comp : Infinity.Runtime.Component { static int Get() => Loader.Load().Result; }");
 
         Assert.True(result.Success, result.Errors);
         Assert.DoesNotContain(BlockingWaitAnalyzer.BlockingWaitId, result.Output);
@@ -80,7 +80,7 @@ public class BlockingWaitAnalyzerTests : EditorTestHarness
     [Fact]
     public void SaysNothingAboutAwait()
     {
-        ScriptCompiler.CompileResult result = Compile("public class Comp : Prowl.Runtime.Component { public override async void Start() { int v = await Loader.Load(); } }");
+        ScriptCompiler.CompileResult result = Compile("public class Comp : Infinity.Runtime.Component { public override async void Start() { int v = await Loader.Load(); } }");
 
         Assert.True(result.Success, result.Errors);
         Assert.DoesNotContain(BlockingWaitAnalyzer.BlockingWaitId, result.Output);
@@ -91,7 +91,7 @@ public class BlockingWaitAnalyzerTests : EditorTestHarness
     public void SaysNothingInsideALambda()
     {
         ScriptCompiler.CompileResult result = Compile(
-            "public class Comp : Prowl.Runtime.Component { public override void Start() " +
+            "public class Comp : Infinity.Runtime.Component { public override void Start() " +
             "{ System.Threading.Tasks.Task.Run(() => Loader.Load().Result); } }");
 
         Assert.True(result.Success, result.Errors);

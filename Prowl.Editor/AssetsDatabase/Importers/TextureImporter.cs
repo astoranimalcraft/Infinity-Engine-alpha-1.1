@@ -1,17 +1,17 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Echo;
-using Prowl.Editor.Projects;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Editor.Projects;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-namespace Prowl.Editor.Importers;
+namespace Infinity.Editor.Importers;
 
 // Every extension Aperture decodes. Detection is by content, so an extension that turns out
 // to hold something else is refused at import rather than mis-decoded.
@@ -600,7 +600,7 @@ public static class TextureSpriteMeta
         }
         catch (Exception ex)
         {
-            Prowl.Runtime.Debug.LogWarning($"[Sprite] Could not read the source image of texture {textureGuid}: {ex.Message}");
+            Infinity.Runtime.Debug.LogWarning($"[Sprite] Could not read the source image of texture {textureGuid}: {ex.Message}");
             return (0, 0);
         }
     }
@@ -617,7 +617,7 @@ public static class TextureSpriteMeta
         }
         catch (Exception ex)
         {
-            Prowl.Runtime.Debug.LogWarning($"[Sprite] Could not read the source alpha of texture {textureGuid}: {ex.Message}");
+            Infinity.Runtime.Debug.LogWarning($"[Sprite] Could not read the source alpha of texture {textureGuid}: {ex.Message}");
             return null;
         }
     }
@@ -884,7 +884,7 @@ public static class SpriteSlicer
         }
         catch (Exception ex)
         {
-            Prowl.Runtime.Debug.LogWarning($"[SpriteSlicer] Could not read texture alpha: {ex.Message}");
+            Infinity.Runtime.Debug.LogWarning($"[SpriteSlicer] Could not read texture alpha: {ex.Message}");
             return null;
         }
     }
@@ -1037,7 +1037,7 @@ public static class SpriteBuilder
         // Only the built sprite is clamped - the authored slicing is left alone so restoring the original
         // image (or re-slicing) brings it straight back.
         if (clampedCount > 0)
-            Prowl.Runtime.Debug.LogWarning(
+            Infinity.Runtime.Debug.LogWarning(
                 $"[Sprite] '{tex.Name}': {clampedCount} slice(s) fall outside the {sourceWidth}x{sourceHeight} texture and were clamped for this import. The stored slicing is unchanged.");
 
         return result;

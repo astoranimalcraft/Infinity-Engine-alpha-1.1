@@ -1,12 +1,12 @@
-// This file is part of the Prowl Game Engine fork.
+// This file is part of the Infinity Engine fork.
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Runtime;
-using Prowl.Runtime.Rendering;
+using Infinity.Runtime;
+using Infinity.Runtime.Rendering;
 
-namespace Prowl.Runtime.Rendering.Pipelines.Infinity.PostProcessing;
+namespace Infinity.Runtime.Rendering.Pipelines.Infinity.PostProcessing;
 
 /// <summary>
 /// Reads Prowl's blended VolumeStack and copies its CPU values into an Infinity-owned settings object.

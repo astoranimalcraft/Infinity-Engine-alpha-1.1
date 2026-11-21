@@ -1,10 +1,10 @@
-using Prowl.Editor.GUI;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.Runtime;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Projects.Settings;
+namespace Infinity.Editor.Projects.Settings;
 
 /// <summary> Project settings for headset support: whether play mode and built players start XR on their own, and how. </summary>
 [ProjectSettings("XR", EditorIcons.Headset, order: 30)]

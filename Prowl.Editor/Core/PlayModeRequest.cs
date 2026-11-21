@@ -1,7 +1,7 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 /// <summary>
 /// A request to start or stop play mode, handed to every subscriber of EditorApplication.PlayModeRequested before anything happens.

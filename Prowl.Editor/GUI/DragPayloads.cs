@@ -1,15 +1,15 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 //
 // Editor-specific drag payloads. The drag system itself is OrigamiUI.DragDrop.
 
 using System;
 
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.Runtime;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.GUI;
+namespace Infinity.Editor.GUI;
 
 /// <summary> Abstract base class for editor-specific drag payloads that carry a display name and icon. </summary>
 public abstract class EditorDragPayload : DragPayload

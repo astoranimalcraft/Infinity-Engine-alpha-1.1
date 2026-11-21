@@ -1,14 +1,14 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Collections.Generic;
 
-using Prowl.Graphite.Rendering;
-using Prowl.Vector;
+using Infinity.Graphite.Rendering;
+using Infinity.Vector;
 
-using GLightType = Prowl.Graphite.Rendering.LightType;
+using GLightType = Infinity.Graphite.Rendering.LightType;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>Light in every direction from a point, like a bare bulb. Its intensity is in candela.</summary>
 [AddComponentMenu("Rendering/Lights/Point Light")]

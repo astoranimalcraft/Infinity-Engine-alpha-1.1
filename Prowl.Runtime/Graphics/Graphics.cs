@@ -1,25 +1,25 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-using Prowl.Graphite;
-using Prowl.Graphite.Rendering;
-using Prowl.Graphite.ShaderDef;
-using Prowl.Graphite.ShaderDef.Compiler;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Graphite;
+using Infinity.Graphite.Rendering;
+using Infinity.Graphite.ShaderDef;
+using Infinity.Graphite.ShaderDef.Compiler;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
 using Silk.NET.Windowing;
 
-using GTexture = Prowl.Graphite.Texture;
-using RenderTexture = Prowl.Runtime.Resources.RenderTexture;
-using Material = Prowl.Runtime.Resources.Material;
-using GShader = Prowl.Graphite.Rendering.Shader;
+using GTexture = Infinity.Graphite.Texture;
+using RenderTexture = Infinity.Runtime.Resources.RenderTexture;
+using Material = Infinity.Runtime.Resources.Material;
+using GShader = Infinity.Graphite.Rendering.Shader;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// Prowl's link to the GPU: one Vulkan device and one Graphite renderer for the application, and the frame every view
@@ -27,7 +27,7 @@ namespace Prowl.Runtime;
 /// stays absent while its CPU state works as usual.
 /// </summary>
 // Script hot reload must not migrate these statics. Nothing here references user types, so there is nothing to migrate.
-[Prowl.Ember.ReloadIgnore]
+[Infinity.Ember.ReloadIgnore]
 public static class Graphics
 {
     private static GlslShaderCompiler? s_compiler;
@@ -94,7 +94,7 @@ public static class Graphics
     /// Where compiled shader stages are kept between runs, keyed by their source, so each variant compiles once per
     /// machine. Set before anything compiles; null keeps them in memory only.
     /// </summary>
-    public static string? ShaderCacheDirectory = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Prowl", "ShaderCache");
+    public static string? ShaderCacheDirectory = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Infinity", "ShaderCache");
 
     // Graphite's library is registered here too, so shaders parse and list their axes headless
     private static GlslShaderCompiler CreateCompiler()
@@ -360,7 +360,7 @@ public static class Graphics
     }
 
     /// <summary>Records transfer work (updates, copies, mips) and waits for the GPU to finish it.</summary>
-    public static void RunNow(Action<CommandBuffer> record, string name = "Prowl")
+    public static void RunNow(Action<CommandBuffer> record, string name = "Infinity")
     {
         if (Device == null) return;
         Device.Record(record, name).Wait();

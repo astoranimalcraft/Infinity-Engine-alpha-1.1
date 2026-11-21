@@ -1,14 +1,14 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-using Prowl.PaperUI;
-using Prowl.Runtime;
+using Infinity.PaperUI;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.GUI.PropertyEditors;
+namespace Infinity.Editor.GUI.PropertyEditors;
 
 /// <summary>
 /// Draws a non-flags enum using its members' [InspectorName]s — the one place that naming lives, whether or not the field itself carries the attribute.

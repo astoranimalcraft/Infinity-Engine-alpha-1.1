@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -8,12 +8,12 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Prowl.Echo;
-using Prowl.Runtime.Tasks;
-using Prowl.Runtime.Rendering;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Runtime.Tasks;
+using Infinity.Runtime.Rendering;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.Resources;
+namespace Infinity.Runtime.Resources;
 
 /// <summary>
 /// A scene as stored in a .scene file. Holding one keeps only its stored data loaded, not what the scene uses:

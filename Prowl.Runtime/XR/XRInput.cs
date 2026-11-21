@@ -1,10 +1,10 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Vector;
+using Infinity.Vector;
 
 using Silk.NET.Core.Native;
 using Silk.NET.OpenXR;
@@ -13,7 +13,7 @@ using Silk.NET.OpenXR.Extensions.EXT;
 using XrAction = Silk.NET.OpenXR.Action;
 using XrApi = Silk.NET.OpenXR.XR;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 public enum XRHand
 {

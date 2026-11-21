@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-using Prowl.Ember;
-using Prowl.PaperUI;
-using Prowl.Runtime.Rendering;
+using Infinity.Ember;
+using Infinity.PaperUI;
+using Infinity.Runtime.Rendering;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// Which optional <see cref="Component"/> callbacks a component actually overrides. Resolved once per

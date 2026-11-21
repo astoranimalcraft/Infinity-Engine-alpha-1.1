@@ -1,17 +1,17 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Vector;
+using Infinity.Vector;
 
 using Silk.NET.OpenXR;
 
 using Xunit;
 
-using Quaternion = Prowl.Vector.Quaternion;
+using Quaternion = Infinity.Vector.Quaternion;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>
 /// Tracking without a headset: the conversions and the recentring maths the session relies on, and every tracking
@@ -215,7 +215,7 @@ public class XRTrackingTests
     public void WithoutXR_TheDeviceNeedsNothingExtra()
     {
         Assert.False(XR.InitializeOnStartup);
-        Prowl.Graphite.VulkanDeviceOptions options = XR.VulkanOptions();
+        Infinity.Graphite.VulkanDeviceOptions options = XR.VulkanOptions();
 
         Assert.Empty(options.InstanceExtensions);
         Assert.Empty(options.DeviceExtensions);

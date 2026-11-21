@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -7,18 +7,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 
-using Prowl.Echo;
-using Prowl.Runtime.Rendering;
-using Prowl.Vector;
-using Prowl.Vector.Geometry;
+using Infinity.Echo;
+using Infinity.Runtime.Rendering;
+using Infinity.Vector;
+using Infinity.Vector.Geometry;
 
-using Prowl.Graphite.Rendering;
+using Infinity.Graphite.Rendering;
 
-using GBlendShapeData = Prowl.Graphite.Rendering.BlendShapeData;
-using GBlendShapeFrame = Prowl.Graphite.Rendering.BlendShapeFrame;
-using GVertexSemantic = Prowl.Graphite.Rendering.VertexSemantic;
+using GBlendShapeData = Infinity.Graphite.Rendering.BlendShapeData;
+using GBlendShapeFrame = Infinity.Graphite.Rendering.BlendShapeFrame;
+using GVertexSemantic = Infinity.Graphite.Rendering.VertexSemantic;
 
-namespace Prowl.Runtime.Resources;
+namespace Infinity.Runtime.Resources;
 
 public enum IndexFormat : byte
 {
@@ -328,7 +328,7 @@ public class Mesh : Asset, ISerializable
 
     /// <summary>
     /// Monotonic version that advances whenever the mesh's data changes (vertices, indices, topology,
-    /// submeshes, ...). Mirrors <see cref="Prowl.Vector.Transform.Version"/>. Useful for invalidating
+    /// submeshes, ...). Mirrors <see cref="Infinity.Vector.Transform.Version"/>. Useful for invalidating
     /// caches derived from this mesh (e.g. baked physics meshes - see <see cref="PhysicsWorld.BakeMesh"/>).
     /// </summary>
     public uint Version { get { EnsureLoaded(); return _version; } }

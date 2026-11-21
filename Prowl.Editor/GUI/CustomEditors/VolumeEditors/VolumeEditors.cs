@@ -1,17 +1,17 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Echo;
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.Runtime;
-using Prowl.Runtime.Rendering;
+using Infinity.Echo;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.Runtime;
+using Infinity.Runtime.Rendering;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 /// <summary>The .volume asset inspector: the profile's components, edited live. Edits are undo records that put the profile in the dirty asset set.</summary>
 [CustomAssetEditor(typeof(VolumeProfile))]
@@ -93,7 +93,7 @@ public class CameraEditor : CustomEditor
 
         VolumeProfile? profile = camera.Profile;
         EditorGUI.SectionHeader(paper, $"{id}_base_hdr", "Base Profile");
-        using (paper.Row($"{id}_base_btns").Height(Prowl.PaperUI.LayoutEngine.UnitValue.Auto)
+        using (paper.Row($"{id}_base_btns").Height(Infinity.PaperUI.LayoutEngine.UnitValue.Auto)
             .Padding(Origami.Current.Metrics.PaddingLarge, Origami.Current.Metrics.PaddingLarge, 0, 0).Gap(Origami.Current.Metrics.Padding)
             .Margin(0, 0, 0, Origami.Current.Metrics.SpacingLarge).Enter())
         {

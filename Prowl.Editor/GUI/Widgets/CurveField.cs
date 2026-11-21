@@ -1,23 +1,23 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Quill;
-using Prowl.Runtime;
-using Prowl.Vector;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Quill;
+using Infinity.Runtime;
+using Infinity.Vector;
 
 using Color = System.Drawing.Color;
 
-namespace Prowl.Editor.GUI.Widgets;
+namespace Infinity.Editor.GUI.Widgets;
 
 /// <summary>
 /// Fluent builder for an AnimationCurve editor field.
 /// Renders an inline preview swatch that opens a full curve editor popover on click.
-/// Depends on Prowl.Runtime (AnimationCurve) so lives outside Origami.
+/// Depends on Infinity.Runtime (AnimationCurve) so lives outside Origami.
 ///
 /// Usage:
 ///   CurveField.Create(paper, id, curve, v => myCurve = v).Show();

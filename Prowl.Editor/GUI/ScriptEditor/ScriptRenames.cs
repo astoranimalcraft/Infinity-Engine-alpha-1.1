@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.Projects;
-using Prowl.OrigamiUI;
-using Prowl.OrigamiUI.CSharp;
+using Infinity.Editor.Core;
+using Infinity.Editor.Projects;
+using Infinity.OrigamiUI;
+using Infinity.OrigamiUI.CSharp;
 
-namespace Prowl.Editor.GUI.ScriptEditor;
+namespace Infinity.Editor.GUI.ScriptEditor;
 
 /// <summary>
 /// Follows asset renames into the Script Editor, and offers to rename the type a script declares under its old file
@@ -74,7 +74,7 @@ internal static class ScriptRenames
         string indent = text[lineStart..start];
         if (indent.Trim().Length > 0) indent = "";
         string newLine = text.Contains("\r\n") ? "\r\n" : "\n";
-        return new CodeTextEdit(start, 0, $"[Prowl.Echo.FormerlySerializedAs(\"{oldName}\")]{newLine}{indent}");
+        return new CodeTextEdit(start, 0, $"[Infinity.Echo.FormerlySerializedAs(\"{oldName}\")]{newLine}{indent}");
     }
 
     internal static async Task RenameAsync(string oldPath, string newPath, string oldName, string newName)

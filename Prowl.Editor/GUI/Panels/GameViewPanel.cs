@@ -2,27 +2,27 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI;
-using Prowl.Editor.Projects.Settings;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Rosetta;
-using Prowl.Runtime;
-using Prowl.Runtime.Diagnostics;
-using Prowl.Runtime.GUI;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
-using Prowl.Vector.Spatial;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Projects.Settings;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.Runtime.Diagnostics;
+using Infinity.Runtime.GUI;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
+using Infinity.Vector.Spatial;
 
 using Color = System.Drawing.Color;
-// Aliased to avoid clashing with Prowl.PaperUI types used elsewhere in this file.
-using RuntimeEventSystem = Prowl.Runtime.UI.EventSystem;
+// Aliased to avoid clashing with Infinity.PaperUI types used elsewhere in this file.
+using RuntimeEventSystem = Infinity.Runtime.UI.EventSystem;
 
-namespace Prowl.Editor.GUI.Panels;
+namespace Infinity.Editor.GUI.Panels;
 
 public enum GameViewOnPlay { Focus, Maximize, Nothing }
 public enum PauseOnLog { Off, ErrorsAndExceptions, ExceptionsOnly }
@@ -346,7 +346,7 @@ public class GameViewPanel : DockPanel
                 {
                     try
                     {
-                        cam.Render(new CameraRenderOptions { FallbackTarget = _rt, Kind = Prowl.Graphite.Rendering.ViewKind.Game, DisplayGizmos = _showGizmos });
+                        cam.Render(new CameraRenderOptions { FallbackTarget = _rt, Kind = Infinity.Graphite.Rendering.ViewKind.Game, DisplayGizmos = _showGizmos });
                     }
                     catch (Exception ex)
                     {
@@ -618,7 +618,7 @@ public class GameViewPanel : DockPanel
 
         float round = EditorTheme.Roundness * 0.5f;
         canvas.RoundedRectFilled(x, y, w, h, round, round, round, round,
-            Prowl.Vector.Color32.FromArgb(255, 10, 10, 14));
+            Infinity.Vector.Color32.FromArgb(255, 10, 10, 14));
 
         float maxMs = 8f;
         for (int i = 0; i < len; i++)

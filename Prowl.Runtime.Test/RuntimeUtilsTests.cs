@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Reflection;
@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 using Xunit;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>Tests for <see cref="RuntimeUtils.ResolveType"/> assembly-qualified name binding.</summary>
 public class RuntimeUtilsTests
@@ -33,7 +33,7 @@ public class RuntimeUtilsTests
     public void ResolveType_WithoutAssemblyQualifier_ResolvesByFullName()
     {
         Assert.Equal(typeof(int), RuntimeUtils.ResolveType("System.Int32"));
-        Assert.Equal(typeof(RuntimeUtils), RuntimeUtils.ResolveType("Prowl.Runtime.RuntimeUtils"));
+        Assert.Equal(typeof(RuntimeUtils), RuntimeUtils.ResolveType("Infinity.Runtime.RuntimeUtils"));
     }
 
     // These names reach the editor from a persisted asset database, so a corrupt or truncated entry
@@ -41,7 +41,7 @@ public class RuntimeUtilsTests
     [Theory]
     [InlineData("Foo,")]                                                                    // empty assembly name
     [InlineData("Foo, ==")]                                                                 // invalid assembly name
-    [InlineData("Prowl.Runtime.RuntimeUtils[")]                                             // truncated
+    [InlineData("Infinity.Runtime.RuntimeUtils[")]                                             // truncated
     [InlineData("Ns.T, Missing.Asm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null")] // assembly not loaded
     public void ResolveType_MalformedOrUnloadable_ReturnsNullWithoutThrowing(string name)
     {
@@ -53,7 +53,7 @@ public class RuntimeUtilsTests
     [Fact]
     public void ResolveType_TypeNameQualifiedWithWrongAssembly_ReturnsNull()
     {
-        string wrong = $"Prowl.Runtime.RuntimeUtils, {typeof(int).Assembly.GetName().Name}";
+        string wrong = $"Infinity.Runtime.RuntimeUtils, {typeof(int).Assembly.GetName().Name}";
         Assert.Null(RuntimeUtils.ResolveType(wrong));
     }
 
@@ -141,9 +141,9 @@ public class RuntimeUtilsTests
             return s_outOfContextType;
 
         AssemblyBuilder asm = AssemblyBuilder.DefineDynamicAssembly(
-            new AssemblyName("Prowl.Runtime.Test.OutOfContext"), AssemblyBuilderAccess.Run);
+            new AssemblyName("Infinity.Runtime.Test.OutOfContext"), AssemblyBuilderAccess.Run);
         ModuleBuilder module = asm.DefineDynamicModule("Main");
-        TypeBuilder type = module.DefineType("Prowl.Runtime.Test.OutOfContextAsset", TypeAttributes.Public | TypeAttributes.Class);
+        TypeBuilder type = module.DefineType("Infinity.Runtime.Test.OutOfContextAsset", TypeAttributes.Public | TypeAttributes.Class);
 
         return s_outOfContextType = type.CreateType();
     }

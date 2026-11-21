@@ -1,12 +1,12 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Gizmo = Prowl.OrigamiUI.Gizmo;
+using Gizmo = Infinity.OrigamiUI.Gizmo;
 
-namespace Prowl.Editor.GUI.SceneView;
+namespace Infinity.Editor.GUI.SceneView;
 
 /// <summary>Which built-in transform manipulator the scene view is currently offering.</summary>
 public enum TransformTool

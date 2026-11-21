@@ -1,18 +1,18 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Linq;
 using System.Collections.Generic;
 
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using GMaterial = Prowl.Graphite.Rendering.Material;
-using SphericalHarmonicsL2 = Prowl.Runtime.Rendering.SphericalHarmonicsL2;
+using GMaterial = Infinity.Graphite.Rendering.Material;
+using SphericalHarmonicsL2 = Infinity.Runtime.Rendering.SphericalHarmonicsL2;
 
-namespace Prowl.Runtime.Rendering;
+namespace Infinity.Runtime.Rendering;
 
 /// <summary>
 /// Something in a scene that keeps state in the scene's <see cref="RenderWorld"/>: a renderer, a light, a probe. It

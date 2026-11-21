@@ -1,22 +1,22 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Runtime.CompilerServices;
 
-using Prowl.Echo;
-using Prowl.Editor.GUI;
-using Prowl.Editor.Importers;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Importers;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
-using PropertyGridUtils = Prowl.Editor.GUI.PropertyGridUtils;
+using PropertyGridUtils = Infinity.Editor.GUI.PropertyGridUtils;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 /// <summary>
 /// Inspector for imported audio clips: what the file turned out to contain, and the import settings

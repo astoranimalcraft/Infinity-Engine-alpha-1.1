@@ -1,15 +1,15 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Rendering;
-using Prowl.Vector;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Rendering;
+using Infinity.Vector;
 
 using Xunit;
 
-using GLightType = Prowl.Graphite.Rendering.LightType;
+using GLightType = Infinity.Graphite.Rendering.LightType;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 public class LightTests : RuntimeTestBase
 {

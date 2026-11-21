@@ -1,9 +1,9 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Vector;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.Rendering;
+namespace Infinity.Runtime.Rendering;
 
 /// <summary>
 /// Runtime light-probe sampler. Built from a baked set of probe positions + SH and a precomputed

@@ -1,4 +1,4 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 // based on https://www.musicdsp.org/en/latest/Effects/78-phaser-code.html
@@ -20,9 +20,9 @@
 
 using System;
 
-using Prowl.Vector;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.Audio.Effects;
+namespace Infinity.Runtime.Audio.Effects;
 
 public sealed class Phaser
 {

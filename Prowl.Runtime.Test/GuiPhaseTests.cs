@@ -1,12 +1,12 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.PaperUI;
-using Prowl.Runtime.Resources;
+using Infinity.PaperUI;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>Tests for the GUI phase of a frame, <see cref="Game.RunGui"/>.</summary>
 public class GuiPhaseTests : RuntimeTestBase

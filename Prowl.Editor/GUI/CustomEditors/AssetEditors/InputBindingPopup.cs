@@ -2,17 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.Editor.GUI;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
 
 using Color = System.Drawing.Color;
-using Segment = Prowl.Editor.Inspector.InputBindingDisplay.Segment;
+using Segment = Infinity.Editor.Inspector.InputBindingDisplay.Segment;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 /// <summary>
 /// The panel the input action editor opens to add a binding, or to edit one binding or composite in full.

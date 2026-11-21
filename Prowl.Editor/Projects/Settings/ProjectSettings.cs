@@ -1,6 +1,6 @@
-using Prowl.PaperUI;
+using Infinity.PaperUI;
 
-namespace Prowl.Editor.Projects.Settings;
+namespace Infinity.Editor.Projects.Settings;
 
 /// <summary> Attribute to mark a class as a project settings page. The Name, Icon, Order and ExportToBuild properties control how the page appears in the Project Settings panel. </summary>
 [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple = false)]

@@ -5,25 +5,25 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI.Popups;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Inspector;
-using Prowl.Editor.Prefabs;
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Editor.Theming;
-using Prowl.Editor.Utils;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Rosetta;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI.Popups;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Inspector;
+using Infinity.Editor.Prefabs;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Editor.Theming;
+using Infinity.Editor.Utils;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
 using Color = System.Drawing.Color;
 
-namespace Prowl.Editor.GUI.Panels;
+namespace Infinity.Editor.GUI.Panels;
 
 public class HierarchyPanel : DockPanel
 {

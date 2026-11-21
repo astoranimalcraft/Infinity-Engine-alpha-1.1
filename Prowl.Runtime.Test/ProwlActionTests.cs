@@ -1,11 +1,11 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Runtime.Resources;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>
 /// Tests for <see cref="ProwlAction"/> / <see cref="ProwlCall"/>: what a configured call invokes, and
@@ -117,8 +117,8 @@ public class ProwlActionTests : RuntimeTestBase
     public void Invoke_OnADetachedTarget_SaysTheTargetIsDetached()
     {
         CallTarget target = MakeTarget();
-        var detached = (CallTarget)Prowl.Echo.Serializer.Deserialize<Component>(
-            Prowl.Echo.Serializer.Serialize(typeof(Component), target))!;
+        var detached = (CallTarget)Infinity.Echo.Serializer.Deserialize<Component>(
+            Infinity.Echo.Serializer.Serialize(typeof(Component), target))!;
 
         Assert.True(detached.GameObject.IsNotValid(), "Precondition: an out-of-graph reference loads back detached.");
 

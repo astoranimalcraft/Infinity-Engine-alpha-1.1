@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Prowl.Echo;
-using Prowl.Runtime;
-using Prowl.Runtime.MeshFeatures;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Runtime;
+using Infinity.Runtime.MeshFeatures;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor.Importers;
+namespace Infinity.Editor.Importers;
 
 /// <summary>
 /// Bridge between the runtime <see cref="MeshFeatureRegistry"/> and the editor

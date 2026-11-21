@@ -1,28 +1,28 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GraphEditor;
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.Widgets;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Runtime.AnimationNodes;
-using Prowl.Vector;
+using Infinity.Editor.Core;
+using Infinity.Editor.GraphEditor;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.Widgets;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.AnimationNodes;
+using Infinity.Vector;
 
 using Color = System.Drawing.Color;
-using TransitionEasing = Prowl.Motion.TransitionEasing;
-using TransitionSync = Prowl.Motion.TransitionSync;
+using TransitionEasing = Infinity.Motion.TransitionEasing;
+using TransitionSync = Infinity.Motion.TransitionSync;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 /// <summary>The editor for an <see cref="AnimationGraph"/> asset, its state machines and its parameters.</summary>
 public class AnimationGraphWindow : GraphWindow<AnimationGraphWindow, GraphNodeRecord>

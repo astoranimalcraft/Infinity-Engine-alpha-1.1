@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -9,11 +9,11 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 
-using Prowl.Echo;
-using Prowl.Runtime.AssetImporting;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Runtime.AssetImporting;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 #region File sources
 

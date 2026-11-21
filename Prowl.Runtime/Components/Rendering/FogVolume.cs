@@ -1,13 +1,13 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Echo;
-using Prowl.Runtime.Rendering;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Runtime.Rendering;
+using Infinity.Vector;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>The shape a <see cref="FogVolume"/> fills.</summary>
 public enum FogVolumeShape

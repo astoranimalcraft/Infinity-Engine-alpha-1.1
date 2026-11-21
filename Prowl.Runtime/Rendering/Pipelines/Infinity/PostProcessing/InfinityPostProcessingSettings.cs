@@ -1,7 +1,7 @@
-// This file is part of the Prowl Game Engine fork.
+// This file is part of the Infinity Engine fork.
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-namespace Prowl.Runtime.Rendering.Pipelines.Infinity.PostProcessing;
+namespace Infinity.Runtime.Rendering.Pipelines.Infinity.PostProcessing;
 
 /// <summary>
 /// Plain CPU-side settings consumed by Infinity's own Vulkan post-processing passes.

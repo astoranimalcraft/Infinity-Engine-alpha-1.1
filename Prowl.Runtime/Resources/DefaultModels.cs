@@ -1,13 +1,13 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.IO;
 
-using Prowl.Echo;
-using Prowl.Runtime.AssetImporting;
+using Infinity.Echo;
+using Infinity.Runtime.AssetImporting;
 
-namespace Prowl.Runtime.Resources;
+namespace Infinity.Runtime.Resources;
 
 /// <summary>
 /// Builds the embedded default models (Cube, Sphere, ...) as prefabs.

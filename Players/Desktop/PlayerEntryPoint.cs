@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,9 +6,9 @@ using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-using Prowl.Runtime;
+using Infinity.Runtime;
 
-namespace Prowl.Player;
+namespace Infinity.Player;
 
 /// <summary>
 /// The whole of a built player's startup. The generated program is one line that calls this, so

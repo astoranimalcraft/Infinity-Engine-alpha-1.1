@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 
-namespace Prowl.Editor.Core.Tasks;
+namespace Infinity.Editor.Core.Tasks;
 
 /// <summary> Base class for editor tasks that provides a utility to asynchronously wait until a condition is met. </summary>
 public class EditorTask

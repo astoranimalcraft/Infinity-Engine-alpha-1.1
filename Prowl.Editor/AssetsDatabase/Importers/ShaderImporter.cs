@@ -1,10 +1,10 @@
 using System.IO;
 
-using Prowl.Editor.Projects;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Editor.Projects;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor.Importers;
+namespace Infinity.Editor.Importers;
 
 /// <summary> Imports .shader files into runtime Shader assets, with their project includes inlined. </summary>
 [ImporterFor(".shader")]

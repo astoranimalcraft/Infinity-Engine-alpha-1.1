@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
-namespace Prowl.Analyzers;
+namespace Infinity.Analyzers;
 
 /// <summary>
 /// Flags comparing a live world (<c>SceneInstance</c>) with a scene asset (<c>Scene</c>), which compiles because both
@@ -19,10 +19,10 @@ public sealed class SceneAnalyzer : DiagnosticAnalyzer
     public const string WorldComparedWithAssetId = "PROWLSC001";
     public const string HardSceneFieldId = "PROWLSC002";
 
-    public const string SceneMetadataName = "Prowl.Runtime.Resources.Scene";
-    public const string SceneInstanceMetadataName = "Prowl.Runtime.Resources.SceneInstance";
-    private const string ComponentMetadataName = "Prowl.Runtime.Component";
-    private const string SerializeFieldMetadataName = "Prowl.Echo.SerializeFieldAttribute";
+    public const string SceneMetadataName = "Infinity.Runtime.Resources.Scene";
+    public const string SceneInstanceMetadataName = "Infinity.Runtime.Resources.SceneInstance";
+    private const string ComponentMetadataName = "Infinity.Runtime.Component";
+    private const string SerializeFieldMetadataName = "Infinity.Echo.SerializeFieldAttribute";
 
     private static readonly DiagnosticDescriptor s_worldComparedWithAsset = new(
         WorldComparedWithAssetId,

@@ -3,25 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI;
-using Prowl.Editor.Inspector;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Theming;
-using Prowl.Editor.Thumbnails;
-using Prowl.Editor.Utils;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Rosetta;
-using Prowl.Runtime;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Inspector;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Theming;
+using Infinity.Editor.Thumbnails;
+using Infinity.Editor.Utils;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
+using Infinity.Runtime;
 
-using static Prowl.Editor.GUI.EditorGUI;
+using static Infinity.Editor.GUI.EditorGUI;
 
 using Color = System.Drawing.Color;
-using VColor = Prowl.Vector.Color;
+using VColor = Infinity.Vector.Color;
 
-namespace Prowl.Editor.GUI.Panels;
+namespace Infinity.Editor.GUI.Panels;
 
 public class PreferencesPanel : DockPanel
 {
@@ -891,7 +891,7 @@ public class PreferencesPanel : DockPanel
                     paper.Box("pref_pv_logo").Width(13).Height(13).Margin(0, 0, UnitValue.StretchOne, UnitValue.StretchOne).Rounded(radius * 0.5f)
                         .BackgroundColor(EditorTheme.Accent).IsNotInteractable();
                     paper.Box("pref_pv_name").Margin(SP, 0, 0, 0).IsNotInteractable()
-                        .Text("Prowl", font).TextColor(EditorTheme.Ink500).FontSize(EditorTheme.FontSizeSmall)
+                        .Text("Infinity Engine", font).TextColor(EditorTheme.Ink500).FontSize(EditorTheme.FontSizeSmall)
                         .Alignment(TextAlignment.MiddleLeft);
                     for (int i = 0; i < 3; i++)
                         paper.Box($"pref_pv_wdot{i}").Width(7).Height(7).Margin(0, 0, UnitValue.StretchOne, UnitValue.StretchOne).Rounded(4)

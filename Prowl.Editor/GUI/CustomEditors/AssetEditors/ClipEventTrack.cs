@@ -1,25 +1,25 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-using Prowl.Echo;
-using Prowl.Editor.GUI;
-using Prowl.Editor.Importers;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Importers;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Vector;
 
-using Canvas = Prowl.Quill.Canvas;
+using Canvas = Infinity.Quill.Canvas;
 using Color = System.Drawing.Color;
-using Color32 = Prowl.Vector.Color32;
+using Color32 = Infinity.Vector.Color32;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 /// <summary>
 /// The events of one clip on a strip the length of the clip: moments as markers, stretches as bars.

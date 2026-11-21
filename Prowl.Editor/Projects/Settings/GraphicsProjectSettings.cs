@@ -1,14 +1,14 @@
 ﻿
-using Prowl.Editor.GUI;
-using Prowl.Editor.Inspector;
-using Prowl.Editor.Projects.Settings;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.Runtime.Rendering.Pipelines;
-using Prowl.Runtime.Rendering.Pipelines.Infinity;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Inspector;
+using Infinity.Editor.Projects.Settings;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.Runtime.Rendering.Pipelines;
+using Infinity.Runtime.Rendering.Pipelines.Infinity;
 
-namespace Prowl.Editor.Projects.Settings;
+namespace Infinity.Editor.Projects.Settings;
 
 [ProjectSettings("Graphics", EditorIcons.GaugeHigh, order: 24, exportToBuild: true)]
 public sealed class GraphicsProjectSettings : ProjectSettingsBase

@@ -1,14 +1,14 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Collections.Generic;
 
-using Prowl.Echo;
-using Prowl.Runtime;
-using Prowl.Runtime.UI;
-using Prowl.Runtime.Rendering;
+using Infinity.Echo;
+using Infinity.Runtime;
+using Infinity.Runtime.UI;
+using Infinity.Runtime.Rendering;
 
-namespace Prowl.Vector;
+namespace Infinity.Vector;
 
 /// <summary>
 /// A component that stores anchor, pivot, and size information for 2D UI layout. It is a standalone

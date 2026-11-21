@@ -1,14 +1,14 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using GFilter = Prowl.Graphite.FilterMode;
-using GPixelFormat = Prowl.Graphite.PixelFormat;
-using GSamplerAddress = Prowl.Graphite.SamplerAddressMode;
-using GSampler = Prowl.Graphite.SamplerDescription;
+using GFilter = Infinity.Graphite.FilterMode;
+using GPixelFormat = Infinity.Graphite.PixelFormat;
+using GSamplerAddress = Infinity.Graphite.SamplerAddressMode;
+using GSampler = Infinity.Graphite.SamplerDescription;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// A texture's texel format, a subset of Graphite's pixel formats. The numbers are stored in assets, so they never

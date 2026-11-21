@@ -1,13 +1,13 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Runtime;
-using Prowl.Vector;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Runtime;
+using Infinity.Vector;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>
 /// Guards the arbitration rules in <see cref="HandleContext"/> that decide which of the viewport's

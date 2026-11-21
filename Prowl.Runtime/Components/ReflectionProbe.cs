@@ -1,23 +1,23 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
 
-using Prowl.Echo;
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using GProbeMode = Prowl.Graphite.Rendering.ReflectionProbeMode;
-using GProbeRefresh = Prowl.Graphite.Rendering.ReflectionProbeRefresh;
-using GProbeSlicing = Prowl.Graphite.Rendering.ReflectionProbeTimeSlicing;
-using ReflectionProbeMode = Prowl.Runtime.ReflectionProbeMode;
-using ReflectionProbeTimeSlicing = Prowl.Runtime.ReflectionProbeTimeSlicing;
+using GProbeMode = Infinity.Graphite.Rendering.ReflectionProbeMode;
+using GProbeRefresh = Infinity.Graphite.Rendering.ReflectionProbeRefresh;
+using GProbeSlicing = Infinity.Graphite.Rendering.ReflectionProbeTimeSlicing;
+using ReflectionProbeMode = Infinity.Runtime.ReflectionProbeMode;
+using ReflectionProbeTimeSlicing = Infinity.Runtime.ReflectionProbeTimeSlicing;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 public enum ReflectionProbeMode
 {

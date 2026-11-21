@@ -1,13 +1,13 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Prowl.Runtime.Resources;
-using Prowl.Runtime.Tasks;
-using Prowl.Vector;
+using Infinity.Runtime.Resources;
+using Infinity.Runtime.Tasks;
+using Infinity.Vector;
 
 using Xunit;
 
@@ -15,7 +15,7 @@ using Xunit;
 // which could resume on another thread.
 #pragma warning disable xUnit1031
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>Stands in for a user script that overrides OnDispose without calling base.</summary>
 public sealed class ForgetsBaseDispose : Component

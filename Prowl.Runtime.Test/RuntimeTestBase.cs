@@ -1,10 +1,10 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>
 /// Base class for tests that spin up a live instance of the runtime (scenes, GameObjects,
@@ -82,7 +82,7 @@ public abstract class RuntimeTestBase : IDisposable
     }
 
     /// <summary>The list of stored objects in a captured scene tree.</summary>
-    protected static Prowl.Echo.EchoObject StoredObjects(Prowl.Echo.EchoObject content) => content["Objects"]["array"];
+    protected static Infinity.Echo.EchoObject StoredObjects(Infinity.Echo.EchoObject content) => content["Objects"]["array"];
 
     /// <summary>
     /// Creates a tracked world, an edit world inside <see cref="EditMode"/>. Pass <paramref name="enable"/> to activate

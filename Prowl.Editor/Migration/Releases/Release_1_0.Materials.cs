@@ -1,17 +1,17 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.Echo;
+using Infinity.Echo;
 
-namespace Prowl.Editor.Migration.Releases;
+namespace Infinity.Editor.Migration.Releases;
 
 internal sealed partial class Release_1_0
 {
-    private const string MaterialType = "Prowl.Runtime.Resources.Material";
+    private const string MaterialType = "Infinity.Runtime.Resources.Material";
 
     // BuiltInAssets.GuidFor of the shaders and placeholder textures
     internal static readonly Guid LitShader = new("63d5be44-f531-7354-a255-717cb71004bb");

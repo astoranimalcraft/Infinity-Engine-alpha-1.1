@@ -2,16 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Aperture;
-using Prowl.Aperture.Utilities;
-using Prowl.Editor.GUI;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Theming;
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Aperture;
+using Infinity.Aperture.Utilities;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Theming;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor.Thumbnails;
+namespace Infinity.Editor.Thumbnails;
 
 /// <summary>
 /// Lazily generates small thumbnail images for assets. Queues work and generates one thumbnail at a

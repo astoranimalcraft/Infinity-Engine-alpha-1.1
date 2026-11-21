@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -7,28 +7,28 @@ using System.Globalization;
 
 using Echo.Logging;
 
-using Prowl.Runtime.Audio;
+using Infinity.Runtime.Audio;
 
-using Prowl.PaperUI;
-using Prowl.Runtime.Diagnostics;
-using Prowl.Runtime.GUI;
-using Prowl.Runtime.Resources;
-using Prowl.Runtime.UI;
-using Prowl.Vector;
+using Infinity.PaperUI;
+using Infinity.Runtime.Diagnostics;
+using Infinity.Runtime.GUI;
+using Infinity.Runtime.Resources;
+using Infinity.Runtime.UI;
+using Infinity.Vector;
 
 using Silk.NET.Maths;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 public class EchoLogger : IEchoLogger
 {
-    public void Debug(string message) => Prowl.Runtime.Debug.Log(message);
+    public void Debug(string message) => Infinity.Runtime.Debug.Log(message);
 
-    public void Error(string message, Exception? exception = null) => Prowl.Runtime.Debug.LogError(message);
+    public void Error(string message, Exception? exception = null) => Infinity.Runtime.Debug.LogError(message);
 
-    public void Info(string message) => Prowl.Runtime.Debug.Log(message);
+    public void Info(string message) => Infinity.Runtime.Debug.Log(message);
 
-    public void Warning(string message) => Prowl.Runtime.Debug.LogWarning(message);
+    public void Warning(string message) => Infinity.Runtime.Debug.LogWarning(message);
 }
 
 public abstract class Game
@@ -108,7 +108,7 @@ public abstract class Game
             _paperRenderer = new PaperRenderer();
             _paperRenderer.Initialize(fbSize.X, fbSize.Y);
             _paperRenderer.Target = null;
-            _paper = new Paper(_paperRenderer, winSize.X, winSize.Y, new Prowl.Quill.FontAtlasSettings());
+            _paper = new Paper(_paperRenderer, winSize.X, winSize.Y, new Infinity.Quill.FontAtlasSettings());
             _paper.SetClipboardHandler(new RuntimeClipboardHandler());
             // Apply the hovered element's requested cursor to the OS window.
             _paper.OnCursorChange += c => Input.SetCursorShape(c);

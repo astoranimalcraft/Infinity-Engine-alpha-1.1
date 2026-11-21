@@ -1,17 +1,17 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.PaperUI;
-using Prowl.Runtime.Diagnostics;
-using Prowl.Vector;
+using Infinity.PaperUI;
+using Infinity.Runtime.Diagnostics;
+using Infinity.Vector;
 
 using Silk.NET.Maths;
 
-namespace Prowl.Runtime.GUI;
+namespace Infinity.Runtime.GUI;
 
 /// <summary>
 /// Feeds engine <see cref="Input"/> state into a <see cref="Paper"/> instance. Call once per frame

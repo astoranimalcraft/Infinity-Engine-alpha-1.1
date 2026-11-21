@@ -1,14 +1,14 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Linq;
 
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Editor.Projects.Settings;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Editor.Projects.Settings;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>
 /// Tests for the plugin system: managed/native libraries under <c>Plugins/</c> folders being
@@ -34,7 +34,7 @@ public class PluginTests : EditorTestHarness
         CopyIntoAssets(pluginDll, Path.Combine("Plugins", "Acme.Greeter.dll"));
 
         WriteScript("PluginUser.cs", """
-            using Prowl.Runtime;
+            using Infinity.Runtime;
             using Acme.Greeter;
 
             public class PluginUser : Component

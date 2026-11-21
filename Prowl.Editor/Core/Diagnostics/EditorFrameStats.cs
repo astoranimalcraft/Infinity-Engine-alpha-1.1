@@ -1,10 +1,10 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Runtime.Diagnostics;
-using Prowl.Vector;
+using Infinity.Runtime.Diagnostics;
+using Infinity.Vector;
 
-namespace Prowl.Editor.Core.Diagnostics;
+namespace Infinity.Editor.Core.Diagnostics;
 
 /// <summary>
 /// Cached subcategories of <see cref="FrameStats.Editor"/>, registered with the shared frame profiler. Editor work too

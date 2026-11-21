@@ -1,12 +1,12 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Analyzers;
-using Prowl.Editor.Projects.Scripting;
+using Infinity.Analyzers;
+using Infinity.Editor.Projects.Scripting;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>
 /// The analyzer that refuses '?.', '??', '??=' and comparisons with null on engine objects, which test only for a null
@@ -17,7 +17,7 @@ public class EngineObjectNullAnalyzerTests : EditorTestHarness
 {
     private ScriptCompiler.CompileResult Compile(string members)
     {
-        WriteScript("Comp.cs", $"using Prowl.Runtime;\npublic class Comp : Component {{ {members} }}");
+        WriteScript("Comp.cs", $"using Infinity.Runtime;\npublic class Comp : Component {{ {members} }}");
         return ScriptCompiler.CompileAll(Project);
     }
 

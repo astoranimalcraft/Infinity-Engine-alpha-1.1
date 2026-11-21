@@ -2,22 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Echo;
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI;
-using Prowl.Editor.Importers;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Scribe;
-using Prowl.Vector;
-using Prowl.Vector.Spatial;
+using Infinity.Echo;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Importers;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Scribe;
+using Infinity.Vector;
+using Infinity.Vector.Spatial;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 [CustomAssetEditor(typeof(Texture2D))]
 public class TextureAssetEditor : ImportSettingsEditor
@@ -64,8 +64,8 @@ public class TextureAssetEditor : ImportSettingsEditor
                 {
                     // Checkerboard so texture alpha reads clearly.
                     const float cell = 10f;
-                    Color ca = Prowl.Vector.Color32.FromArgb(255, 44, 40, 54);
-                    Color cb = Prowl.Vector.Color32.FromArgb(255, 34, 30, 44);
+                    Color ca = Infinity.Vector.Color32.FromArgb(255, 44, 40, 54);
+                    Color cb = Infinity.Vector.Color32.FromArgb(255, 34, 30, 44);
                     int cols = (int)MathF.Ceiling((float)r.Size.X / cell);
                     int crows = (int)MathF.Ceiling((float)r.Size.Y / cell);
                     for (int cy = 0; cy < crows; cy++)
@@ -90,7 +90,7 @@ public class TextureAssetEditor : ImportSettingsEditor
                     canvas.SetBrushTextureTransform(
                         Transform2D.CreateTranslation(drawX, drawY + drawH) *
                         Transform2D.CreateScale(drawW, -drawH));
-                    canvas.RectFilled(drawX, drawY, drawW, drawH, Prowl.Vector.Color32.FromArgb(255, 255, 255, 255));
+                    canvas.RectFilled(drawX, drawY, drawW, drawH, Infinity.Vector.Color32.FromArgb(255, 255, 255, 255));
                     canvas.ClearBrushTexture();
                 }));
 

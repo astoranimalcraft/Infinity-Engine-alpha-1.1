@@ -1,20 +1,20 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI.Gizmo;
-using Prowl.PaperUI;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Runtime.UI;
-using Prowl.Vector;
-using Prowl.Vector.Geometry;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI.Gizmo;
+using Infinity.PaperUI;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Runtime.UI;
+using Infinity.Vector;
+using Infinity.Vector.Geometry;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 /// <summary> Scene tool for editing UIBehaviour elements in the scene view. Provides rect outline, resize handles, anchor handles, pivot handle, and move support for RectTransform-based UI elements. </summary>
 [ComponentSceneTool(typeof(UIBehaviour))]

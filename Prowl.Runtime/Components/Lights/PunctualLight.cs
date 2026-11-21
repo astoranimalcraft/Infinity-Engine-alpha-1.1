@@ -1,13 +1,13 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Collections.Generic;
 
-using Prowl.Echo;
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>A point or spot light, which shines from a small sphere and can shine through a cookie or a photometric profile.</summary>
 public abstract class PunctualLight : LocalLight

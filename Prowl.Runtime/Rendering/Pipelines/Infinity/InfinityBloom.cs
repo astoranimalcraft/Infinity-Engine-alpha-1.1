@@ -1,6 +1,6 @@
-using Prowl.Runtime.Rendering;
+using Infinity.Runtime.Rendering;
 
-namespace Prowl.Runtime.Rendering.Pipelines.Infinity;
+namespace Infinity.Runtime.Rendering.Pipelines.Infinity;
 
 /// <summary>
 /// Infinity bloom, in linear HDR before tonemapping.

@@ -2,10 +2,10 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 
-using Prowl.Echo;
-using Prowl.Runtime;
+using Infinity.Echo;
+using Infinity.Runtime;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 /// <summary>
 /// Represents a sub-asset inside a parent asset (e.g. a Mesh inside a Model file).

@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -8,13 +8,13 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Prowl.Echo;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Projects;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Projects;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor.Navigation;
+namespace Infinity.Editor.Navigation;
 
 /// <summary>
 /// Bakes a <see cref="NavMeshSurface"/> in the background and saves the result as a <c>.navmesh</c>

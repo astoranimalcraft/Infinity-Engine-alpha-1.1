@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -21,14 +21,14 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Emit;
 
-using Prowl.Cli;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Editor.Theming;
-using Prowl.Runtime;
+using Infinity.Cli;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Editor.Theming;
+using Infinity.Runtime;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 /// <summary> Exposes a static method to the prowl CLI and to agents driving the editor. Runs on the main thread. </summary>
 [AttributeUsage(AttributeTargets.Method)]
@@ -354,7 +354,7 @@ public static class CliEval
     private static readonly string[] s_defaultUsings =
     [
         "System", "System.Collections.Generic", "System.Linq", "System.Threading.Tasks",
-        "Prowl.Vector", "Prowl.Runtime", "Prowl.Runtime.Resources", "Prowl.Editor", "Prowl.Editor.Core",
+        "Infinity.Vector", "Infinity.Runtime", "Infinity.Runtime.Resources", "Infinity.Editor", "Infinity.Editor.Core",
     ];
 
     private static readonly ConditionalWeakTable<Assembly, MetadataReference> s_fileReferences = [];

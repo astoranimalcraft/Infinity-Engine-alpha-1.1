@@ -13,12 +13,12 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
 
-using Prowl.Analyzers;
-using Prowl.Ember.Analyzers;
+using Infinity.Analyzers;
+using Infinity.Ember.Analyzers;
 
-using CompilationUnit = Prowl.Editor.Projects.Scripting.ScriptCompiler.CompilationUnit;
+using CompilationUnit = Infinity.Editor.Projects.Scripting.ScriptCompiler.CompilationUnit;
 
-namespace Prowl.Editor.Projects.Scripting;
+namespace Infinity.Editor.Projects.Scripting;
 
 /// <summary>
 /// Compiles a user assembly in process with Roslyn instead of shelling out to `dotnet build`. Emits to
@@ -309,11 +309,11 @@ internal static class RoslynScriptBackend
             AddFileReference(refs, seen, corelibName, corelib.Location);
 
         // User scripts resolve [ReloadIgnore], [ReloadInitializer] and the reload interfaces out of
-        // Prowl.Ember.Contracts. It reaches the editor as a lazily loaded transitive dependency, so it may not be
+        // Infinity.Ember.Contracts. It reaches the editor as a lazily loaded transitive dependency, so it may not be
         // in the trusted-platform-assemblies list above and has to be referenced explicitly.
         if (!unit.NoEngineReferences)
         {
-            string contractsPath = typeof(Prowl.Ember.IReloadAware).Assembly.Location;
+            string contractsPath = typeof(Infinity.Ember.IReloadAware).Assembly.Location;
             AddFileReference(refs, seen, Path.GetFileNameWithoutExtension(contractsPath), contractsPath);
         }
 

@@ -4,9 +4,9 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-using Prowl.OrigamiUI;
+using Infinity.OrigamiUI;
 
-namespace Prowl.Editor.Theming;
+namespace Infinity.Editor.Theming;
 
 /// <summary>Static editor-background style used when the animated background is off.</summary>
 public enum EditorBackgroundStyle { Nebula, Gradient, Color, Image }

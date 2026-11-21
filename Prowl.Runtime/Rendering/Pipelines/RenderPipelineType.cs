@@ -1,4 +1,4 @@
-﻿namespace Prowl.Runtime.Rendering.Pipelines;
+﻿namespace Infinity.Runtime.Rendering.Pipelines;
 
 public enum RenderPipelineType
 {

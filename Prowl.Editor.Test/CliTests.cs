@@ -1,4 +1,4 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Net;
@@ -8,15 +8,15 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-using Prowl.Cli;
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Editor.Theming;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-using Prowl.Runtime.Tasks;
-using Prowl.Vector;
+using Infinity.Cli;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Editor.Theming;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Runtime.Tasks;
+using Infinity.Vector;
 
 using Xunit;
 
@@ -24,7 +24,7 @@ using Xunit;
 // which could resume on another thread.
 #pragma warning disable xUnit1031
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 public class CliTests : EditorTestHarness
 {
@@ -678,8 +678,8 @@ public class CliEditorCommandTests : EditorTestHarness
     {
         static void AssertTonemaps(Camera camera)
         {
-            var tonemapping = camera.Profile!.Get<Prowl.Runtime.Rendering.Tonemapping>()!;
-            Assert.Equal(Prowl.Runtime.Rendering.TonemappingMode.ACES, tonemapping.Mode.Value);
+            var tonemapping = camera.Profile!.Get<Infinity.Runtime.Rendering.Tonemapping>()!;
+            Assert.Equal(Infinity.Runtime.Rendering.TonemappingMode.ACES, tonemapping.Mode.Value);
             Assert.True(tonemapping.Mode.Override);
         }
 
@@ -1103,11 +1103,11 @@ public class CliApiCommandTests : EditorTestHarness
     public void ATypeListsItsMembersAndAMemberItsParameterDocs()
     {
         JsonNode type = Ok("--type", "AssetRef");
-        Assert.Equal("Prowl.Runtime.AssetRef<T>", type["name"]!.GetValue<string>());
+        Assert.Equal("Infinity.Runtime.AssetRef<T>", type["name"]!.GetValue<string>());
         Assert.Contains("asset", type["summary"]!.GetValue<string>());
         Assert.Contains(type["members"]!.AsArray(), m => m!["signature"]!.GetValue<string>() == "public T Load()");
 
-        JsonNode member = Ok("--type", "Prowl.Runtime.Debug", "--member", "EnsureMainThread")["members"]![0]!;
+        JsonNode member = Ok("--type", "Infinity.Runtime.Debug", "--member", "EnsureMainThread")["members"]![0]!;
         Assert.Contains(member["parameters"]!.AsArray(), p => p!.GetValue<string>().StartsWith("member: Defaults to the calling member"));
         Assert.Contains("main thread", member["returns"]!.GetValue<string>());
     }
@@ -1116,7 +1116,7 @@ public class CliApiCommandTests : EditorTestHarness
     public void AShortNameSharedWithALibraryPrefersTheEngineType()
     {
         JsonNode camera = Ok("--type", "Camera");
-        Assert.Equal("Prowl.Runtime.Camera", camera["name"]!.GetValue<string>());
+        Assert.Equal("Infinity.Runtime.Camera", camera["name"]!.GetValue<string>());
         Assert.NotEmpty(camera["alsoNamed"]!.AsArray());
     }
 
@@ -1154,7 +1154,7 @@ public class AgentFilesTests : EditorTestHarness
         string launcher = Path.Combine(Project.LibraryPath, "prowl.cmd");
         File.WriteAllText(launcher, "stale");
         AgentFiles.Write(Project.RootPath, Project.LibraryPath);
-        Assert.Contains("Prowl.Cli", File.ReadAllText(launcher));
+        Assert.Contains("Infinity.Cli", File.ReadAllText(launcher));
 
         // Git Bash would otherwise turn a ref like /Player into C:/Program Files/Git/Player.
         Assert.Contains("MSYS_NO_PATHCONV=1", File.ReadAllText(Path.Combine(Project.LibraryPath, "prowl")));
@@ -1222,7 +1222,7 @@ public class AgentSkillExampleTests : EditorTestHarness
             WriteScript($"SkillExample{examples++}.cs", code);
 
         Assert.True(examples >= 4, $"Expected the skill examples, found {examples}.");
-        ScriptCompiler.CompileResult result = Prowl.Editor.Projects.Scripting.ScriptCompiler.CompileAll(Project);
+        ScriptCompiler.CompileResult result = Infinity.Editor.Projects.Scripting.ScriptCompiler.CompileAll(Project);
         Assert.True(result.Success, result.Errors);
         Assert.DoesNotContain(result.Diagnostics, d => d.Severity == "Warning");
     }
@@ -1230,7 +1230,7 @@ public class AgentSkillExampleTests : EditorTestHarness
     [Fact]
     public void EveryEvalRecipeInTheSkillsCompiles()
     {
-        var assemblies = Prowl.Editor.Projects.Scripting.ScriptAssemblyManager.LiveAssemblies().Where(a => !a.IsDynamic).ToList();
+        var assemblies = Infinity.Editor.Projects.Scripting.ScriptAssemblyManager.LiveAssemblies().Where(a => !a.IsDynamic).ToList();
         var recipes = SkillBlocks("csharp").Where(c => c.StartsWith("// prowl eval", StringComparison.Ordinal)).ToList();
 
         Assert.True(recipes.Count >= 3, $"Expected the eval recipes, found {recipes.Count}.");

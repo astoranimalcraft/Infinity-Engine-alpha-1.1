@@ -1,34 +1,34 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Linq;
 using System.Numerics;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Inspector;
-using Prowl.Editor.Lightmapping;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Rosetta;
-using Prowl.Runtime;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Inspector;
+using Infinity.Editor.Lightmapping;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using static Prowl.Graphite.Rendering.PropertyIDText;
+using static Infinity.Graphite.Rendering.PropertyIDText;
 
-using static Prowl.Editor.GUI.EditorGUI;
+using static Infinity.Editor.GUI.EditorGUI;
 
 using Color = System.Drawing.Color;
-using Material = Prowl.Runtime.Resources.Material;
-using MaterialProperty = Prowl.Graphite.Rendering.MaterialProperty;
-using Shader = Prowl.Runtime.Resources.Shader;
-namespace Prowl.Editor.GUI.Panels;
+using Material = Infinity.Runtime.Resources.Material;
+using MaterialProperty = Infinity.Graphite.Rendering.MaterialProperty;
+using Shader = Infinity.Runtime.Resources.Shader;
+namespace Infinity.Editor.GUI.Panels;
 
 public class EnvironmentPanel : DockPanel
 {

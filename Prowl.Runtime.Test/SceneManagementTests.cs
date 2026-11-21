@@ -1,14 +1,14 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Runtime.Resources;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.UI;
-using Prowl.Vector;
+using Infinity.Runtime.Resources;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.UI;
+using Infinity.Vector;
 
 using Xunit;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>
 /// Tests for Scene object management (Add/Remove/Clear/Flush, collection views, Find*) and the

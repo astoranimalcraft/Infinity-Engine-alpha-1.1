@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -10,12 +10,12 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Prowl.Aperture;
-using Prowl.Runtime.Resources;
+using Infinity.Aperture;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 /// <summary>Reads a .crate file holding just a number, to prove a format the engine does not know can be loaded.</summary>
 public sealed class CrateRuntimeImporter : RuntimeImporter
@@ -174,7 +174,7 @@ public class AssetSourceTests : RuntimeTestBase
         WritePng(folder, "Textures/Paint.png", 4);
         Write(folder, "Materials/Painted.mat", $$"""
             {
-              "$type": "Prowl.Runtime.Resources.Material, Prowl.Runtime",
+              "$type": "Infinity.Runtime.Resources.Material, Infinity.Runtime",
               "_shader": { "$asset": "{{StandardShader}}" },
               "_properties": {
                 "_textures": { "base_color_map": { "$asset": "Textures/Paint" } }
@@ -233,7 +233,7 @@ public class AssetSourceTests : RuntimeTestBase
             """);
         Write(folder, "Materials/Paint.mat", $$"""
             {
-              "$type": "Prowl.Runtime.Resources.Material, Prowl.Runtime",
+              "$type": "Infinity.Runtime.Resources.Material, Infinity.Runtime",
               "_shader": { "$asset": "{{StandardShader}}" },
               "Name": "Paint"
             }

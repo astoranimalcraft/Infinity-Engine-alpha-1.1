@@ -1,11 +1,11 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Echo;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Projects.Scripting;
+using Infinity.Echo;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Projects.Scripting;
 
-namespace Prowl.Editor.Importers;
+namespace Infinity.Editor.Importers;
 
 /// <summary>
 /// Tracks managed and native plugin libraries (.dll/.so/.dylib). Produces no EngineObject -

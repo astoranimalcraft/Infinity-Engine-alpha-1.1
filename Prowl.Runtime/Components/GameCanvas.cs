@@ -1,20 +1,20 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Echo;
-using Prowl.Runtime.GUI;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
-using Prowl.Vector.Geometry;
-using Prowl.Runtime.UI;
+using Infinity.Echo;
+using Infinity.Runtime.GUI;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
+using Infinity.Vector.Geometry;
+using Infinity.Runtime.UI;
 
-using RenderWorld = Prowl.Graphite.Rendering.RenderWorld;
+using RenderWorld = Infinity.Graphite.Rendering.RenderWorld;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// Coordinates a UI hierarchy: owns layout, scale, and the destination surface.
@@ -127,7 +127,7 @@ public class GameCanvas : Component, IRenderSync
     // NEW: render tree + dirty state
     // ----------------------------------------------------------------
 
-    // Read-only auto-property: not serialized by Prowl.Echo.
+    // Read-only auto-property: not serialized by Infinity.Echo.
     internal UIRenderTree Tree { get; } = new();
     [SerializeIgnore] private bool _isDirty = true;
 

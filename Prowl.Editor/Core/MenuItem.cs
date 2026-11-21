@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using Prowl.Editor.Core;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.Runtime;
+using Infinity.Editor.Core;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.Runtime;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 /// <summary> Provides a pinned GameObject context for menu operations, either set explicitly or following the active selection. </summary>
 public static class MenuContext

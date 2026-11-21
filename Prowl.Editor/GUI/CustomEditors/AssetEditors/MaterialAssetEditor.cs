@@ -3,23 +3,23 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using Prowl.Echo;
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.PropertyEditors;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Rosetta;
-using Prowl.Runtime;
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.PropertyEditors;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Resources;
 
-using PropertyGridUtils = Prowl.Editor.GUI.PropertyGridUtils;
-using Shader = Prowl.Runtime.Resources.Shader;
-using Material = Prowl.Runtime.Resources.Material;
-namespace Prowl.Editor.Inspector;
+using PropertyGridUtils = Infinity.Editor.GUI.PropertyGridUtils;
+using Shader = Infinity.Runtime.Resources.Shader;
+using Material = Infinity.Runtime.Resources.Material;
+namespace Infinity.Editor.Inspector;
 
 [CustomAssetEditor(typeof(Material))]
 public class MaterialAssetEditor : AssetImporterEditor

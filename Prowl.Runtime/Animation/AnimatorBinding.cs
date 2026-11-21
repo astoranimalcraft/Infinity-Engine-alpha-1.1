@@ -1,15 +1,15 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Vector;
-using Prowl.Vector.Spatial;
+using Infinity.Vector;
+using Infinity.Vector.Spatial;
 
-using MotionSkeleton = Prowl.Motion.Skeleton;
+using MotionSkeleton = Infinity.Motion.Skeleton;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// Ties a skeleton to the hierarchy under it: a Transform per bone, matched by name and then by path,

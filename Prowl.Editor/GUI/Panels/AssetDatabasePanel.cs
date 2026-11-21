@@ -4,20 +4,20 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Quill;
-using Prowl.Runtime;
-using Prowl.Scribe;
-using Prowl.Vector;
+using Infinity.Editor.Core;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Quill;
+using Infinity.Runtime;
+using Infinity.Scribe;
+using Infinity.Vector;
 
 using Color = System.Drawing.Color;
-using TextAlignment = Prowl.PaperUI.TextAlignment;
+using TextAlignment = Infinity.PaperUI.TextAlignment;
 
-namespace Prowl.Editor.GUI.Panels;
+namespace Infinity.Editor.GUI.Panels;
 
 /// <summary>
 /// Read-only view into what the asset database holds: every asset object made this session, whether it is loaded,

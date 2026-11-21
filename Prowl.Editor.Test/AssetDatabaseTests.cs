@@ -1,16 +1,16 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 
-using Prowl.Echo;
-using Prowl.Editor.Importers;
-using Prowl.Editor.Navigation;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Editor.Importers;
+using Infinity.Editor.Navigation;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>A component that names a scene lazily, for soft dependency tests.</summary>
 public sealed class AssetRefComponent : Component
@@ -971,8 +971,8 @@ public class AssetDatabaseTests : EditorTestHarness
         {
             var floor = new GameObject("Floor");
             scene.Add(floor);
-            floor.AddComponent<BoxCollider>().Size = new Prowl.Vector.Float3(20, 1, 20);
-            floor.Transform.Position = new Prowl.Vector.Float3(0, -0.5f, 0);
+            floor.AddComponent<BoxCollider>().Size = new Infinity.Vector.Float3(20, 1, 20);
+            floor.Transform.Position = new Infinity.Vector.Float3(0, -0.5f, 0);
 
             var go = new GameObject("Surface");
             scene.Add(go);
@@ -1006,8 +1006,8 @@ public class AssetDatabaseTests : EditorTestHarness
 
     private static NavMeshGeometrySource FlatQuad(float size)
     {
-        Prowl.Vector.Float3[] verts = [new(0, 0, 0), new(0, 0, size), new(size, 0, size), new(size, 0, 0)];
-        return new NavMeshGeometrySource(verts, [0, 1, 2, 0, 2, 3], Prowl.Vector.Float4x4.Identity);
+        Infinity.Vector.Float3[] verts = [new(0, 0, 0), new(0, 0, size), new(size, 0, size), new(size, 0, 0)];
+        return new NavMeshGeometrySource(verts, [0, 1, 2, 0, 2, 3], Infinity.Vector.Float4x4.Identity);
     }
 
     #endregion

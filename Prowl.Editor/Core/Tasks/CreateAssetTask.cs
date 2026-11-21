@@ -1,15 +1,15 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.IO;
 
-using Prowl.Editor.GUI.Panels;
-using Prowl.Editor.GUI.Popups;
-using Prowl.Editor.Utils;
-using Prowl.Runtime;
+using Infinity.Editor.GUI.Panels;
+using Infinity.Editor.GUI.Popups;
+using Infinity.Editor.Utils;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Core.Tasks;
+namespace Infinity.Editor.Core.Tasks;
 
 /// <summary>
 /// Creates a new asset or folder the way every Create menu item does: a placeholder is named inline in the Project

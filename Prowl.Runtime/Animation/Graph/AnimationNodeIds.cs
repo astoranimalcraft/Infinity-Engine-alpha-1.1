@@ -1,7 +1,7 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>The type ids of the built in graph nodes, as saved in graph assets.</summary>
 public static class AnimationNodeIds

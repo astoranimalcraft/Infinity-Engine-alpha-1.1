@@ -1,7 +1,7 @@
-using Prowl.Runtime.Rendering;
-using Prowl.Vector;
+using Infinity.Runtime.Rendering;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.Rendering.Pipelines.Infinity;
+namespace Infinity.Runtime.Rendering.Pipelines.Infinity;
 
 public enum InfinityColorBlindnessMode
 {

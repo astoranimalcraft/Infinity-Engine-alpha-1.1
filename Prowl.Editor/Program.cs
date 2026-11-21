@@ -4,13 +4,13 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Editor.Theming;
+using Infinity.Editor.Core;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Editor.Theming;
 
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 
 /// <summary> Entry point for the Prowl Editor application. Parses command-line arguments and either runs a headless build or launches the editor UI. </summary>
@@ -136,12 +136,12 @@ public static class Program
     /// <summary>
     /// "miniaudioex" is manually vendored (not a real NuGet native-asset package), so a self-contained
     /// Editor publish never flattens it to the app root and needs explicit resolving. Registered here
-    /// (Editor-only), not in Prowl.Runtime.dll: exported Player builds already register their own
+    /// (Editor-only), not in Infinity.Runtime.dll: exported Player builds already register their own
     /// resolver for that assembly, and only one resolver per assembly is allowed.
     /// </summary>
     private static void RegisterMiniAudioExResolver()
     {
-        NativeLibrary.SetDllImportResolver(typeof(Prowl.Runtime.Game).Assembly, (libraryName, _, _) =>
+        NativeLibrary.SetDllImportResolver(typeof(Infinity.Runtime.Game).Assembly, (libraryName, _, _) =>
         {
             if (libraryName != "miniaudioex")
                 return IntPtr.Zero;

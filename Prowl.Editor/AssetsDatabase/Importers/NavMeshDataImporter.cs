@@ -1,6 +1,6 @@
-using Prowl.Runtime;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Importers;
+namespace Infinity.Editor.Importers;
 
 /// <summary>
 /// Imports .navmesh files - Echo-serialized NavMeshData objects (baked navigation meshes).

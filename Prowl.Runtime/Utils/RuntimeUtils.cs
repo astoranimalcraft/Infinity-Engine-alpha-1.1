@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -13,11 +13,11 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
-using Prowl.Echo;
+using Infinity.Echo;
 
-using Prowl.Ember;
+using Infinity.Ember;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 
 // From https://github.com/dotnet/runtime/blob/main/src/libraries/Microsoft.NETCore.Platforms/src/PortableRuntimeIdentifierGraph.json

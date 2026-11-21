@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -7,9 +7,9 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-using Prowl.Editor.Projects;
+using Infinity.Editor.Projects;
 
-namespace Prowl.Editor.Core;
+namespace Infinity.Editor.Core;
 
 /// <summary>
 /// Catches whatever gets past everything else and writes it down before the process goes. A windowed

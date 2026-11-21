@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -9,10 +9,10 @@ using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Prowl.Runtime.Diagnostics;
-using Prowl.Runtime.Resources;
+using Infinity.Runtime.Diagnostics;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Runtime.Tasks;
+namespace Infinity.Runtime.Tasks;
 
 /// <summary>
 /// Sends async continuations back to the main thread, so <c>await</c> in game code resumes where the

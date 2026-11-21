@@ -1,9 +1,9 @@
 using System;
 
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor.Thumbnails;
+namespace Infinity.Editor.Thumbnails;
 
 /// <summary> Specifies the type of asset for which the decorated class generates thumbnails. </summary>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]

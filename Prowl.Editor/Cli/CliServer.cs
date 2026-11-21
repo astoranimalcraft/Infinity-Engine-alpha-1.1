@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -17,14 +17,14 @@ using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Prowl.Cli;
-using Prowl.Editor.Projects;
-using Prowl.Runtime;
-using Prowl.Runtime.Tasks;
+using Infinity.Cli;
+using Infinity.Editor.Projects;
+using Infinity.Runtime;
+using Infinity.Runtime.Tasks;
 
-using Debug = Prowl.Runtime.Debug;
+using Debug = Infinity.Runtime.Debug;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 /// <summary>
 /// Loopback HTTP server the prowl CLI talks to. Listens on 127.0.0.1 on a random port and writes the port and a
@@ -663,7 +663,7 @@ public static class AgentFiles
 
     private static void WriteLauncher(string libraryPath)
     {
-        string exe = Path.Combine(AppContext.BaseDirectory, OperatingSystem.IsWindows() ? "Prowl.Cli.exe" : "Prowl.Cli");
+        string exe = Path.Combine(AppContext.BaseDirectory, OperatingSystem.IsWindows() ? "Infinity.Cli.exe" : "Infinity.Cli");
         if (!File.Exists(exe)) return;
 
         Directory.CreateDirectory(libraryPath);

@@ -1,4 +1,4 @@
-﻿// This file is part of the Prowl Game Engine
+﻿// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -8,13 +8,13 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-using Prowl.Ember;
-using Prowl.Echo;
-using Prowl.Runtime.Resources;
-using Prowl.Runtime.Tasks;
-using Prowl.Vector;
+using Infinity.Ember;
+using Infinity.Echo;
+using Infinity.Runtime.Resources;
+using Infinity.Runtime.Tasks;
+using Infinity.Vector;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// The Base Class for all Object/Entities in a Scene.
@@ -166,9 +166,9 @@ public partial class GameObject : EngineObject, ISerializable
 
 
     /// <summary>
-    /// The GameObjects parent <see cref="Prowl.Runtime.Resources.SceneInstance"/>. Each GameObject can belong to
-    /// exactly one Scene, or no Scene at all. To add or remove GameObjects to / from a Scene, use the <see cref="Prowl.Runtime.Resources.SceneInstance.Add(GameObject)"/> and
-    /// <see cref="Prowl.Runtime.Resources.SceneInstance.Remove(GameObject)"/> methods.
+    /// The GameObjects parent <see cref="Infinity.Runtime.Resources.SceneInstance"/>. Each GameObject can belong to
+    /// exactly one Scene, or no Scene at all. To add or remove GameObjects to / from a Scene, use the <see cref="Infinity.Runtime.Resources.SceneInstance.Add(GameObject)"/> and
+    /// <see cref="Infinity.Runtime.Resources.SceneInstance.Remove(GameObject)"/> methods.
     /// </summary>
     public SceneInstance? Scene
     {
@@ -547,9 +547,9 @@ public partial class GameObject : EngineObject, ISerializable
         // Draw order and layout are derived from the child tree at canvas build time, and a same-scene
         // reparent fires no OnAdded/Removed - so mark the affected canvas(es) dirty explicitly.
         GameCanvas? uiNewCanvas = GetComponentInParent<GameCanvas>();
-        if (uiOldCanvas.IsValid()) uiOldCanvas.MarkDirty(Prowl.Runtime.UI.UIDirtyFlags.Hierarchy);
+        if (uiOldCanvas.IsValid()) uiOldCanvas.MarkDirty(Infinity.Runtime.UI.UIDirtyFlags.Hierarchy);
         if (!ReferenceEquals(uiNewCanvas, uiOldCanvas) && uiNewCanvas.IsValid())
-            uiNewCanvas.MarkDirty(Prowl.Runtime.UI.UIDirtyFlags.Hierarchy);
+            uiNewCanvas.MarkDirty(Infinity.Runtime.UI.UIDirtyFlags.Hierarchy);
 
         return true;
     }
@@ -742,7 +742,7 @@ public partial class GameObject : EngineObject, ISerializable
         // Sibling order feeds the canvas draw-order (depth-first index); force a rebuild so the
         // reorder is reflected instead of drawing in the stale order.
         GameCanvas? canvas = GetComponentInParent<GameCanvas>();
-        if (canvas.IsValid()) canvas.MarkDirty(Prowl.Runtime.UI.UIDirtyFlags.Hierarchy);
+        if (canvas.IsValid()) canvas.MarkDirty(Infinity.Runtime.UI.UIDirtyFlags.Hierarchy);
     }
 
     /// <summary>

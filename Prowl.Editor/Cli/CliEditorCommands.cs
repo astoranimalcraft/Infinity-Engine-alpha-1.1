@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -12,25 +12,25 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GraphEditor;
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.Panels;
-using Prowl.Editor.Inspector;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Prefabs;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Runtime;
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
-using Prowl.Echo;
-using Prowl.Editor.Build;
-using Shader = Prowl.Runtime.Resources.Shader;
-using Material = Prowl.Runtime.Resources.Material;
+using Infinity.Editor.Core;
+using Infinity.Editor.GraphEditor;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.Panels;
+using Infinity.Editor.Inspector;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Prefabs;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Runtime;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
+using Infinity.Echo;
+using Infinity.Editor.Build;
+using Shader = Infinity.Runtime.Resources.Shader;
+using Material = Infinity.Runtime.Resources.Material;
 
-namespace Prowl.Editor;
+namespace Infinity.Editor;
 
 /// <summary> Every log the editor writes, kept in a ring so the CLI can read what happened between its calls. Thread safe. </summary>
 public static class LogHistory
@@ -1876,7 +1876,7 @@ internal static class CliApi
     private static int Rank(Type type)
     {
         if (ScriptAssemblyManager.IsScriptAssembly(type.Assembly)) return 0;
-        return type.Assembly.GetName().Name switch { "Prowl.Runtime" => 1, "Prowl.Vector" => 2, _ => int.MaxValue };
+        return type.Assembly.GetName().Name switch { "Infinity.Runtime" => 1, "Infinity.Vector" => 2, _ => int.MaxValue };
     }
 
     public static object Describe(string typeName, string member, bool inherited)

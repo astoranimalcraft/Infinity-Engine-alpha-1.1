@@ -2,19 +2,19 @@ using System;
 using System.IO;
 using System.Linq;
 
-using Prowl.Echo;
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI.Panels;
-using Prowl.Editor.Prefabs;
-using Prowl.Editor.Projects;
-using Prowl.OrigamiUI;
-using Prowl.Rosetta;
-using Prowl.Runtime;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI.Panels;
+using Infinity.Editor.Prefabs;
+using Infinity.Editor.Projects;
+using Infinity.OrigamiUI;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-namespace Prowl.Editor.GUI.SceneView;
+namespace Infinity.Editor.GUI.SceneView;
 
 /// <summary>
 /// Isolated prefab editing mode. The prefab is edited in its own world while the edit world sleeps underneath,

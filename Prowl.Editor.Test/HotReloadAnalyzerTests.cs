@@ -1,15 +1,15 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.IO;
 using System.Linq;
 
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Ember.Analyzers;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Ember.Analyzers;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>Verifies the hot-reload-safety analyzer surfaces (and can be suppressed) during the script compile.</summary>
 [Trait("Category", "Build")]
@@ -40,7 +40,7 @@ public class HotReloadAnalyzerTests : EditorTestHarness
     [Fact]
     public void Analyzer_ReloadIgnoreSuppressesTheWarning()
     {
-        WriteScript("Gen.cs", "public class Box<T> { [Prowl.Ember.ReloadIgnore] public static int Count; }");
+        WriteScript("Gen.cs", "public class Box<T> { [Infinity.Ember.ReloadIgnore] public static int Count; }");
 
         ScriptCompiler.CompileResult result = ScriptCompiler.CompileAll(Project);
 
@@ -72,6 +72,6 @@ public class HotReloadAnalyzerTests : EditorTestHarness
             .FirstOrDefault(t => t.Contains("<Compile"));
         Assert.NotNull(csproj);
         Assert.Contains("<Analyzer Include=", csproj);
-        Assert.Contains("Prowl.Ember.Analyzers.dll", csproj);
+        Assert.Contains("Infinity.Ember.Analyzers.dll", csproj);
     }
 }

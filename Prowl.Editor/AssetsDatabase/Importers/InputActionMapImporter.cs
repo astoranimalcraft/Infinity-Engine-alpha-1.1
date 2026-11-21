@@ -1,10 +1,10 @@
 using System;
 using System.IO;
 
-using Prowl.Echo;
-using Prowl.Runtime;
+using Infinity.Echo;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Importers;
+namespace Infinity.Editor.Importers;
 
 /// <summary>
 /// Imports .inputactions files Echo-serialized InputActionMap objects.

@@ -1,12 +1,12 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Vector;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.Diagnostics;
+namespace Infinity.Runtime.Diagnostics;
 
 /// <summary>Time and scope count a category recorded in one frame.</summary>
 public readonly record struct FrameStatSample(float Ms, int Calls);

@@ -1,18 +1,18 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Echo;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.MeshFeatures;
+namespace Infinity.Runtime.MeshFeatures;
 
 /// <summary>
 /// A Signed Distance Field for a mesh, stored as a single channel 16 bit 3D texture of cubic voxels.
 /// Distances are measured in mesh-local units. Sign convention: negative inside, positive outside.
 /// </summary>
 /// <remarks>
-/// Created by <see cref="Prowl.Runtime.MeshFeatures.Generation.SDFGenerator"/> during asset
+/// Created by <see cref="Infinity.Runtime.MeshFeatures.Generation.SDFGenerator"/> during asset
 /// import with the project's SDF settings. Treat as read-only, changing those settings reimports every mesh.
 ///
 /// Volume sampling (GPU shader):

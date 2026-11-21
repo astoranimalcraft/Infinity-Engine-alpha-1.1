@@ -1,25 +1,25 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Editor.GraphEditor;
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.PropertyEditors;
-using Prowl.Editor.GUI.Widgets;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
+using Infinity.Editor.GraphEditor;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.PropertyEditors;
+using Infinity.Editor.GUI.Widgets;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
 
-using AnimationCurve = Prowl.Vector.AnimationCurve;
-using AnimationNodeCard = Prowl.Editor.GraphEditor.NodeCard<Prowl.Runtime.GraphNodeRecord, Prowl.Editor.Inspector.AnimationGraphEditing>;
-using AnimationNodeInspector = Prowl.Editor.GraphEditor.NodeInspector<Prowl.Runtime.GraphNodeRecord, Prowl.Editor.Inspector.AnimationGraphEditing>;
-using HumanBodyBone = Prowl.Motion.HumanBodyBone;
+using AnimationCurve = Infinity.Vector.AnimationCurve;
+using AnimationNodeCard = Infinity.Editor.GraphEditor.NodeCard<Infinity.Runtime.GraphNodeRecord, Infinity.Editor.Inspector.AnimationGraphEditing>;
+using AnimationNodeInspector = Infinity.Editor.GraphEditor.NodeInspector<Infinity.Runtime.GraphNodeRecord, Infinity.Editor.Inspector.AnimationGraphEditing>;
+using HumanBodyBone = Infinity.Motion.HumanBodyBone;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 /// <summary>
 /// How the graph editor shows one kind of animation node. The default draws any node from its pins and

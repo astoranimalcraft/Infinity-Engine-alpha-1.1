@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -7,16 +7,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
-using Prowl.Echo;
-using Prowl.Ember;
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Ember;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using PropertyID = Prowl.Graphite.PropertyID;
-using PropertySet = Prowl.Graphite.PropertySet;
+using PropertyID = Infinity.Graphite.PropertyID;
+using PropertySet = Infinity.Graphite.PropertySet;
 
-namespace Prowl.Runtime.Rendering;
+namespace Infinity.Runtime.Rendering;
 
 /// <summary>
 /// One setting of a <see cref="VolumeComponent"/>. A volume only changes the settings it overrides, every other one

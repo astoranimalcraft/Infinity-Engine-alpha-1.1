@@ -1,20 +1,20 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Diagnostics;
 using System.Reflection;
 
-using Prowl.Echo;
-using Prowl.Editor.Build;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Editor.Projects.Settings;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Editor.Build;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Editor.Projects.Settings;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
 using Xunit;
 
-namespace Prowl.Editor.Test;
+namespace Infinity.Editor.Test;
 
 /// <summary>
 /// Base class for headless editor tests. Each test gets a fresh throwaway project on disk with a live
@@ -39,11 +39,11 @@ public abstract class EditorTestHarness : IDisposable
     protected EditorAssetBackend Assets { get; private set; }
 
     // English text, as the editor shows it, so messages read the same in tests.
-    static EditorTestHarness() => Prowl.Rosetta.Loc.Configure(cfg => cfg
+    static EditorTestHarness() => Infinity.Rosetta.Loc.Configure(cfg => cfg
         .SetFallbackLocale("en")
-        .AddProvider(new Prowl.Rosetta.EmbeddedResourceProvider(typeof(Prowl.Editor.Core.EditorApplication).Assembly, "Prowl.Editor.Resources.Locale"))
+        .AddProvider(new Infinity.Rosetta.EmbeddedResourceProvider(typeof(Infinity.Editor.Core.EditorApplication).Assembly, "Infinity.Editor.Resources.Locale"))
         .SetLocale("en")
-        .OnMissingKey(Prowl.Rosetta.MissingKeyBehavior.ReturnKey));
+        .OnMissingKey(Infinity.Rosetta.MissingKeyBehavior.ReturnKey));
 
     protected EditorTestHarness()
     {

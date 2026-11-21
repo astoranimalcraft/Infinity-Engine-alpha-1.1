@@ -1,15 +1,15 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Graphite.Rendering;
-using Prowl.Runtime.Resources;
+using Infinity.Graphite.Rendering;
+using Infinity.Runtime.Resources;
 
-using GTexture = Prowl.Graphite.Texture;
+using GTexture = Infinity.Graphite.Texture;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// Prowl's shader library, the includes its shaders and user shaders share as <c>Prowl/Name.glsl</c>, and the named

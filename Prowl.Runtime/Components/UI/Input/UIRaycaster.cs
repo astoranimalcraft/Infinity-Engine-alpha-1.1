@@ -1,13 +1,13 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System.Collections.Generic;
 
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
-using Prowl.Vector.Geometry;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
+using Infinity.Vector.Geometry;
 
-namespace Prowl.Runtime.UI;
+namespace Infinity.Runtime.UI;
 
 internal static class UIRaycaster
 {

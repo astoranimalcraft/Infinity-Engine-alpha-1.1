@@ -4,19 +4,19 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-using Prowl.Echo;
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI.Panels;
-using Prowl.Editor.Importers;
-using Prowl.Editor.Prefabs;
-using Prowl.Editor.Projects;
-using Prowl.Editor.Projects.Settings;
-using Prowl.Runtime;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Echo;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI.Panels;
+using Infinity.Editor.Importers;
+using Infinity.Editor.Prefabs;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Projects.Settings;
+using Infinity.Runtime;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-namespace Prowl.Editor.GUI.SceneView;
+namespace Infinity.Editor.GUI.SceneView;
 
 /// <summary>
 /// Manages scene loading, saving, and tracking for the editor.

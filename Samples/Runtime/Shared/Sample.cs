@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 //
@@ -14,24 +14,24 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO.Compression;
 
-using Prowl.Graphite;
-using Prowl.PaperUI;
-using Prowl.PaperUI.Events;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Runtime.ParticleSystem;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Scribe;
-using Prowl.Vector;
+using Infinity.Graphite;
+using Infinity.PaperUI;
+using Infinity.PaperUI.Events;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.ParticleSystem;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Scribe;
+using Infinity.Vector;
 
 using Silk.NET.Maths;
 
-using Gradient = Prowl.Vector.Gradient;
-using MouseButton = Prowl.Runtime.MouseButton;
-using TextAlignment = Prowl.PaperUI.TextAlignment;
+using Gradient = Infinity.Vector.Gradient;
+using MouseButton = Infinity.Runtime.MouseButton;
+using TextAlignment = Infinity.PaperUI.TextAlignment;
 
-namespace Prowl.Samples;
+namespace Infinity.Samples;
 
 public abstract class StationGame : Game
 {
@@ -198,7 +198,7 @@ public abstract class StationGame : Game
     {
         uint seed = 1;
         foreach (GameObject go in SampleScene.Objects)
-            foreach (ParticleSystemComponent particles in go.GetComponents<Prowl.Runtime.ParticleSystem.ParticleSystemComponent>())
+            foreach (ParticleSystemComponent particles in go.GetComponents<Infinity.Runtime.ParticleSystem.ParticleSystemComponent>())
             {
                 particles.AutoRandomSeed = false;
                 particles.RandomSeed = seed++;
@@ -240,7 +240,7 @@ public abstract class StationGame : Game
             _captureStation = args[station + 1];
 
         // Warnings and errors land in the capture's log, so a capture that looks wrong says why
-        Prowl.Runtime.Debug.OnLog += (e) =>
+        Infinity.Runtime.Debug.OnLog += (e) =>
         {
             if (e.Severity >= LogSeverity.Warning) Console.WriteLine($"{e.Severity}: {e.Message}");
         };
@@ -893,7 +893,7 @@ public sealed class SampleHud : Component
         }
     }
 
-    private void DrawGraph(Prowl.Quill.Canvas canvas, Rect rect, FontFile font, float worst)
+    private void DrawGraph(Infinity.Quill.Canvas canvas, Rect rect, FontFile font, float worst)
     {
         float x = rect.Min.X, y = rect.Min.Y, w = rect.Size.X, h = rect.Size.Y;
         int count = _frameTimes.Length;
@@ -939,7 +939,7 @@ public sealed class SampleHud : Component
             canvas.LineTo(X(i), Y(Sample(i)));
         canvas.SetStrokeColor(Accent);
         canvas.SetStrokeWidth(1.5f);
-        canvas.SetStrokeJoint(Prowl.Quill.JointStyle.Bevel);
+        canvas.SetStrokeJoint(Infinity.Quill.JointStyle.Bevel);
         canvas.Stroke();
 
         // Frames slower than 30 per second get a red marker.

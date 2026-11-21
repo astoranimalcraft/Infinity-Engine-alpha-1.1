@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Editor.Projects;
-using Prowl.Graphite.Rendering;
-using Prowl.Graphite.ShaderDef;
-using Prowl.OrigamiUI.Graphite;
-using Prowl.Runtime;
+using Infinity.Editor.Projects;
+using Infinity.Graphite.Rendering;
+using Infinity.Graphite.ShaderDef;
+using Infinity.OrigamiUI.Graphite;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.GUI.ScriptEditor;
+namespace Infinity.Editor.GUI.ScriptEditor;
 
 /// <summary>
 /// The shader workspace every open shader shares. Includes resolve like <see cref="Importers.ShaderImporter"/>:

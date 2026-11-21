@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
-namespace Prowl.Analyzers;
+namespace Infinity.Analyzers;
 
 /// <summary>
 /// Flags blocking waits on a task inside a <c>Component</c>: <c>.Result</c>, <c>.Wait()</c> and
@@ -19,7 +19,7 @@ public sealed class BlockingWaitAnalyzer : DiagnosticAnalyzer
 {
     public const string BlockingWaitId = "PROWLTH001";
 
-    private const string ComponentMetadataName = "Prowl.Runtime.Component";
+    private const string ComponentMetadataName = "Infinity.Runtime.Component";
 
     public static readonly DiagnosticDescriptor BlockingWait = new(
         BlockingWaitId,

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Prowl.Editor.Core;
+namespace Infinity.Editor.Core;
 
 /// <summary> Represents a single item in a hierarchical menu system, with support for labels, icons, click actions, dynamic state, and nested sub-items. </summary>
 public sealed class AppMenuItem

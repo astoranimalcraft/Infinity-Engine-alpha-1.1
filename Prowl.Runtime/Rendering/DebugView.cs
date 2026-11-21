@@ -1,9 +1,9 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Graphite.Rendering;
+using Infinity.Graphite.Rendering;
 
-namespace Prowl.Runtime.Rendering;
+namespace Infinity.Runtime.Rendering;
 
 /// <summary>What a view shows in place of the lit scene: its surfaces draw through their Debug pass with the GRAPHITE_DEBUG value.</summary>
 public enum DebugViewMode

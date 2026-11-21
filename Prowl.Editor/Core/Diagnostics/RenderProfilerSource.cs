@@ -1,19 +1,19 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.Graphite;
-using Prowl.Graphite.Debugger;
-using Prowl.Graphite.Debugger.Serialization;
-using Prowl.Graphite.Debugger.Viewer;
-using Prowl.Graphite.Debugging;
-using Prowl.OrigamiUI;
-using Prowl.Runtime;
+using Infinity.Graphite;
+using Infinity.Graphite.Debugger;
+using Infinity.Graphite.Debugger.Serialization;
+using Infinity.Graphite.Debugger.Viewer;
+using Infinity.Graphite.Debugging;
+using Infinity.OrigamiUI;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Core.Diagnostics;
+namespace Infinity.Editor.Core.Diagnostics;
 
 /// <summary>
 /// Feeds Graphite's render profiler from the editor's frames. A frame is recorded only while one of the profiler panels

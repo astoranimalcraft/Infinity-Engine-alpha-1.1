@@ -1,15 +1,15 @@
 using System;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.GUI;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime.ParticleSystem;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime.ParticleSystem;
 
-using PropertyGridUtils = Prowl.Editor.GUI.PropertyGridUtils;
-namespace Prowl.Editor.Inspector;
+using PropertyGridUtils = Infinity.Editor.GUI.PropertyGridUtils;
+namespace Infinity.Editor.Inspector;
 
 [CustomEditor(typeof(ParticleSystemComponent))]
 public class ParticleSystemComponentEditor : CustomEditor
@@ -64,7 +64,7 @@ public class ParticleSystemComponentEditor : CustomEditor
             PropertyGridUtils.Draw(paper, $"{id}_grid", module, _ => ps.OnValidate(), 1);
     }
 
-    private static void DrawPlaybackControls(Paper paper, string id, ParticleSystemComponent ps, Prowl.Scribe.FontFile font)
+    private static void DrawPlaybackControls(Paper paper, string id, ParticleSystemComponent ps, Infinity.Scribe.FontFile font)
     {
         float fs = EditorTheme.FontSize;
 

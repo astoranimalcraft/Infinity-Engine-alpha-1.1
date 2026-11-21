@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 
-using Prowl.Echo;
-using Prowl.Editor.Projects;
-using Prowl.Runtime;
-using Prowl.Runtime.AssetImporting;
-using Prowl.Runtime.MeshFeatures;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Editor.Projects;
+using Infinity.Runtime;
+using Infinity.Runtime.AssetImporting;
+using Infinity.Runtime.MeshFeatures;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor.Importers;
+namespace Infinity.Editor.Importers;
 
 /// <summary> Imports .gltf, .glb, .obj and .fbx model files into the editor asset database. Produces a PrefabAsset with meshes, materials, animations, textures and mesh features as sub-assets. </summary>
 [ImporterFor(".gltf", ".glb", ".obj", ".fbx")]

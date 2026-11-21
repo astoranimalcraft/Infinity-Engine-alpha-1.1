@@ -7,9 +7,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-using Prowl.Editor.Projects.Settings;
+using Infinity.Editor.Projects.Settings;
 
-namespace Prowl.Editor.Projects.Scripting;
+namespace Infinity.Editor.Projects.Scripting;
 
 /// <summary>
 /// Generates .csproj files for user scripts and compiles them via `dotnet build`.
@@ -459,7 +459,7 @@ public static class ScriptCompiler
 
         // Only the user's own output assemblies must be excluded from the engine-reference sweep -
         // match them by exact name, never by a name prefix (a project named "Prowl" must still get
-        // Prowl.Echo etc.).
+        // Infinity.Echo etc.).
         var unitNames = new HashSet<string>(allUnits.Select(u => u.Name), StringComparer.OrdinalIgnoreCase);
         var emitted = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -484,14 +484,14 @@ public static class ScriptCompiler
         // Engine references (Private=true forces use of the HintPath instead of local probing).
         if (!unit.NoEngineReferences)
         {
-            AppendReference(sb, emitted, "Prowl.Runtime", Path.Combine(engineDir, "Prowl.Runtime.dll"), copyLocal: true);
-            AppendReference(sb, emitted, "Prowl.Editor", Path.Combine(engineDir, "Prowl.Editor.dll"), copyLocal: true);
+            AppendReference(sb, emitted, "Infinity.Runtime", Path.Combine(engineDir, "Infinity.Runtime.dll"), copyLocal: true);
+            AppendReference(sb, emitted, "Infinity.Editor", Path.Combine(engineDir, "Infinity.Editor.dll"), copyLocal: true);
 
             foreach (string dll in Directory.EnumerateFiles(engineDir, "*.dll"))
             {
                 string name = Path.GetFileNameWithoutExtension(dll);
-                if (name == "Prowl.Runtime" || name == "Prowl.Editor" || unitNames.Contains(name)) continue;
-                if (name == "Prowl.Ember.Analyzers" || name == "Prowl.Analyzers") continue; // added below as <Analyzer>, not plain references
+                if (name == "Infinity.Runtime" || name == "Infinity.Editor" || unitNames.Contains(name)) continue;
+                if (name == "Infinity.Ember.Analyzers" || name == "Infinity.Analyzers") continue; // added below as <Analyzer>, not plain references
 
                 // A self-contained Prowl publish drops the whole .NET runtime next to the app. Never
                 // reference the shared-framework assemblies (esp. System.Private.CoreLib): they are the
@@ -506,7 +506,7 @@ public static class ScriptCompiler
 
             // Run the Prowl script-safety analyzers over user scripts so the warnings show in the IDE too,
             // matching the editor's own in-process compile.
-            foreach (string analyzer in new[] { "Prowl.Ember.Analyzers.dll", "Prowl.Analyzers.dll" })
+            foreach (string analyzer in new[] { "Infinity.Ember.Analyzers.dll", "Infinity.Analyzers.dll" })
             {
                 string analyzerDll = Path.Combine(engineDir, analyzer);
                 if (File.Exists(analyzerDll))

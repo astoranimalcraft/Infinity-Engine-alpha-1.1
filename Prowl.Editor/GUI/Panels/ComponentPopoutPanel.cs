@@ -1,16 +1,16 @@
 using System;
 using System.Linq;
 
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Editor.Core;
-using Prowl.Editor.Inspector;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.Rosetta;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
-namespace Prowl.Editor.GUI.Panels;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Core;
+using Infinity.Editor.Inspector;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+namespace Infinity.Editor.GUI.Panels;
 
 /// <summary>
 /// A floating panel that displays a single component editor.

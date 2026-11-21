@@ -1,6 +1,6 @@
-using Prowl.Runtime.Resources;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor.Importers;
+namespace Infinity.Editor.Importers;
 
 /// <summary>
 /// Imports .rendertexture files Echo-serialized RenderTexture descriptions (native Prowl format).

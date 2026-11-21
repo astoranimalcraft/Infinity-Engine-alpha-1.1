@@ -1,15 +1,15 @@
 using System;
 
-using Prowl.Editor.GUI;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
+using Infinity.Editor.GUI;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
 
-using Gradient = Prowl.Vector.Gradient;
+using Gradient = Infinity.Vector.Gradient;
 
-using PropertyGridUtils = Prowl.Editor.GUI.PropertyGridUtils;
-namespace Prowl.Editor.Inspector;
+using PropertyGridUtils = Infinity.Editor.GUI.PropertyGridUtils;
+namespace Infinity.Editor.Inspector;
 
 // ================================================================
 //  MinMaxGradient Property Editor

@@ -1,8 +1,8 @@
 using System;
 
-using Prowl.PaperUI;
+using Infinity.PaperUI;
 
-namespace Prowl.Editor.GUI;
+namespace Infinity.Editor.GUI;
 
 /// <summary>
 /// Attribute to register a custom property editor for a specific type.

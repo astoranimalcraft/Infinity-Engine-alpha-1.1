@@ -1,8 +1,8 @@
-using Prowl.Echo;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Echo;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor.Importers;
+namespace Infinity.Editor.Importers;
 
 /// <summary>How an imported clip's audio is stored.</summary>
 public enum AudioLoadType

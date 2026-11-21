@@ -1,4 +1,4 @@
-﻿namespace Prowl.Runtime.Rendering.Pipelines.Legacy;
+﻿namespace Infinity.Runtime.Rendering.Pipelines.Legacy;
 
 public sealed class LegacyRenderPipeline
 {

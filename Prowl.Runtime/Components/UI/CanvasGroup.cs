@@ -1,9 +1,9 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Echo;
+using Infinity.Echo;
 
-namespace Prowl.Runtime.UI;
+namespace Infinity.Runtime.UI;
 
 [AddComponentMenu("UI/Canvas Group")]
 public class CanvasGroup : UIBehaviour

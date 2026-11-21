@@ -1,20 +1,20 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Echo;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Runtime.UI;
-using Prowl.Scribe;
-using Prowl.Vector;
-using Prowl.Vector.Geometry;
+using Infinity.Echo;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Runtime.UI;
+using Infinity.Scribe;
+using Infinity.Vector;
+using Infinity.Vector.Geometry;
 
-using ScribeAlign = Prowl.Scribe.TextAlignment;
-using TAlignment = Prowl.Runtime.UI.TextAlignment;
+using ScribeAlign = Infinity.Scribe.TextAlignment;
+using TAlignment = Infinity.Runtime.UI.TextAlignment;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// Retained-mode text element. Produces one textured quad per glyph using Scribe's

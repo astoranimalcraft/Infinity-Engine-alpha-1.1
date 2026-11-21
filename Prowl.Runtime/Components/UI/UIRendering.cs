@@ -1,25 +1,25 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-using Prowl.Graphite;
-using Prowl.Graphite.Rendering;
-using Prowl.Graphite.ShaderDef;
-using Prowl.Runtime.Rendering;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Graphite;
+using Infinity.Graphite.Rendering;
+using Infinity.Graphite.ShaderDef;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using GMaterial = Prowl.Graphite.Rendering.Material;
-using GShader = Prowl.Graphite.Rendering.Shader;
-using GTexture = Prowl.Graphite.Texture;
-using Material = Prowl.Runtime.Resources.Material;
-using Mesh = Prowl.Runtime.Resources.Mesh;
-using Texture2D = Prowl.Runtime.Resources.Texture2D;
+using GMaterial = Infinity.Graphite.Rendering.Material;
+using GShader = Infinity.Graphite.Rendering.Shader;
+using GTexture = Infinity.Graphite.Texture;
+using Material = Infinity.Runtime.Resources.Material;
+using Mesh = Infinity.Runtime.Resources.Mesh;
+using Texture2D = Infinity.Runtime.Resources.Texture2D;
 
-namespace Prowl.Runtime.UI;
+namespace Infinity.Runtime.UI;
 
 /// <summary>
 /// Draws the GameObject UI of every scene world. World space canvases become provider items among the transparents, in

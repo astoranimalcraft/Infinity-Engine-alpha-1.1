@@ -7,12 +7,12 @@ using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using System.Threading.Tasks;
 
-using Prowl.Editor.Core;
-using Prowl.Editor.Theming;
-using Prowl.Runtime;
-using Prowl.Runtime.Resources;
+using Infinity.Editor.Core;
+using Infinity.Editor.Theming;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
 
-namespace Prowl.Editor.Projects.Scripting;
+namespace Infinity.Editor.Projects.Scripting;
 
 /// <summary>
 /// Manages script assembly compilation, loading, and hot-reload. Recompiles migrate the live graph onto the
@@ -36,7 +36,7 @@ public static class ScriptAssemblyManager
 
     // Raw IL bytes of each loaded user assembly, kept so hot reload can read a swapped assembly's IL with
     // Cecil (for lambda/closure migration). Keyed weakly so an unloaded assembly's bytes can be collected.
-    [Prowl.Ember.ReloadIgnore]
+    [Infinity.Ember.ReloadIgnore]
     private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Assembly, byte[]> s_assemblyBytes = [];
 
     /// <summary>The raw IL bytes an assembly was loaded from, or null if it wasn't loaded through here.</summary>
@@ -54,7 +54,7 @@ public static class ScriptAssemblyManager
 
         // Echo resolves a persisted $type by scanning the domain, which finds the superseded build first. Its
         // override hook is consulted after the predefined and structural cases, so this only redirects the scan.
-        Prowl.Echo.TypeNameRegistry.TypeResolver = RuntimeUtils.FindType;
+        Infinity.Echo.TypeNameRegistry.TypeResolver = RuntimeUtils.FindType;
     }
 
     /// <summary> Whether this is one of the project's live script assemblies. </summary>
@@ -543,7 +543,7 @@ public static class ScriptAssemblyManager
             // The migrate path clears those through EchoCacheMigrator; this path runs no walk, so clear them here.
             // Matters when the startup compile failed and the scene loaded anyway - the retry after the user fixes
             // the errors comes back through here, and without this the types stay missing regardless.
-            Prowl.Echo.Serializer.ClearCache();
+            Infinity.Echo.Serializer.ClearCache();
 
             EditorApplication.Instance?.ReinitializeAfterReload();
             return true;

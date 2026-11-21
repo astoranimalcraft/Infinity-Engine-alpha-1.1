@@ -1,10 +1,10 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
-using Prowl.Editor.Theming;
-using Prowl.Rosetta;
+using Infinity.Editor.Theming;
+using Infinity.Rosetta;
 
-namespace Prowl.Editor.Utils;
+namespace Infinity.Editor.Utils;
 
 /// <summary>
 /// Shared locale data for the language dropdown in Preferences and the Project Launcher.

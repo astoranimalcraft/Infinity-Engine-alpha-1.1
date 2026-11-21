@@ -1,18 +1,18 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Linq;
 
-using Prowl.Runtime.MeshFeatures;
-using Prowl.Runtime.MeshFeatures.Generation;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Runtime.MeshFeatures;
+using Infinity.Runtime.MeshFeatures.Generation;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 public class SDFGeneratorTests(ITestOutputHelper output)
 {

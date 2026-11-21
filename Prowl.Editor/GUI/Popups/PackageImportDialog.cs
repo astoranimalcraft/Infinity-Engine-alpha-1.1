@@ -4,18 +4,18 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 
-using Prowl.Editor.Projects;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Rosetta;
-using Prowl.Runtime;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
+using Infinity.Runtime;
 
 using Color = System.Drawing.Color;
-using Texture2D = Prowl.Runtime.Resources.Texture2D;
+using Texture2D = Infinity.Runtime.Resources.Texture2D;
 
-namespace Prowl.Editor.GUI.Popups;
+namespace Infinity.Editor.GUI.Popups;
 
 /// <summary>
 /// Overlay dialog for importing a .prowlpackage file.
@@ -320,7 +320,7 @@ public static class PackageImportDialog
         }
     }
 
-    private static void DrawTitle(Paper paper, Prowl.Scribe.FontFile font)
+    private static void DrawTitle(Paper paper, Infinity.Scribe.FontFile font)
     {
         using (paper.Row("pkgimp_title")
             .Height(32)
@@ -343,7 +343,7 @@ public static class PackageImportDialog
         }
     }
 
-    private static void DrawSettingsWarning(Paper paper, Prowl.Scribe.FontFile font)
+    private static void DrawSettingsWarning(Paper paper, Infinity.Scribe.FontFile font)
     {
         using (paper.Row("pkgimp_settings_warn")
             .Height(36)
@@ -372,7 +372,7 @@ public static class PackageImportDialog
         }
     }
 
-    private static void DrawBody(Paper paper, Prowl.Scribe.FontFile font)
+    private static void DrawBody(Paper paper, Infinity.Scribe.FontFile font)
     {
         float warningHeight = _hasProjectSettings ? 36f : 0f;
         float bodyHeight = DialogHeight - 32 - warningHeight - 44;
@@ -416,7 +416,7 @@ public static class PackageImportDialog
         }
     }
 
-    private static void DrawDetailPanel(Paper paper, Prowl.Scribe.FontFile font, float height)
+    private static void DrawDetailPanel(Paper paper, Infinity.Scribe.FontFile font, float height)
     {
         float detailWidth = DialogWidth - TreeWidth - 1;
 
@@ -514,7 +514,7 @@ public static class PackageImportDialog
         }
     }
 
-    private static void DetailRow(Paper paper, Prowl.Scribe.FontFile font, string id, string label, string value)
+    private static void DetailRow(Paper paper, Infinity.Scribe.FontFile font, string id, string label, string value)
     {
         using (paper.Row(id)
             .Height(RowHeight)
@@ -536,7 +536,7 @@ public static class PackageImportDialog
         }
     }
 
-    private static void DrawBottomBar(Paper paper, Prowl.Scribe.FontFile font)
+    private static void DrawBottomBar(Paper paper, Infinity.Scribe.FontFile font)
     {
         using (paper.Row("pkgimp_bottom")
             .Height(44)

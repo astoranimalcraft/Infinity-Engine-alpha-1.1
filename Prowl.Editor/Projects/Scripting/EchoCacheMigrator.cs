@@ -1,11 +1,11 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Ember;
+using Infinity.Ember;
 
-namespace Prowl.Editor.Projects.Scripting;
+namespace Infinity.Editor.Projects.Scripting;
 
 /// <summary>Clears Echo's reflection caches around a reload so they stop holding the outgoing types.</summary>
 internal sealed class EchoCacheMigrator : IValueMigrator, IReloadScopedMigrator

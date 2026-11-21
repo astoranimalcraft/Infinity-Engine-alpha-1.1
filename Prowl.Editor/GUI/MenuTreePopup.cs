@@ -1,16 +1,16 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
 
-namespace Prowl.Editor.GUI;
+namespace Infinity.Editor.GUI;
 
 /// <summary>
 /// One selectable leaf in a <see cref="MenuTreePopup"/>. <see cref="Path"/> is the full
@@ -156,7 +156,7 @@ public static class MenuTreePopup
     }
 
     // Flat, globally-filtered list shown while the search box has text (ignores the current folder).
-    private static void DrawSearchResults(Paper paper, Prowl.Scribe.FontFile font, string id,
+    private static void DrawSearchResults(Paper paper, Infinity.Scribe.FontFile font, string id,
         IReadOnlyList<MenuTreeEntry> entries, MenuTreeState state, Action<MenuTreeEntry> onPick, string emptyText,
         MenuTreeEntry? pinned)
     {
@@ -194,7 +194,7 @@ public static class MenuTreePopup
 
     // Click-to-navigate browser: the current folder's subfolders and leaves, with a "Back" row when
     // nested. Clicking a folder drills in; clicking Back steps back out.
-    private static void DrawBrowseLevel(Paper paper, Prowl.Scribe.FontFile font, string id,
+    private static void DrawBrowseLevel(Paper paper, Infinity.Scribe.FontFile font, string id,
         IReadOnlyList<MenuTreeEntry> entries, MenuTreeState state, Action<MenuTreeEntry> onPick, string emptyText,
         MenuTreeEntry? pinned)
     {
@@ -296,12 +296,12 @@ public static class MenuTreePopup
         return (leaves, sortedSubfolders);
     }
 
-    private static void DrawEmpty(Paper paper, Prowl.Scribe.FontFile font, string id, string emptyText)
+    private static void DrawEmpty(Paper paper, Infinity.Scribe.FontFile font, string id, string emptyText)
     {
         EditorGUI.EmptyState(paper, $"{id}_empty", emptyText, font);
     }
 
-    private static void DrawItem(Paper paper, Prowl.Scribe.FontFile font, string id,
+    private static void DrawItem(Paper paper, Infinity.Scribe.FontFile font, string id,
         MenuTreeEntry entry, Action<MenuTreeEntry> onPick, bool showPath, bool highlighted = false)
     {
         using (paper.Row(id)

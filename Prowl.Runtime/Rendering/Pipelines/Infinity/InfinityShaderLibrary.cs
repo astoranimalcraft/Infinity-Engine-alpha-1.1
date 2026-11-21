@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Prowl.Runtime.Rendering.Pipelines.Infinity;
+namespace Infinity.Runtime.Rendering.Pipelines.Infinity;
 
 public enum InfinityShaderStage
 {
@@ -238,7 +238,7 @@ public sealed class InfinityShaderLibrary : IDisposable
 
             Path.Combine(
                 AppContext.BaseDirectory,
-                "Prowl.Runtime",
+                "Infinity.Runtime",
                 "Rendering",
                 "Pipelines",
                 "Infinity",

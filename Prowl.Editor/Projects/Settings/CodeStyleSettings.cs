@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -12,14 +12,14 @@ using Microsoft.CodeAnalysis.CSharp.Formatting;
 using Microsoft.CodeAnalysis.Formatting;
 using Microsoft.CodeAnalysis.Options;
 
-using Prowl.Editor.GUI;
-using Prowl.Editor.GUI.ScriptEditor;
-using Prowl.Editor.Projects.Scripting;
-using Prowl.Editor.Theming;
-using Prowl.PaperUI;
-using Prowl.Runtime;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.ScriptEditor;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Editor.Theming;
+using Infinity.PaperUI;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Projects.Settings;
+namespace Infinity.Editor.Projects.Settings;
 
 public enum VarPreference { Always, WhenTypeIsApparent, Never }
 public enum NamespaceStyle { FileScoped, BlockScoped }

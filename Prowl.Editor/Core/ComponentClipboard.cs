@@ -1,19 +1,19 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Echo;
-using Prowl.Editor.GUI.SceneView;
-using Prowl.Runtime;
+using Infinity.Echo;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Runtime;
 
-namespace Prowl.Editor.Core;
+namespace Infinity.Editor.Core;
 
 /// <summary>
 /// Handles copy / paste-as-new / paste-values for individual components, using Echo serialization.
 /// The payload lives on the system clipboard as text so it survives a scene swap - which matters,
-/// because <see cref="Prowl.Editor.GUI.SceneView.PrefabEditingMode"/> discards and reloads the whole
+/// because <see cref="Infinity.Editor.GUI.SceneView.PrefabEditingMode"/> discards and reloads the whole
 /// scene on enter/exit. That's what makes "copy in prefab mode, paste into the scene" work.
 ///
 /// Payload format (first line is a header so the type can be peeked without parsing the body):

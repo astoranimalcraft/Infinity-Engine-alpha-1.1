@@ -1,19 +1,19 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-using Prowl.Runtime.AnimationNodes;
-using Prowl.Vector;
+using Infinity.Runtime.AnimationNodes;
+using Infinity.Vector;
 
-using MotionAvatar = Prowl.Motion.Avatar;
-using MotionGraph = Prowl.Motion.AnimationGraph;
-using MotionSkeleton = Prowl.Motion.Skeleton;
-using StringID = Prowl.Motion.StringID;
+using MotionAvatar = Infinity.Motion.Avatar;
+using MotionGraph = Infinity.Motion.AnimationGraph;
+using MotionSkeleton = Infinity.Motion.Skeleton;
+using StringID = Infinity.Motion.StringID;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>What flows down a pin.</summary>
 public enum NodePinKind : byte

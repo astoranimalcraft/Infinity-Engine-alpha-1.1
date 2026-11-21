@@ -1,13 +1,13 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 
-using Prowl.Motion;
-using Prowl.Vector;
+using Infinity.Motion;
+using Infinity.Vector;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 /// <summary>
 /// Builds a ragdoll onto a humanoid's bones: a rigidbody and collider per body part, and constraints
@@ -120,7 +120,7 @@ public static class RagdollBuilder
         foreach (PartSpec part in s_parts)
             if (Included(part, bones, settings)) massTotal += part.Mass;
 
-        Prowl.Motion.Avatar? human = settings.Avatar.IsValid() ? settings.Avatar!.Runtime : null;
+        Infinity.Motion.Avatar? human = settings.Avatar.IsValid() ? settings.Avatar!.Runtime : null;
         Pose? middle = human?.Humanoid != null ? MiddlePose(human) : null;
 
         foreach (PartSpec part in s_parts)
@@ -209,7 +209,7 @@ public static class RagdollBuilder
     }
 
     private static void AddJoint(GameObject go, PartSpec part, Transform bone, IReadOnlyDictionary<HumanBodyBone, Transform> bones,
-        Rigidbody3D parent, HumanBodyBone parentBone, Float3 forward, Prowl.Motion.Avatar? human, Pose? middle)
+        Rigidbody3D parent, HumanBodyBone parentBone, Float3 forward, Infinity.Motion.Avatar? human, Pose? middle)
     {
         Float3 along = Float3.Normalize(SegmentEnd(part.Bone, bone, bones, forward) - bone.Position);
         Float3 localAlong = bone.InverseTransformDirection(along);
@@ -246,7 +246,7 @@ public static class RagdollBuilder
     }
 
     // The skeleton posed with every muscle in the middle of its range.
-    private static Pose MiddlePose(Prowl.Motion.Avatar human)
+    private static Pose MiddlePose(Infinity.Motion.Avatar human)
     {
         HumanoidRig rig = human.Humanoid!;
         var pose = new HumanPose();

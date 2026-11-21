@@ -1,11 +1,11 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 
-using Prowl.Vector;
+using Infinity.Vector;
 
-namespace Prowl.Runtime.ParticleSystem.Modules;
+namespace Infinity.Runtime.ParticleSystem.Modules;
 
 /// <summary>
 /// Blows particles around. The wind a particle feels is a steady <see cref="AmbientWind"/>, plus the

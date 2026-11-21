@@ -1,19 +1,19 @@
 using System;
 using System.Collections.Generic;
 
-using Prowl.Editor.GUI;
-using Prowl.Editor.Theming;
-using Prowl.OrigamiUI;
-using Prowl.PaperUI;
-using Prowl.PaperUI.LayoutEngine;
-using Prowl.Runtime;
-using Prowl.Runtime.MeshFeatures;
-using Prowl.Runtime.Resources;
-using Prowl.Vector;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.MeshFeatures;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
 
-using static Prowl.Editor.GUI.EditorGUI;
+using static Infinity.Editor.GUI.EditorGUI;
 
-namespace Prowl.Editor.Inspector;
+namespace Infinity.Editor.Inspector;
 
 /// <summary>
 /// Read-only inspector for a <see cref="Mesh"/>. Shows mesh info, the list of generated
@@ -83,7 +83,7 @@ public class MeshAssetEditor : AssetImporterEditor
         }
     }
 
-    private static void DrawStatChips(Paper paper, string id, Mesh mesh, Prowl.Scribe.FontFile font, OrigamiMetrics m)
+    private static void DrawStatChips(Paper paper, string id, Mesh mesh, Infinity.Scribe.FontFile font, OrigamiMetrics m)
     {
         int verts = mesh.Vertices?.Length ?? 0;
         int tris = (mesh.Indices?.Length ?? 0) / 3;
@@ -100,7 +100,7 @@ public class MeshAssetEditor : AssetImporterEditor
         }
     }
 
-    private static void DrawDetails(Paper paper, string id, Mesh mesh, Prowl.Scribe.FontFile font, OrigamiMetrics m)
+    private static void DrawDetails(Paper paper, string id, Mesh mesh, Infinity.Scribe.FontFile font, OrigamiMetrics m)
     {
         EditorGUI.SectionHeader(paper, $"{id}_h_details", "Details");
 
@@ -117,7 +117,7 @@ public class MeshAssetEditor : AssetImporterEditor
         ValueRow(paper, id, "_attrs", "Attributes", attrs.TrimEnd(), font, m);
     }
 
-    private static void DrawFeaturePanel(Paper paper, string id, AssetEntry parentEntry, SubAssetEntry? subEntry, Mesh mesh, Prowl.Scribe.FontFile font, OrigamiMetrics m)
+    private static void DrawFeaturePanel(Paper paper, string id, AssetEntry parentEntry, SubAssetEntry? subEntry, Mesh mesh, Infinity.Scribe.FontFile font, OrigamiMetrics m)
     {
         EditorGUI.SectionHeader(paper, $"{id}_h_feat", "Mesh Features");
 
@@ -128,7 +128,7 @@ public class MeshAssetEditor : AssetImporterEditor
         ValueRow(paper, id, "_sdf", "SDF", sdfText, font, m);
     }
 
-    private static void ValueRow(Paper paper, string id, string key, string label, string value, Prowl.Scribe.FontFile font, OrigamiMetrics m)
+    private static void ValueRow(Paper paper, string id, string key, string label, string value, Infinity.Scribe.FontFile font, OrigamiMetrics m)
     {
         EditorGUI.Row(paper, $"{id}{key}", label, () =>
             paper.Box($"{id}{key}_v").Height(m.RowHeight).IsNotInteractable()

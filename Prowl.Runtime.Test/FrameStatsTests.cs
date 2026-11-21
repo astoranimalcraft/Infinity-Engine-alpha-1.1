@@ -1,4 +1,4 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
@@ -6,11 +6,11 @@ using System.Diagnostics;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 
-using Prowl.Runtime.Diagnostics;
+using Infinity.Runtime.Diagnostics;
 
 using Xunit;
 
-namespace Prowl.Runtime.Test;
+namespace Infinity.Runtime.Test;
 
 // Frame stats are static and record one thread, and a headless run elsewhere would take it over.
 [CollectionDefinition(nameof(FrameStatsTests), DisableParallelization = true)]
@@ -121,12 +121,12 @@ public class FrameStatsTests
     public void AColourIsUsedOnlyWhenTheCategoryIsMade()
     {
         string path = "Test.Coloured." + Guid.NewGuid();
-        var red = new Prowl.Vector.Color(1f, 0f, 0f, 1f);
+        var red = new Infinity.Vector.Color(1f, 0f, 0f, 1f);
 
         FrameStat made = FrameStats.GetCategory(path, red);
 
         Assert.Equal(red, made.Color);
-        Assert.Equal(red, FrameStats.GetCategory(path, new Prowl.Vector.Color(0f, 0f, 1f, 1f)).Color);
+        Assert.Equal(red, FrameStats.GetCategory(path, new Infinity.Vector.Color(0f, 0f, 1f, 1f)).Color);
     }
 
     [Theory]

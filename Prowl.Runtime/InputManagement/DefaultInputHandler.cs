@@ -1,18 +1,18 @@
-// This file is part of the Prowl Game Engine
+// This file is part of the Infinity Engine
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Prowl.PaperUI;
-using Prowl.Runtime.Diagnostics;
-using Prowl.Vector;
+using Infinity.PaperUI;
+using Infinity.Runtime.Diagnostics;
+using Infinity.Vector;
 
 using Silk.NET.GLFW;
 using Silk.NET.Input;
 
-namespace Prowl.Runtime;
+namespace Infinity.Runtime;
 
 public class DefaultInputHandler : IInputHandler, IDisposable
 {
