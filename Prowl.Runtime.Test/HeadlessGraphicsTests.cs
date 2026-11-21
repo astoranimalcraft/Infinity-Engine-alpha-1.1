@@ -168,6 +168,40 @@ public class HeadlessGraphicsTests
     }
 
     [Fact]
+    public void EveryPostEffectShader_Compiles()
+    {
+        const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+        var shaderProperty = typeof(Rendering.PostEffect).GetProperty("Shader", flags)!;
+        var stageProperty = typeof(Rendering.PostEffect).GetProperty("Stage", flags)!;
+
+        List<string> compiled = [];
+        foreach (System.Type type in typeof(Rendering.PostEffect).Assembly.GetTypes())
+        {
+            if (type.IsAbstract || !typeof(Rendering.PostEffect).IsAssignableFrom(type)) continue;
+
+            var effect = (Rendering.PostEffect)System.Activator.CreateInstance(type)!;
+            string shader = (string)shaderProperty.GetValue(effect)!;
+            if ((Rendering.PostEffectStage)stageProperty.GetValue(effect)! == Rendering.PostEffectStage.Tonemap)
+                shader = Rendering.PostEffect.TonemapShader(shader);
+
+            ShaderPass pass = FullscreenProgram.Pass(shader, type.Name);
+            List<Keyword> combo = [];
+            foreach (VariantSpace axis in Graphics.Compiler.GetAxes(pass))
+                combo.Add(new Keyword(axis.Name, axis.Name == "GRAPHITE_NO_SOURCE" ? "false" : axis.Values[0]));
+            Graphics.Compiler.CompileProgram(pass, [.. combo]);
+
+            compiled.Add(type.Name);
+        }
+
+        // The point is that no effect is skipped silently: a new one that fails to compile throws above.
+        Assert.True(compiled.Count >= 20, $"Only {compiled.Count} post effects were found.");
+        Assert.Contains("InfinityHalftone", compiled);
+        Assert.Contains("InfinityKaleidoscope", compiled);
+        Assert.Contains("InfinityCrtScreen", compiled);
+        Assert.Contains("InfinityBleachBypass", compiled);
+    }
+
+    [Fact]
     public void Lit_ExposesPbrFactors()
     {
         // The model importer sets these factors, so every glTF material without textures depends on them

@@ -91,3 +91,11 @@ export DISPLAY=:99 VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp_icd.json
 ./Build/Editor/Release/net11.0/Prowl.Editor &   # needs `openbox` for mouse input, dotnet on PATH for script builds
 import -window root /tmp/shot.png                # ImageMagick
 ```
+
+## Application icon
+
+`Window.SetWindowIcon` takes raw RGBA and is public. Without an embedded icon, the window looks for
+`icon.png`/`icon.ico` beside the executable, which is why a build copies both there. `AppIcon.Load`
+turns either format into the array the window wants (an `.ico` yields every size, so `DecodeAllFrames`
+must stay on). `AppIconExporter.TryExport` writes `icon.png` plus a 16-256 `icon.ico`, and Project
+Settings > General applies the choice to the editor window as a live preview.
