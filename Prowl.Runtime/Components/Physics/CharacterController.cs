@@ -42,12 +42,22 @@ public class CharacterController : Component
     public enum ColliderShape
     {
         Capsule,
-        Cylinder
+        Cylinder,
+        Box,
+        Sphere
     }
 
     public ColliderShape Shape = ColliderShape.Cylinder;
     public float Radius = 0.5f;
     public float Height = 1.8f;
+
+    /// <summary>
+    /// Shifts the shape from the GameObject's origin, in world axes: X sideways, Y up, Z forward. It is where the
+    /// pivot sits relative to the body: with a model whose origin is at the feet the shape already lines up, but a
+    /// model centred on its hips needs the shape moved down by half its height. The feet, the ground probe, every
+    /// cast and the gizmo follow it, so the controller still walks on the ground it draws.
+    /// </summary>
+    public Float3 Offset = Float3.Zero;
 
     /// <summary>The gap kept between the controller and everything it touches, so casts never start inside.</summary>
     public float SkinWidth = 0.02f;
@@ -199,7 +209,7 @@ public class CharacterController : Component
     public Float3 Bottom => GameObject.Transform.Position;
 
     /// <summary>The top of the controller in world space.</summary>
-    public Float3 Top => GameObject.Transform.Position + _up * Height;
+    public Float3 Top => GameObject.Transform.Position + Offset + _up * Height;
 
     private float MinWalkableNormalY => Maths.Cos(MaxSlopeAngle * Maths.Deg2Rad);
 
@@ -243,18 +253,35 @@ public class CharacterController : Component
         JQuaternion queryOrientation = orientation.ToJitter();
         JVector queryPosition = position.ToJitter();
 
-        if (Shape == ColliderShape.Capsule)
+        switch (Shape)
         {
-            Float3 bottom = feet + _up * Radius;
-            Float3 top = feet + _up * Maths.Max(Height - Radius, Radius + 0.001f);
-            SupportPrimitives.Capsule capsule = SupportPrimitives.CreateCapsule(Radius, Float3.Length(top - bottom) * 0.5f);
-            return NarrowPhase.MprEpa(shape, capsule, queryOrientation, Orientation.ToJitter(), queryPosition, ((top + bottom) * 0.5f).ToJitter(),
-                out _, out _, out _, out _);
+            case ColliderShape.Capsule:
+            {
+                Float3 bottom = CapsuleBottom(feet);
+                Float3 top = CapsuleTop(feet);
+                SupportPrimitives.Capsule capsule = SupportPrimitives.CreateCapsule(Radius, Float3.Length(top - bottom) * 0.5f);
+                return NarrowPhase.MprEpa(shape, capsule, queryOrientation, Orientation.ToJitter(), queryPosition, ((top + bottom) * 0.5f).ToJitter(),
+                    out _, out _, out _, out _);
+            }
+            case ColliderShape.Box:
+            {
+                SupportPrimitives.Box box = SupportPrimitives.CreateBox(BoxHalfExtents.ToJitter());
+                return NarrowPhase.MprEpa(shape, box, queryOrientation, Orientation.ToJitter(), queryPosition, ShapeCenter(feet).ToJitter(),
+                    out _, out _, out _, out _);
+            }
+            case ColliderShape.Sphere:
+            {
+                SupportPrimitives.Sphere sphere = SupportPrimitives.CreateSphere(Radius);
+                return NarrowPhase.MprEpa(shape, sphere, queryOrientation, Orientation.ToJitter(), queryPosition, SphereCenter(feet).ToJitter(),
+                    out _, out _, out _, out _);
+            }
+            default:
+            {
+                SupportPrimitives.Cylinder cylinder = SupportPrimitives.CreateCylinder(Radius, Height * 0.5f);
+                return NarrowPhase.MprEpa(shape, cylinder, queryOrientation, Orientation.ToJitter(), queryPosition, ShapeCenter(feet).ToJitter(),
+                    out _, out _, out _, out _);
+            }
         }
-
-        SupportPrimitives.Cylinder cylinder = SupportPrimitives.CreateCylinder(Radius, Height * 0.5f);
-        return NarrowPhase.MprEpa(shape, cylinder, queryOrientation, Orientation.ToJitter(), queryPosition, ShapeCenter(feet).ToJitter(),
-            out _, out _, out _, out _);
     }
 
     private QueryFilter BuildFilter()
@@ -529,9 +556,7 @@ public class CharacterController : Component
         normal = _up;
         drop = 0f;
 
-        int count = Shape == ColliderShape.Capsule
-            ? GameObject.Scene.Physics.CapsuleCastAll(CapsuleBottom(position), CapsuleTop(position), EffectiveRadius, Down, reach, _groundHits, _filter)
-            : GameObject.Scene.Physics.CylinderCastAll(ShapeCenter(position), EffectiveRadius, Height, Orientation, Down, reach, _groundHits, _filter);
+        int count = ShapeCastAll(position, Down, reach, _groundHits);
         if (count == 0) return false;
 
         float nearest = _groundHits[0].Distance;
@@ -718,7 +743,7 @@ public class CharacterController : Component
 
     // How far above the feet the shape still counts as its bottom: the round end of a capsule below its
     // widest point, or just the flat base of a cylinder.
-    private float BottomBand => Shape == ColliderShape.Capsule ? EffectiveRadius * 0.9f : SkinWidth + 0.05f;
+    private float BottomBand => Shape is ColliderShape.Capsule or ColliderShape.Sphere ? EffectiveRadius * 0.9f : SkinWidth + 0.05f;
 
     // A walkable face straight down from just above a point, within reach below it.
     private bool WalkableFaceBelow(Float3 point, float reach, out Float3 normal)
@@ -897,10 +922,13 @@ public class CharacterController : Component
     {
         results.Clear();
 
-        if (Shape == ColliderShape.Capsule)
-            return GameObject.Scene.Physics.OverlapCapsule(CapsuleBottom(position), CapsuleTop(position), EffectiveRadius, results, _filter);
-
-        return GameObject.Scene.Physics.OverlapCylinder(ShapeCenter(position), EffectiveRadius, Height, Orientation, results, _filter);
+        return Shape switch
+        {
+            ColliderShape.Capsule => GameObject.Scene.Physics.OverlapCapsule(CapsuleBottom(position), CapsuleTop(position), EffectiveRadius, results, _filter),
+            ColliderShape.Box => GameObject.Scene.Physics.OverlapBox(ShapeCenter(position), BoxHalfExtents * 2f, Orientation, results, _filter),
+            ColliderShape.Sphere => GameObject.Scene.Physics.OverlapSphere(SphereCenter(position), EffectiveRadius, results, _filter),
+            _ => GameObject.Scene.Physics.OverlapCylinder(ShapeCenter(position), EffectiveRadius, Height, Orientation, results, _filter),
+        };
     }
 
     /// <summary>Notes something the move touched and which side of the controller it was on. The same surface is only listed once.</summary>
@@ -929,7 +957,7 @@ public class CharacterController : Component
     /// <summary>Changes the height if the new size fits where the controller stands. Returns false and leaves it alone otherwise.</summary>
     public bool TrySetHeight(float newHeight)
     {
-        float minHeight = Shape == ColliderShape.Capsule ? Radius * 2 : 0.1f;
+        float minHeight = Shape is ColliderShape.Capsule or ColliderShape.Sphere ? Radius * 2 : 0.1f;
         if (newHeight <= minHeight)
         {
             _failedHeightAttempt = false;
@@ -965,27 +993,44 @@ public class CharacterController : Component
         float effectiveRadius = Maths.Max(radius - SkinWidth, 0.001f);
         QueryFilter filter = BuildFilter();
 
-        if (Shape == ColliderShape.Capsule)
-        {
-            Float3 bottom = position + _up * effectiveRadius;
-            Float3 top = position + _up * Maths.Max(height - effectiveRadius, effectiveRadius + 0.001f);
-            return GameObject.Scene.Physics.CheckCapsule(bottom, top, effectiveRadius, filter);
-        }
+        Float3 origin = position + Offset;
+        Float3 centre = origin + _up * (height * 0.5f);
 
-        return GameObject.Scene.Physics.CheckCylinder(position + _up * (height * 0.5f), effectiveRadius, height, Orientation, filter);
+        switch (Shape)
+        {
+            case ColliderShape.Capsule:
+            {
+                Float3 bottom = origin + _up * effectiveRadius;
+                Float3 top = origin + _up * Maths.Max(height - effectiveRadius, effectiveRadius + 0.001f);
+                return GameObject.Scene.Physics.CheckCapsule(bottom, top, effectiveRadius, filter);
+            }
+            case ColliderShape.Box:
+                return GameObject.Scene.Physics.CheckBox(centre, new Float3(effectiveRadius * 2f, height, effectiveRadius * 2f), Orientation, filter);
+            case ColliderShape.Sphere:
+                return GameObject.Scene.Physics.CheckSphere(origin + _up * effectiveRadius, effectiveRadius, filter);
+            default:
+                return GameObject.Scene.Physics.CheckCylinder(centre, effectiveRadius, height, Orientation, filter);
+        }
     }
 
     // ----------------------------------------------------------------
     //  Shape
     // ----------------------------------------------------------------
 
-    private Float3 ShapeCenter(Float3 position) => position + _up * (Height * 0.5f);
+    private Float3 ShapeCenter(Float3 position) => position + Offset + _up * (Height * 0.5f);
 
-    private Float3 CapsuleBottom(Float3 position) => position + _up * EffectiveRadius;
+    // A sphere stands on the feet rather than straddling them, so its middle is a radius up.
+    private Float3 SphereCenter(Float3 position) => position + Offset + _up * EffectiveRadius;
+
+    private Float3 CapsuleBottom(Float3 position) => position + Offset + _up * EffectiveRadius;
 
     // Jitter rejects a capsule of zero length, which a height at or below twice the radius would make.
     private Float3 CapsuleTop(Float3 position)
-        => position + _up * Maths.Max(Height - EffectiveRadius, EffectiveRadius + 0.001f);
+        => position + Offset + _up * Maths.Max(Height - EffectiveRadius, EffectiveRadius + 0.001f);
+
+    // Half extents, which is what Jitter's support primitives and its box queries take: as wide as the radius and
+    // as tall as the height, less the skin so a cast never starts inside the shape.
+    private Float3 BoxHalfExtents => new(EffectiveRadius, Maths.Max(Height * 0.5f - SkinWidth, 0.001f), EffectiveRadius);
 
     // Stands the cylinder along the controller's up.
     private Quaternion Orientation => Quaternion.FromToRotation(Float3.UnitY, _up);
@@ -996,13 +1041,21 @@ public class CharacterController : Component
 
     private float EffectiveRadius => Maths.Max(Radius - SkinWidth, 0.001f);
 
-    private bool Sweep(Float3 position, Float3 direction, float distance, out ShapeCastHit hit)
+    private bool Sweep(Float3 position, Float3 direction, float distance, out ShapeCastHit hit) => Shape switch
     {
-        if (Shape == ColliderShape.Capsule)
-            return GameObject.Scene.Physics.CapsuleCast(CapsuleBottom(position), CapsuleTop(position), EffectiveRadius, direction, distance, out hit, _filter);
+        ColliderShape.Capsule => GameObject.Scene.Physics.CapsuleCast(CapsuleBottom(position), CapsuleTop(position), EffectiveRadius, direction, distance, out hit, _filter),
+        ColliderShape.Box => GameObject.Scene.Physics.BoxCast(ShapeCenter(position), BoxHalfExtents * 2f, Orientation, direction, distance, out hit, _filter),
+        ColliderShape.Sphere => GameObject.Scene.Physics.SphereCast(SphereCenter(position), EffectiveRadius, direction, distance, out hit, _filter),
+        _ => GameObject.Scene.Physics.CylinderCast(ShapeCenter(position), EffectiveRadius, Height, Orientation, direction, distance, out hit, _filter),
+    };
 
-        return GameObject.Scene.Physics.CylinderCast(ShapeCenter(position), EffectiveRadius, Height, Orientation, direction, distance, out hit, _filter);
-    }
+    private int ShapeCastAll(Float3 position, Float3 direction, float distance, List<ShapeCastHit> hits) => Shape switch
+    {
+        ColliderShape.Capsule => GameObject.Scene.Physics.CapsuleCastAll(CapsuleBottom(position), CapsuleTop(position), EffectiveRadius, direction, distance, hits, _filter),
+        ColliderShape.Box => GameObject.Scene.Physics.BoxCastAll(ShapeCenter(position), BoxHalfExtents * 2f, Orientation, direction, distance, hits, _filter),
+        ColliderShape.Sphere => GameObject.Scene.Physics.SphereCastAll(SphereCenter(position), EffectiveRadius, direction, distance, hits, _filter),
+        _ => GameObject.Scene.Physics.CylinderCastAll(ShapeCenter(position), EffectiveRadius, Height, Orientation, direction, distance, hits, _filter),
+    };
 
     private float SlopeAngle(Float3 normal) => Maths.Acos(Maths.Clamp(Rise(normal), -1.0f, 1.0f)) * Maths.Rad2Deg;
 
@@ -1014,26 +1067,35 @@ public class CharacterController : Component
 
         Float3 position = GameObject.Transform.Position;
 
-        if (Shape == ColliderShape.Capsule)
-            Debug.DrawWireCapsule(CapsuleBottom(position), CapsuleTop(position), Radius, Color.Cyan, 16);
-        else
-            Debug.DrawWireCylinder(ShapeCenter(position), Orientation, Radius, Height, Color.Cyan, 16);
+        DrawShape(position, Height, Radius, Color.Cyan);
 
         if (_groundHit.Hit) _groundHit.DrawGizmos();
 
         if (_failedHeightAttempt)
+            DrawShape(position, _failedAttemptHeight, _failedAttemptRadius, Color.Red);
+    }
+
+    private void DrawShape(Float3 position, float height, float radius, Color color)
+    {
+        Float3 centre = position + Offset + _up * (height * 0.5f);
+        float reach = Maths.Max(radius - SkinWidth, 0.001f);
+
+        switch (Shape)
         {
-            if (Shape == ColliderShape.Capsule)
-            {
-                Float3 bottom = position + _up * _failedAttemptRadius;
-                Float3 top = position + _up * (_failedAttemptHeight - _failedAttemptRadius);
-                Debug.DrawWireCapsule(bottom, top, _failedAttemptRadius, Color.Red, 16);
-            }
-            else
-            {
-                Float3 center = position + _up * (_failedAttemptHeight * 0.5f);
-                Debug.DrawWireCylinder(center, Orientation, _failedAttemptRadius, _failedAttemptHeight, Color.Red, 16);
-            }
+            case ColliderShape.Capsule:
+                Float3 bottom = position + Offset + _up * reach;
+                Float3 top = position + Offset + _up * Maths.Max(height - reach, reach + 0.001f);
+                Debug.DrawWireCapsule(bottom, top, radius, color, 16);
+                break;
+            case ColliderShape.Box:
+                Debug.DrawWireCube(centre, new Float3(radius, height * 0.5f, radius), color);
+                break;
+            case ColliderShape.Sphere:
+                Debug.DrawWireSphere(position + Offset + _up * reach, radius, color, 16);
+                break;
+            default:
+                Debug.DrawWireCylinder(centre, Orientation, radius, height, color, 16);
+                break;
         }
     }
 }

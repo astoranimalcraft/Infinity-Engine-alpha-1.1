@@ -220,7 +220,39 @@ public sealed class Ocean : Component, IRenderSync
     /// <summary>Captures the floor again next frame, after the scene around the ocean changed.</summary>
     public void RecaptureFloor() => _captured = false;
 
+    // The ocean syncs from inside the render loop, so a failure here used to come back every frame and take the
+    // editor with it. Failing once, saying what broke and turning the ocean off keeps the rest of the frame drawing
+    // and turns the problem into one readable line in the console.
     bool IRenderSync.Sync(G.RenderWorld world)
+    {
+        try
+        {
+            return SyncCore(world);
+        }
+        catch (Exception e)
+        {
+            if (!_reported)
+            {
+                _reported = true;
+                Debug.LogError($"The ocean at {Transform.Position} failed to sync and is turned off: {e}");
+            }
+
+            try
+            {
+                ((IRenderSync)this).Detach(world);
+            }
+            catch
+            {
+                // Detaching is best effort: the point of getting here is to stop drawing, not to clean up perfectly.
+            }
+
+            return false;
+        }
+    }
+
+    [System.NonSerialized, NotHeld] private bool _reported;
+
+    private bool SyncCore(G.RenderWorld world)
     {
         if (Graphics.Renderer is not { } renderer)
             return false;

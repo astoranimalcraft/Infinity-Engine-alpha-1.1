@@ -969,6 +969,39 @@ public sealed class Rigidbody3D : Component, ITransformChangeListener
             _body.SetActivationState(active);
     }
 
+    /// <summary>Puts the body to sleep, so it stops being simulated until something wakes it.</summary>
+    public void Sleep() => SetActive(false);
+
+    /// <summary>Wakes the body, so it is simulated again from the next step.</summary>
+    public void WakeUp() => SetActive(true);
+
+    /// <summary>
+    /// Pushes the body away from a point, the way a blast does: the force is strongest at the origin and falls to
+    /// nothing at <paramref name="radius"/>, so a grenade throws what is next to it and only nudges what is far.
+    /// <paramref name="upwardsModifier"/> lifts the origin, which is what stops everything being thrown flat and
+    /// makes a blast send bodies up and out. Only bodies with a <see cref="Rigidbody3D"/> are affected; the caller
+    /// picks them with <see cref="Physics.OverlapSphere"/> and calls this on each.
+    /// </summary>
+    /// <param name="force">The force at the origin, in the unit of <paramref name="mode"/>.</param>
+    /// <param name="origin">The centre of the blast in world space.</param>
+    /// <param name="radius">How far the blast reaches, in metres.</param>
+    /// <param name="upwardsModifier">How far the origin is lifted before the direction is taken.</param>
+    /// <param name="mode">How <paramref name="force"/> is applied, <see cref="ForceMode.Force"/> by default.</param>
+    public void AddExplosionForce(float force, Float3 origin, float radius, float upwardsModifier = 0f, ForceMode mode = ForceMode.Force)
+    {
+        if (radius <= 0f) return;
+
+        Float3 centre = Position;
+        Float3 lifted = origin + Float3.UnitY * upwardsModifier;
+        Float3 offset = centre - lifted;
+        float distance = Float3.Length(offset);
+        if (distance >= radius) return;
+
+        // Linear falloff: full force at the centre, none at the rim.
+        Float3 direction = distance > 1e-4f ? offset / distance : Float3.UnitY;
+        AddForce(direction * (force * (1f - distance / radius)), mode);
+    }
+
     /// <summary>
     /// Gets the velocity at a world space point on this rigidbody.
     /// </summary>
