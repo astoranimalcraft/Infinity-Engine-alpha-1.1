@@ -64,6 +64,63 @@ public sealed class AnimationTake
         return track;
     }
 
+    /// <summary>
+    /// Finds or adds a track for a named member: the uniform of a material track or the property of a component
+    /// track. Two tracks of the same kind on the same target only match when they drive the same member.
+    /// </summary>
+    public AnimationTrack GetOrAddTrack(string target, AnimationTrackKind kind, string component, string property, int channels)
+    {
+        foreach (AnimationTrack track in _tracks)
+        {
+            if (track.Kind != kind) continue;
+            if (!string.Equals(track.Target, target ?? string.Empty, StringComparison.Ordinal)) continue;
+            if (!string.Equals(track.Component, component ?? string.Empty, StringComparison.Ordinal)) continue;
+            if (!string.Equals(track.Property, property ?? string.Empty, StringComparison.Ordinal)) continue;
+            return track;
+        }
+
+        var added = new AnimationTrack(target, kind)
+        {
+            Component = component,
+            Property = property,
+            Channels = channels,
+        };
+        _tracks.Add(added);
+        return added;
+    }
+
+    /// <summary>
+    /// Shifts every key at or after <paramref name="at"/> by <paramref name="amount"/> and grows the take to hold
+    /// them, which is how the timeline opens a gap without retyping every key after it.
+    /// </summary>
+    public void InsertTime(float at, float amount)
+    {
+        if (amount <= 0f) return;
+        foreach (AnimationTrack track in _tracks) track.ShiftKeys(at, amount);
+
+        float last = 0f;
+        foreach (AnimationTrack track in _tracks)
+        {
+            List<float> times = track.KeyTimes();
+            if (times.Count > 0) last = MathF.Max(last, times[^1]);
+        }
+
+        // Opening a gap past the end moves nothing, so the take keeps its length instead of stretching.
+        Duration = MathF.Max(at <= _duration ? _duration + amount : _duration, last);
+    }
+
+    /// <summary>Every key time across every track, sorted, which is what the timeline's summary band draws.</summary>
+    public List<float> AllKeyTimes()
+    {
+        var times = new List<float>();
+        foreach (AnimationTrack track in _tracks) times.AddRange(track.KeyTimes());
+        times.Sort();
+
+        for (int i = times.Count - 1; i > 0; i--)
+            if (times[i] - times[i - 1] <= AnimationTrack.TimeEpsilon) times.RemoveAt(i);
+        return times;
+    }
+
     public AnimationTrack? FindTrack(string target, AnimationTrackKind kind)
     {
         foreach (AnimationTrack track in _tracks)
@@ -123,6 +180,18 @@ public sealed class AnimationTake
                 if (renderer.IsValid()) renderer.Sprite = sprite;
                 break;
             }
+            case AnimationTrackKind.TintColor:
+                track.ApplyTint(target, time);
+                break;
+            case AnimationTrackKind.MaterialProperty:
+                track.ApplyMaterialProperty(target, time);
+                break;
+            case AnimationTrackKind.MaterialTexture:
+                track.ApplyMaterialTexture(target, time);
+                break;
+            case AnimationTrackKind.ComponentProperty:
+                track.ApplyComponentProperty(target, time);
+                break;
         }
     }
 
