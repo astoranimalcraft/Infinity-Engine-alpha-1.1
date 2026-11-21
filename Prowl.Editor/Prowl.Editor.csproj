@@ -1,7 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <!-- A windowed host has no console, so its stdout goes nowhere. Build with -p:ProwlEditorConsole=true to get a
+         console window that shows the graphics layer's diagnostics as they happen. -->
+    <OutputType Condition="'$(ProwlEditorConsole)' == 'true'">Exe</OutputType>
+    <OutputType Condition="'$(ProwlEditorConsole)' != 'true'">WinExe</OutputType>
     <TargetFramework>net11.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
