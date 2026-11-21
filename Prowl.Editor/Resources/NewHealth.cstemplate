@@ -1,6 +1,6 @@
 using System;
 
-using Prowl.Runtime;
+using Infinity.Runtime;
 
 public class {[className]} : Component
 {

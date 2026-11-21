@@ -272,7 +272,9 @@ public sealed class ScriptEditorPreferences : EditorPreferences
         }
         else
         {
-            options.Font = null;
+            // The code editor draws outside the theme push, so hand it the theme's mono font instead of
+            // leaving the font to be looked up at draw time.
+            options.Font = EditorTheme.FontMono ?? EditorTheme.DefaultFont;
             options.BoldFont = EditorTheme.FontMonoBold;
             options.ItalicFont = EditorTheme.FontMonoItalic;
             options.BoldItalicFont = EditorTheme.FontMonoBoldItalic;

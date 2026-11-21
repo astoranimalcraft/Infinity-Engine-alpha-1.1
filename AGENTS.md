@@ -56,6 +56,18 @@ usually fails silently:
 - Analyzer DLLs are matched by suffix (`.Analyzers` / `.Analyzer`), and the CLI executable name comes
   from `typeof(Infinity.Cli.CliProtocol).Assembly` (`CliServer.WriteLauncher`).
 - Prefer `type.Assembly == typeof(...).Assembly` over comparing `GetName().Name` to `Infinity.*`.
+- Script templates (`Prowl.Editor/Resources/*.cstemplate`) are compiled by the user's project, so their
+  usings must be `Infinity.Runtime` / `Infinity.Runtime.Resources` / `Infinity.Vector`. A stale
+  `using Prowl.Runtime;` makes every new script fail to build, which also breaks drag and drop: the
+  component type never exists, so dropping a script on an object silently does nothing.
+
+## Origami draw callbacks run without the theme
+
+`EditorApplication.EndGui` pops the editor's Origami theme (`_origamiScope.Dispose()`) before Paper
+flushes the frame's draw callbacks, so `Origami.Current` inside a `paper.Draw(...)` callback is the
+empty root theme: no fonts, no colours. Resolve theme values while building widgets (as
+`CodeEditor.Build` does for its font), never inside the draw callback. A draw-time
+`Origami.Current.Mono` lookup is what made the script editor render nothing but its background.
 
 ## Headless editor checks
 

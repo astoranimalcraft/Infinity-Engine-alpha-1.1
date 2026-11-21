@@ -1,4 +1,4 @@
-using Prowl.Runtime;
+using Infinity.Runtime;
 
 [CreateAssetMenu("{[className]}", Extension = ".asset")]
 public class {[className]} : EngineObject

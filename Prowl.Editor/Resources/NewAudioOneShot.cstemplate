@@ -1,4 +1,4 @@
-using Prowl.Runtime;
+using Infinity.Runtime;
 
 [RequireComponent(typeof(AudioSource))]
 public class {[className]} : Component

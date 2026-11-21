@@ -1,7 +1,7 @@
 using System;
 
-using Prowl.Runtime;
-using Prowl.Vector;
+using Infinity.Runtime;
+using Infinity.Vector;
 
 public class {[className]} : Component
 {
