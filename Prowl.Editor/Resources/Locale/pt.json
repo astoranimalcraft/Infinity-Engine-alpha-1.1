@@ -10,7 +10,6 @@
   "panel.project": "Projeto",
   "panel.project_settings": "Configuracoes do Projeto",
   "panel.scene": "Cena",
-
   "save.auto_saved": "Salvo automaticamente",
   "save.cant_play_mode": "Nao e possivel salvar no modo de jogo",
   "save.cant_play_mode_msg": "Saia do modo de jogo para salvar sua cena ou prefab.",
@@ -23,7 +22,6 @@
   "save.prefab": "Prefab: {{name}}",
   "save.saved": "Salvo",
   "save.scene": "Cena: {{name}}",
-
   "scene.show_grid": "Mostrar grade",
   "scene.show_gizmos": "Mostrar gizmos",
   "scene.post_processing": "Pos-processamento",
@@ -60,7 +58,6 @@
   "scene.pivot_center": "Pivo: Centro",
   "scene.orientation_local": "Orientacao: Local",
   "scene.settings": "Configuracoes de vista",
-
   "game.resolution": "Resolucao",
   "game.show_stats": "Mostrar estatisticas",
   "play.paused_on_error": "Pausado",
@@ -81,7 +78,6 @@
   "game.resume": "Retomar",
   "game.step": "Avancar um quadro",
   "game.settings": "Configuracoes do jogo",
-
   "dialog.delete_assets": "Excluir Assets",
   "dialog.unsaved_changes": "Alteracoes nao salvas",
   "dialog.unsaved_changes_body": "Estes itens tem alteracoes nao salvas:",
@@ -98,11 +94,9 @@
   "dialog.unapplied_settings_body": "\"{{name}}\" tem configuracoes de importacao nao aplicadas. Aplicar ou reverter para o disco?",
   "dialog.apply": "Aplicar",
   "dialog.revert": "Reverter",
-
   "hierarchy.delete": "Excluir",
   "hierarchy.duplicate": "Duplicar",
   "hierarchy.rename": "Renomear",
-
   "project.copy_path": "Copiar Caminho",
   "project.cut": "Recortar",
   "project.copy": "Copiar",
@@ -119,7 +113,6 @@
   "project.compare": "Comparar",
   "project.regenerate_project_files": "Regenerar arquivos de projeto",
   "project.options": "Opcoes",
-
   "toast.cursor_locked": "Cursor Bloqueado",
   "toast.cursor_locked_msg": "Pressione Escape para liberar.",
   "toast.cursor_lock_failed": "Falha ao Bloquear Cursor",
@@ -130,7 +123,6 @@
   "toast.prefab_create_failed_body": "Nao foi possivel salvar '{name}' como prefab. Veja o console.",
   "toast.rename_exists": "Um arquivo ou pasta com o nome '{{name}}' ja existe.",
   "toast.rename_failed": "Falha ao Renomear",
-
   "launcher.search": "Buscar projetos",
   "launcher.open_project": "Abrir projeto",
   "launcher.new_project": "Novo projeto",
@@ -159,7 +151,6 @@
   "launcher.migrate_failed_title": "Falha na migracao",
   "launcher.newer_title": "Projeto mais recente",
   "launcher.newer_body": "'{{name}}' foi salvo com {{version}}, que e mais recente que este editor ({{current}}). Atualize o editor para abri-lo.",
-
   "launcher.tip_label": "Dica:",
   "launcher.tip.orbit": "Segure Alt e arraste com o botao esquerdo do mouse para orbitar a camera da Cena.",
   "launcher.tip.dolly": "Segure Alt e arraste com o botao direito do mouse para aproximar ou afastar a vista da Cena.",
@@ -186,7 +177,6 @@
   "launcher.tip.component_menu": "Clique com o botao direito no cabecalho de um componente no Inspetor para reiniciar, remover ou reordena-lo.",
   "launcher.tip.escape_unlock": "Pressione Escape para liberar o cursor sempre que uma vista de jogo o tiver bloqueado.",
   "launcher.tip.nuget": "Adicione pacotes NuGet editando Directory.Build.props na raiz do seu projeto.",
-
   "console.clear": "Limpar",
   "console.collapse": "Agrupar",
   "console.filter": "Filtrar...",
@@ -202,7 +192,6 @@
   "console.copy_message": "Copiar mensagem",
   "console.open_source": "Abrir origem",
   "console.copy_with_stack": "Copiar com stack trace",
-
   "inspector.nothing_selected": "Nada selecionado",
   "inspector.nothing_selected_hint": "Selecione um asset ou objeto para inspecionar.",
   "inspector.selection": "Selecao",
@@ -237,7 +226,6 @@
   "inspector.message": "Mensagem",
   "inspector.stack_trace": "Rastreamento de pilha",
   "inspector.options": "Opcoes do componente",
-
   "hierarchy.back": "Voltar",
   "hierarchy.save_and_exit": "Salvar e Sair",
   "hierarchy.no_scene_loaded": "Nenhuma cena carregada",
@@ -272,7 +260,6 @@
   "hierarchy.enable_all": "Ativar tudo",
   "hierarchy.disable": "Desativar",
   "hierarchy.enable": "Ativar",
-
   "inspector.static": "Estatico",
   "inspector.tag": "Tag",
   "inspector.layer": "Camada",
@@ -314,7 +301,6 @@
   "inspector.missing": "Ausente",
   "inspector.nested_prefab": "Prefab aninhado: {{name}}",
   "inspector.prefab": "Prefab: {{name}}",
-
   "menu.file": "Arquivo",
   "menu.file.new_scene": "Nova cena",
   "menu.file.open_scene": "Abrir cena",
@@ -336,7 +322,6 @@
   "menu.assets.refresh": "Atualizar",
   "menu.assets.reimport_all": "Reimportar tudo",
   "menu.assets.reload_scripts": "Recarregar scripts (Reinicio)",
-
   "launcher.tab_recent": "Recentes",
   "launcher.recent_projects": "Projetos recentes",
   "launcher.open": "Abrir",
@@ -358,7 +343,6 @@
   "editor.filter_scene": "Arquivos de cena (*.scene)",
   "editor.filter_package": "ProwlPackage (*.prowlpackage)",
   "menu.window": "Janela",
-
   "popup.search_components": "Pesquisar componentes...",
   "popup.no_components": "Nenhum componente correspondente",
   "popup.search_shaders": "Pesquisar shaders...",
@@ -372,7 +356,6 @@
   "hierarchy.prefab_fallback": "Prefab",
   "inspector.unknown": "Desconhecido",
   "inspector.guid": "GUID",
-
   "gameview.sec_target": "ALVO",
   "gameview.sec_shadows": "SOMBRAS",
   "gameview.sec_postfx": "POST FX",
@@ -407,7 +390,6 @@
   "project.delete_confirm_body": "Tem certeza de que deseja excluir {{names}}?\nEsta acao nao pode ser desfeita.",
   "project.drop_create_prefab": "Solte para criar um Prefab em {{folder}}",
   "project.drop_move": "Solte para mover para {{folder}}",
-
   "common.cancel": "Cancelar",
   "build.scenes_header": "Cenas na compilacao",
   "build.add_open": "Adicionar aberta",
@@ -491,7 +473,6 @@
   "env.toast_bake_busy_msg": "Outra cena ja esta sendo bakeada. Aguarde a conclusao antes de iniciar outra.",
   "env.toast_bake_untitled": "Salve a cena primeiro",
   "env.toast_bake_untitled_msg": "'{{name}}' ainda nao tem arquivo, e seus lightmaps sao gravados ao lado dele.",
-
   "pref.general": "Geral",
   "pref.language": "Idioma",
   "pref.projects_path": "Caminho padrao de projetos",
@@ -651,7 +632,6 @@
   "package.imported_title": "Pacote importado",
   "package.imported_msg": "{{count}} assets importados",
   "package.imported_msg_failed": "{{count}} assets importados ({{failed}} falharam)",
-
   "pref.window_opacity": "Opacidade da janela",
   "pref.glass_blur": "Desfoque de vidro",
   "pref.drop_shadows": "Sombras",
@@ -661,7 +641,6 @@
   "pref.animated_bg": "Fundo animado",
   "pref.anti_aliasing": "Anti-aliasing",
   "pref.theme_filter": "Tema Prowl",
-
   "pref.performance": "Desempenho",
   "pref.vsync": "VSync",
   "pref.frame_rate_limit": "Limite de quadros",
@@ -672,11 +651,7 @@
   "pref.clear_cache": "Cache do editor",
   "pref.clear_cache_btn": "Limpar cache e redefinir layout",
   "pref.clear_cache_done": "Miniaturas e layout limpos. O tour sera reproduzido novamente na proxima inicializacao.",
-
   "header.theme_settings": "Configuracoes de tema",
-
-
-
   "editor.untitled_scene": "Sem titulo",
   "editor.stat_selected": "Itens selecionados",
   "editor.stat_memory": "Memoria gerenciada",
@@ -687,7 +662,6 @@
   "editor.git_clean": "Arvore de trabalho limpa ({{branch}})",
   "editor.git_dirty": "Alteracoes nao confirmadas ({{branch}})",
   "launcher.no_results": "Nenhum projeto corresponde a sua busca",
-
   "frame_stats.pause_tip": "Pausar: para de adicionar colunas para o grafico ficar parado",
   "frame_stats.resume_tip": "Retomar a visualizacao ao vivo",
   "frame_stats.clear_tip": "Limpar o grafico e comecar a coletar de novo",
@@ -755,5 +729,47 @@
   "frame_stats.desc_render_wait": "Espera para a thread de renderizacao terminar e apresentar os quadros anteriores, VSync incluido. Valores altos sem VSync indicam que a renderizacao e o gargalo",
   "frame_stats.desc_idle": "O limitador de quadros segurando a taxa de quadros",
   "frame_stats.desc_gc": "Pausas da coleta de lixo",
-  "frame_stats.desc_other": "Tempo de quadro que nenhuma categoria reivindicou"
+  "frame_stats.desc_other": "Tempo de quadro que nenhuma categoria reivindicou",
+  "panel.undo_history": "Histórico de Desfazer",
+  "undo_history.edit": "Histórico de edição",
+  "undo_history.play": "Histórico do modo de reprodução",
+  "undo_history.prefab": "Histórico do prefab",
+  "undo_history.start": "Início",
+  "scene.gizmos": "Tipos de gizmo",
+  "scene.gizmos.none_hidden": "Todos os tipos de componente mostram seus gizmos",
+  "scene.gizmos.hidden_count": "{{count}} tipos ocultos. Mostrar todos",
+  "scene.gizmos.none": "Nenhum componente desenha gizmos",
+  "scene.gizmos.search": "Pesquisar tipos de gizmo",
+  "scene.gizmos.no_match": "Nenhum tipo de gizmo corresponde",
+  "scene.camera_preview_hide": "Ocultar prévia da câmera",
+  "scene.camera_preview_show": "Mostrar prévia da câmera",
+  "scene.camera_preview_resize": "Arraste para redimensionar",
+  "scene.orientation_global": "Orientação: global",
+  "scene.rotation_snap": "Encaixe de rotação",
+  "scene.grid_snap": "Encaixe na grade",
+  "inspector.edit_script": "Editar script",
+  "popup.new_component": "Novo componente",
+  "popup.new_component_named": "Novo componente '{{name}}'",
+  "env.volumetric_fog": "Neblina volumétrica",
+  "env.enabled": "Ativado",
+  "env.base_height": "Altura base",
+  "env.height_falloff": "Queda com a altura",
+  "env.albedo": "Albedo",
+  "env.anisotropy": "Anisotropia",
+  "env.ambient_scale": "Escala ambiente",
+  "env.distance": "Distância",
+  "env.slices": "Fatias de profundidade",
+  "env.temporal_blend": "Mistura temporal",
+  "env.volumetric_clouds": "Nuvens volumétricas",
+  "env.coverage": "Cobertura",
+  "env.altitude": "Altitude",
+  "env.thickness": "Espessura",
+  "env.wind_speed": "Velocidade do vento",
+  "env.wind_direction": "Direção do vento",
+  "env.sun_brightness": "Brilho do sol",
+  "env.ambient_brightness": "Brilho ambiente",
+  "env.temporal": "Temporal",
+  "env.shadow_resolution": "Resolução da sombra",
+  "env.high_layer": "Camada superior",
+  "newscript.err_type_exists": "Já existe uma classe chamada {{name}} nos scripts do projeto."
 }

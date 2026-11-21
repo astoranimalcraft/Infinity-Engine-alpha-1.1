@@ -766,10 +766,18 @@ public class SceneViewPanel : DockPanel
         if (Infinity.OrigamiUI.Gizmo.GizmoUtils.WorldToScreen(rect, mvp, icon.Center + right * icon.Scale) is not { } edge) return;
 
         float size = Float2.Distance(edge, center);
-        if (size < 2f || size > 4096f) return;
+        if (size > 4096f) return;
+        // A distant icon would be a couple of pixels, which reads as nothing at all: keep a floor so it stays visible
+        // and clickable, the same way the picking code does.
+        size = MathF.Max(size, GizmoMinPickPixels);
 
+        // The brush maps one texel per world unit unless told otherwise, so without this the icon samples a few
+        // texels around the origin instead of the whole image and effectively draws nothing.
         canvas.SetBrushTexture(icon.Texture);
-        canvas.RoundedRectFilled(center.X - size * 0.5f, center.Y - size * 0.5f, size, size, 0f, 0f, 0f, 0f, icon.Color);
+        canvas.SetBrushTextureTransform(
+            Transform2D.CreateTranslation(center.X - size * 0.5f, center.Y + size * 0.5f) *
+            Transform2D.CreateScale(size, -size));
+        canvas.RectFilled(center.X - size * 0.5f, center.Y - size * 0.5f, size, size, icon.Color);
         canvas.ClearBrushTexture();
     }
 

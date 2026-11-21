@@ -30,6 +30,12 @@ public partial class AnimationTimelinePanel
     private ElementHandle _stripHandle;
     private ElementHandle _curveHandle;
 
+    // Channels the user turned off in the curve view, as one bit each, and the range the drag is holding still.
+    private int _curveHidden;
+    private bool _curveFrozen;
+    private float _curveFrozenMin = -1f;
+    private float _curveFrozenMax = 1f;
+
     /// <summary>Seconds across the strip at the current zoom.</summary>
     private float VisibleSeconds => MathF.Max(0.01f, _stripWidth / _zoom);
 
@@ -146,21 +152,37 @@ public partial class AnimationTimelinePanel
         ClampScroll();
     }
 
-    private void CurvePress(ClickEvent e)
+    private void CurvePress(ClickEvent e, Paper paper)
     {
         if (_track == null || _player.IsNotValid()) return;
+        paper.SetFocus(_curveHandle);
 
         float x = (float)e.RelativePosition.X;
         float y = (float)e.RelativePosition.Y;
         float width = MathF.Max(1f, (float)e.ElementRect.Size.X);
         float height = MathF.Max(1f, (float)e.ElementRect.Size.Y);
 
-        float best = 9f;
+        // The channel chips sit over the plot, so they take the click before any key does.
+        for (int c = 0; c < Math.Min(4, _track.Channels); c++)
+        {
+            if (!CurveChipHit(c, x, y)) continue;
+            _curveHidden ^= 1 << c;
+            return;
+        }
+
+        // The value range is fitted from what is on screen. Fitting it again while a drag moves a key would move the
+        // mapping under the pointer, so it stays where it was for the whole drag.
+        _curveFrozen = true;
+        _curveFrozenMin = _curveMin;
+        _curveFrozenMax = _curveMax;
+
+        float best = 12f;
         int channel = -1;
         int index = -1;
 
         for (int c = 0; c < _track.Channels; c++)
         {
+            if (CurveChannelHidden(c)) continue;
             AnimationCurve curve = _track.CurveFor(c);
             for (int i = 0; i < curve.Count; i++)
             {
@@ -175,9 +197,26 @@ public partial class AnimationTimelinePanel
             }
         }
 
+        if (channel < 0)
+        {
+            // Empty space adds a key there, so a curve can be built without going back to the strip for every key.
+            channel = FirstVisibleCurveChannel();
+            if (channel < 0)
+            {
+                _curveFrozen = false;
+                return;
+            }
+
+            float time = Math.Clamp(_player!.Take.Snap(XToTime(x)), 0f, _player.Take.Duration);
+            index = _track.CurveFor(channel).AddKey(time, PixelToValue(y, height));
+        }
+
         _curveChannel = channel;
         _curveKey = index;
-        _drag = channel >= 0 ? DragMode.Curve : DragMode.None;
+        _drag = DragMode.Curve;
+
+        _playhead = Math.Clamp(_track.CurveFor(channel)[index].Time, 0f, _player!.Take.Duration);
+        _player.Sample(_playhead);
     }
 
     private void CurveDrag(DragEvent e)
@@ -187,7 +226,6 @@ public partial class AnimationTimelinePanel
         AnimationCurve curve = _track.CurveFor(_curveChannel);
         if (_curveKey < 0 || _curveKey >= curve.Count) return;
 
-        float width = MathF.Max(1f, (float)e.ElementRect.Size.X);
         float height = MathF.Max(1f, (float)e.ElementRect.Size.Y);
         float time = Math.Clamp(_player!.Take.Snap(XToTime((float)e.RelativePosition.X)), 0f, _player.Take.Duration);
 
@@ -195,8 +233,47 @@ public partial class AnimationTimelinePanel
         key.Time = time;
         key.Value = PixelToValue((float)e.RelativePosition.Y, height);
         _curveKey = curve.MoveKey(_curveKey, key);
+        _playhead = time;
 
         _player.Sample(_playhead);
+    }
+
+    private void CurveDragEnd()
+    {
+        _drag = DragMode.None;
+        _curveFrozen = false;
+    }
+
+    /// <summary>Removes the key selected in the curve view, if any, and keeps the selection on a neighbour.</summary>
+    private void DeleteCurveKey()
+    {
+        if (_track == null || _curveChannel < 0 || _curveKey < 0) return;
+
+        AnimationCurve curve = _track.CurveFor(_curveChannel);
+        if (_curveKey >= curve.Count) return;
+
+        curve.RemoveKey(_curveKey);
+        _curveKey = curve.Count == 0 ? -1 : Math.Min(_curveKey, curve.Count - 1);
+        if (_player.IsValid()) _player!.Sample(_playhead);
+    }
+
+    private bool CurveChannelHidden(int channel) => (_curveHidden & (1 << channel)) != 0;
+
+    private int FirstVisibleCurveChannel()
+    {
+        for (int c = 0; c < _track!.Channels; c++)
+            if (!CurveChannelHidden(c)) return c;
+        return -1;
+    }
+
+    /// <summary>Where a channel's toggle chip sits, relative to the curve view's top-left corner.</summary>
+    private static (float X, float Y, float W, float H) CurveChipRect(int channel)
+        => (8f + channel * 24f, 4f, 20f, 13f);
+
+    private static bool CurveChipHit(int channel, float x, float y)
+    {
+        (float cx, float cy, float cw, float ch) = CurveChipRect(channel);
+        return x >= cx && x <= cx + cw && y >= cy && y <= cy + ch;
     }
 
     private static bool IsShiftDown(Paper paper)
@@ -380,17 +457,22 @@ public partial class AnimationTimelinePanel
 
     private (float X, float Y) CurveToPixel(float time, float value, float width, float height)
     {
-        float range = MathF.Max(1e-4f, _curveMax - _curveMin);
+        float range = MathF.Max(1e-4f, CurveRangeMax - CurveRangeMin);
         float x = TimeToX(time);
-        float y = (height - 8f) - (value - _curveMin) / range * (height - 16f) + 4f;
+        float y = (height - 8f) - (value - CurveRangeMin) / range * (height - 16f) + 4f;
         return (x, y);
     }
 
     private float PixelToValue(float y, float height)
     {
-        float range = MathF.Max(1e-4f, _curveMax - _curveMin);
-        return _curveMin + (height - 8f - y) / MathF.Max(1f, height - 16f) * range;
+        float range = MathF.Max(1e-4f, CurveRangeMax - CurveRangeMin);
+        return CurveRangeMin + (height - 8f - y) / MathF.Max(1f, height - 16f) * range;
     }
+
+    /// <summary>The value range in use: the one held still for the drag, or the one fitted to what is on screen.</summary>
+    private float CurveRangeMin => _curveFrozen ? _curveFrozenMin : _curveMin;
+
+    private float CurveRangeMax => _curveFrozen ? _curveFrozenMax : _curveMax;
 
     private void PaintCurves(Canvas canvas, Rect rect, Scribe.FontFile font)
     {
@@ -410,11 +492,13 @@ public partial class AnimationTimelinePanel
             return;
         }
 
-        FitCurveRange();
+        if (!_curveFrozen) FitCurveRange();
         DrawCurveGrid(canvas, left, top, width, height);
 
         for (int c = 0; c < _track.Channels; c++)
         {
+            if (CurveChannelHidden(c)) continue;
+
             AnimationCurve curve = _track.CurveFor(c);
             if (curve.Count == 0) continue;
 
@@ -441,17 +525,56 @@ public partial class AnimationTimelinePanel
 
                 (float px, float py) = CurveToPixel(time, curve[i].Value, width, height);
                 bool selected = c == _curveChannel && i == _curveKey;
-                canvas.CircleFilled(left + px, top + py, selected ? 5f : 3.5f, selected ? EditorTheme.ToColor32(Color.White, 1f) : ink);
+                if (selected)
+                {
+                    canvas.CircleFilled(left + px, top + py, 7f, EditorTheme.ToColor32(EditorTheme.Neutral700, 0.9f));
+                    canvas.CircleFilled(left + px, top + py, 4.5f, EditorTheme.ToColor32(Color.White, 1f));
+                }
+                else
+                {
+                    canvas.CircleFilled(left + px, top + py, 3.5f, ink);
+                }
             }
-
-            canvas.DrawText(ChannelName(c), left + 8f + c * 22f, top + 6f, ink, 9f, font);
         }
 
         float playheadX = left + TimeToX(_playhead);
         if (playheadX >= left && playheadX <= left + width)
             canvas.RectFilled(playheadX - 0.75f, top, 1.5f, height, EditorTheme.ToColor32(EditorTheme.Accent, 0.8f));
 
+        DrawCurveChips(canvas, left, top, font);
+        DrawCurveReadout(canvas, left, top, width, font);
+
         canvas.RestoreState();
+    }
+
+    /// <summary>The per-channel toggles, drawn over the plot so a busy track can be read one channel at a time.</summary>
+    private void DrawCurveChips(Canvas canvas, float left, float top, Scribe.FontFile font)
+    {
+        for (int c = 0; c < Math.Min(4, _track!.Channels); c++)
+        {
+            (float cx, float cy, float cw, float ch) = CurveChipRect(c);
+            bool hidden = CurveChannelHidden(c);
+            canvas.RoundedRectFilled(left + cx, top + cy, cw, ch, 3f,
+                EditorTheme.ToColor32(EditorTheme.Neutral600, hidden ? 0.35f : 0.85f));
+            canvas.DrawText(CurveChannelLabel(c), left + cx + 6.5f, top + cy + 2f,
+                EditorTheme.ToColor32(ChannelColor(c), hidden ? 0.3f : 1f), 9f, font);
+        }
+    }
+
+    /// <summary>The time and value of the selected key, so a drag can be read to the number instead of by eye.</summary>
+    private void DrawCurveReadout(Canvas canvas, float left, float top, float width, Scribe.FontFile font)
+    {
+        if (_track == null || _curveChannel < 0 || _curveKey < 0) return;
+
+        AnimationCurve curve = _track.CurveFor(_curveChannel);
+        if (_curveKey >= curve.Count) return;
+
+        Keyframe key = curve[_curveKey];
+        string text = $"{CurveChannelLabel(_curveChannel)}  {key.Time:0.00}s  {key.Value:0.###}";
+        float boxWidth = 14f + text.Length * 5.2f;
+        float x = left + width - boxWidth - 6f;
+        canvas.RoundedRectFilled(x, top + 4f, boxWidth, 13f, 3f, EditorTheme.ToColor32(EditorTheme.Neutral700, 0.85f));
+        canvas.DrawText(text, x + 5f, top + 6f, EditorTheme.ToColor32(EditorTheme.Ink200, 1f), 9f, font);
     }
 
     private void FitCurveRange()
@@ -479,11 +602,12 @@ public partial class AnimationTimelinePanel
             return;
         }
 
-        float span = max - min;
-        if (span < 1e-3f) span = MathF.Max(0.5f, MathF.Abs(max) * 0.5f);
-
-        _curveMin = min - span * 0.15f;
-        _curveMax = max + span * 0.15f;
+        // Centred with room above and below, and never narrower than half a unit: a range that hugs the keys makes the
+        // curve jump every frame as one of them moves.
+        float span = MathF.Max(max - min, 0.5f);
+        float centre = (min + max) * 0.5f;
+        _curveMin = centre - span * 0.65f;
+        _curveMax = centre + span * 0.65f;
     }
 
     private void DrawCurveGrid(Canvas canvas, float left, float top, float width, float height)
@@ -491,14 +615,13 @@ public partial class AnimationTimelinePanel
         for (int i = 0; i <= 4; i++)
         {
             float y = top + height * i / 4f;
-            bool zero = MathF.Abs(_curveMin) < 1e-4f && i == 4;
-            canvas.RectFilled(left, y, width, 1f, EditorTheme.ToColor32(zero ? EditorTheme.Ink400 : EditorTheme.Ink400, zero ? 0.25f : 0.08f));
+            canvas.RectFilled(left, y, width, 1f, EditorTheme.ToColor32(EditorTheme.Ink400, 0.08f));
         }
 
-        if (_curveMin < 0f && _curveMax > 0f)
+        if (CurveRangeMin < 0f && CurveRangeMax > 0f)
         {
-            float range = _curveMax - _curveMin;
-            float y = top + (height - 8f) - (0f - _curveMin) / range * (height - 16f) + 4f;
+            float range = CurveRangeMax - CurveRangeMin;
+            float y = top + (height - 8f) - (0f - CurveRangeMin) / range * (height - 16f) + 4f;
             canvas.RectFilled(left, y, width, 1f, EditorTheme.ToColor32(EditorTheme.Ink400, 0.25f));
         }
     }
@@ -518,4 +641,9 @@ public partial class AnimationTimelinePanel
         2 => "Z",
         _ => "W",
     };
+
+    /// <summary>How a channel is labelled: colours read as channels, everything else as an axis.</summary>
+    private string CurveChannelLabel(int channel) => _track?.Kind == AnimationTrackKind.TintColor
+        ? channel switch { 0 => "R", 1 => "G", 2 => "B", _ => "A" }
+        : ChannelName(channel);
 }

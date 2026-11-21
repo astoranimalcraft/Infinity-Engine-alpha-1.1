@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See the LICENSE file in the project root for details.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -338,9 +339,35 @@ public static class Window
     }
 
 
+    /// <summary>
+    /// Sets the window icon, which is what the title bar, the taskbar button and the Alt+Tab list show. The editor calls
+    /// this when the project's icon changes, and a player gets it from <see cref="TrySetWindowIcon"/>.
+    /// </summary>
+    public static void SetWindowIcon(IReadOnlyList<Silk.NET.Core.RawImage> icons)
+    {
+        if (icons.Count == 0) return;
+
+        try
+        {
+            var images = new Silk.NET.Core.RawImage[icons.Count];
+            for (int i = 0; i < icons.Count; i++) images[i] = icons[i];
+            InternalWindow.SetWindowIcon(images);
+        }
+        catch { /* the platform may not support icons at all */ }
+    }
+
     // Sets the window icon from a raw-RGBA resource embedded in the entry assembly whose name is "prowl-icon.rgba".
     // Format: int32 count, then per image: int32 width, int32 height, width*height*4 straight-alpha RGBA.
     private static void TrySetWindowIcon()
+    {
+        if (TrySetEmbeddedWindowIcon()) return;
+
+        // A build that shipped an icon file next to the executable is as good as one that embedded it, and it is what
+        // the project settings produce, since the icon has to be readable before any asset is loaded.
+        SetWindowIcon(Infinity.Runtime.Resources.AppIcon.FindNextToExecutable());
+    }
+
+    private static bool TrySetEmbeddedWindowIcon()
     {
         // Note: GLFW for Windows initially creates windows with an icon that is sourced from a specific named
         // resource ("GLFW_ICON"). In a .rc file the needed resource would look like this:
@@ -351,10 +378,10 @@ public static class Window
             var asm = System.Reflection.Assembly.GetEntryAssembly();
             string name = System.Array.Find(asm?.GetManifestResourceNames() ?? System.Array.Empty<string>(),
                 n => n.EndsWith(".prowl-icon.rgba", StringComparison.Ordinal));
-            if (name == null) return;
+            if (name == null) return false;
 
             using Stream? stream = asm!.GetManifestResourceStream(name);
-            if (stream == null) return;
+            if (stream == null) return false;
             using var br = new System.IO.BinaryReader(stream);
 
             int count = br.ReadInt32();
@@ -367,8 +394,11 @@ public static class Window
                 icons[i] = new Silk.NET.Core.RawImage(w, h, pixels);
             }
             InternalWindow.SetWindowIcon(icons);
+            return true;
         }
         catch { /* no icon shipped, or the platform doesn't support it - keep the default */ }
+
+        return false;
     }
 
     public static void OnResize(Vector2D<int> size) => Resize?.Invoke(size);

@@ -288,7 +288,13 @@ public sealed class Volume : Component
     [ShowIf(nameof(IsLocal))] public Float3 Size = new(10f, 10f, 10f);
 
     /// <summary>How far outside the box the volume fades in from nothing, in world units.</summary>
-    [ShowIf(nameof(IsLocal))] public float BlendDistance;
+    [ShowIf(nameof(IsLocal))] public float BlendDistance = 2f;
+
+    /// <summary>
+    /// Eases the fade at both ends instead of running it linearly, so a camera crossing the box edge does not make
+    /// the effect start and stop with a jolt.
+    /// </summary>
+    [ShowIf(nameof(IsLocal))] public bool SmoothBlend = true;
 
     [Range(0f, 1f)] public float Weight = 1f;
 
@@ -347,7 +353,9 @@ public sealed class Volume : Component
 
         float distance = Float3.Distance(Transform.TransformPoint(closest), point);
         float blend = MathF.Max(BlendDistance, 0f);
-        return blend <= 0f || distance >= blend ? 0f : 1f - distance / blend;
+        if (blend <= 0f || distance >= blend) return 0f;
+        float t = 1f - distance / blend;
+        return SmoothBlend ? t * t * (3f - 2f * t) : t;
     }
 
     public override void DrawGizmos()

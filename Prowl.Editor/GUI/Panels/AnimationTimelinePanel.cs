@@ -395,9 +395,9 @@ public partial class AnimationTimelinePanel : DockPanel
                 .Rounded(Origami.Current.Metrics.SmallRounding)
                 .Cursor(PaperCursor.Pointer)
                 .OnPostLayout((handle, _) => _curveHandle = handle)
-                .OnPress(e => CurvePress(e))
+                .OnPress(e => CurvePress(e, paper))
                 .OnDragging(e => CurveDrag(e))
-                .OnDragEnd(_ => _drag = DragMode.None)
+                .OnDragEnd(_ => CurveDragEnd())
                 .OnScroll(e => StripScroll(e, paper))
                 .OnKeyPressed(e => Shortcut(e.Key))
                 .Tooltip("Drag a key to change its time and value.");
@@ -411,6 +411,7 @@ public partial class AnimationTimelinePanel : DockPanel
 
     private void Select(AnimationTrack track)
     {
+        if (!ReferenceEquals(_track, track)) _curveHidden = 0;
         _track = track;
         _curveChannel = -1;
         _curveKey = -1;
@@ -636,7 +637,8 @@ public partial class AnimationTimelinePanel : DockPanel
                 break;
             case PaperKey.Delete:
             case PaperKey.Backspace:
-                DeleteSelectedKeys();
+                if (_curveView && _curveChannel >= 0 && _curveKey >= 0) DeleteCurveKey();
+                else DeleteSelectedKeys();
                 break;
             case PaperKey.Left:
                 StepFrame(-1);
