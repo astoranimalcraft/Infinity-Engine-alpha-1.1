@@ -1,0 +1,15 @@
+using Infinity.Runtime.Resources;
+
+namespace Infinity.Editor.Importers;
+
+/// <summary>
+/// Imports .rendertexture files Echo-serialized RenderTexture descriptions (native Prowl format).
+/// </summary>
+[ImporterFor(".rendertexture")]
+public class RenderTextureImporter : AssetImporter
+{
+    public override int Version => 1;
+    public override EchoSource Source => EchoSource.Text;
+
+    public override bool Import(ImportContext ctx) => ImportHelper.ImportEcho<RenderTexture>(ctx, "render texture");
+}

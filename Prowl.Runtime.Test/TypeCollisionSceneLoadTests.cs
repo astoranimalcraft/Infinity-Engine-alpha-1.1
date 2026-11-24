@@ -1,0 +1,83 @@
+// This file is part of the Infinity Engine
+// Licensed under the MIT License. See the LICENSE file in the project root for details.
+
+using System.Linq;
+
+using Infinity.Echo;
+using Infinity.Runtime.Resources;
+
+using Xunit;
+
+namespace Infinity.Runtime.Test;
+
+public sealed class CollisionProbeComponent : Component
+{
+    public int Marker;
+}
+
+// A component whose type name resolves to a non-Component (a user script "World" binding to
+// Jitter2.World) used to throw out of the flat GameObject array and wipe the whole scene to zero objects.
+public class TypeCollisionSceneLoadTests : RuntimeTestBase
+{
+    private static string JitterWorldName => typeof(Jitter2.World).AssemblyQualifiedName!;
+
+    [Fact]
+    public void FindType_HonorsRecordedAssembly_ForCollidingSimpleName()
+    {
+        Assert.Equal(typeof(Jitter2.World), RuntimeUtils.FindType("World, Jitter2"));
+    }
+
+    [Fact]
+    public void Scene_WithComponentTypeResolvingToNonComponent_StillLoadsEveryObject()
+    {
+        SceneInstance scene = CreateScene();
+
+        GameObject withGoodComp = CreateGameObject("Healthy");
+        withGoodComp.AddComponent<CollisionProbeComponent>().Marker = 7;
+        scene.Add(withGoodComp);
+
+        GameObject willGetBadComp = CreateGameObject("HasBadComponent");
+        scene.Add(willGetBadComp);
+
+        GameObject alsoHealthy = CreateGameObject("AlsoHealthy");
+        scene.Add(alsoHealthy);
+
+        EchoObject echo = scene.ActiveSection.CaptureTree();
+
+        // Give one object a component whose $type resolves to a non-Component (Jitter2.World).
+        InjectBadComponent(echo, "HasBadComponent", JitterWorldName);
+
+        SceneInstance? clone = SceneInstance.Instantiate(SceneContent.Read(echo));
+
+        Assert.NotNull(clone);
+        var objs = clone.Objects.ToList();
+        Assert.Equal(3, objs.Count);
+        Assert.Contains(objs, g => g.Name == "Healthy");
+        Assert.Contains(objs, g => g.Name == "HasBadComponent");
+        Assert.Contains(objs, g => g.Name == "AlsoHealthy");
+
+        // The healthy component still deserializes with its data intact.
+        GameObject healthy = objs.First(g => g.Name == "Healthy");
+        Assert.Equal(7, healthy.GetComponent<CollisionProbeComponent>()!.Marker);
+
+        // The bad component is kept as a MissingComponent so its data survives a re-save.
+        GameObject bad = objs.First(g => g.Name == "HasBadComponent");
+        Assert.Contains(bad.GetComponents<Component>(), c => c is MissingComponent);
+    }
+
+    private static void InjectBadComponent(EchoObject sceneEcho, string goName, string typeName)
+    {
+        foreach (EchoObject go in StoredObjects(sceneEcho).List)
+        {
+            if (!go.TryGet("Name", out EchoObject? n) || n!.StringValue != goName)
+                continue;
+
+            var badComp = EchoObject.NewCompound();
+            badComp.Add("$type", new EchoObject(typeName));
+            go["Components"].ListAdd(badComp);
+            return;
+        }
+
+        Assert.Fail($"GameObject '{goName}' not found in serialized scene");
+    }
+}

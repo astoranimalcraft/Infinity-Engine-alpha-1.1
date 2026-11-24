@@ -1,0 +1,691 @@
+// This file is part of the Infinity Engine
+// Licensed under the MIT License. See the LICENSE file in the project root for details.
+
+using Infinity.Runtime.Resources;
+
+using Xunit;
+
+namespace Infinity.Runtime.Test;
+
+/// <summary>
+/// A test component that tracks all lifecycle events for verification in unit tests.
+/// </summary>
+public class TestLifecycleComponent : Component
+{
+    public List<string> Events { get; } = [];
+
+    public void ClearEvents() => Events.Clear();
+
+    public override void OnAddedToScene()
+    {
+        Events.Add("OnAddedToScene");
+    }
+
+    public override void OnRemovedFromScene()
+    {
+        Events.Add("OnRemovedFromScene");
+    }
+
+    public override void OnEnable()
+    {
+        Events.Add("OnEnable");
+    }
+
+    public override void OnDisable()
+    {
+        Events.Add("OnDisable");
+    }
+
+    public override void Start()
+    {
+        Events.Add("Start");
+    }
+
+    protected override void OnDispose()
+    {
+        Events.Add("OnDispose");
+        base.OnDispose();
+    }
+}
+
+/// <summary>
+/// Comprehensive tests for Component lifecycle methods.
+/// Ported from the LifecycleTest sample project.
+/// Scene/GameObject creation, play-mode setup and teardown come from <see cref="RuntimeTestBase"/>.
+/// </summary>
+public class LifecycleTests : RuntimeTestBase
+{
+    private sealed class StartOrderComponent : Component
+    {
+        public readonly List<string> Events = [];
+        public override void Start() => Events.Add("Start");
+        public override void FixedUpdate() => Events.Add("FixedUpdate");
+    }
+
+    // Adding a component to an object already in an active scene must fire OnAddedToScene (and OnEnable).
+    [Fact]
+    public void AddComponent_ToObjectInActiveScene_FiresOnAddedToScene()
+    {
+        SceneInstance scene = CreateScene(enable: true);
+        GameObject go = CreateGameObject();
+        scene.Add(go); // in the scene before the component is added
+
+        TestLifecycleComponent comp = go.AddComponent<TestLifecycleComponent>();
+
+        Assert.Contains("OnAddedToScene", comp.Events);
+        Assert.Contains("OnEnable", comp.Events);
+    }
+
+    // Start must run before a component's first FixedUpdate.
+    [Fact]
+    public void FixedUpdate_RunsStartBeforeFirstFixedUpdate()
+    {
+        SceneInstance scene = CreateScene(enable: true);
+        GameObject go = CreateGameObject();
+        StartOrderComponent comp = go.AddComponent<StartOrderComponent>();
+        scene.Add(go);
+
+        scene.FixedUpdate();
+
+        Assert.Contains("FixedUpdate", comp.Events);
+        Assert.True(comp.Events.IndexOf("Start") >= 0 && comp.Events.IndexOf("Start") < comp.Events.IndexOf("FixedUpdate"),
+            $"Start must precede FixedUpdate; got [{string.Join(", ", comp.Events)}]");
+    }
+
+    /// <summary>
+    /// Test 3: Adding GameObject to ENABLED Scene
+    /// Expected: OnAddedToScene called, then OnEnable called (scene enabled)
+    /// </summary>
+    [Fact]
+    public void AddingGameObject_ToEnabledScene_CallsOnAddedToSceneAndOnEnable()
+    {
+        SceneInstance scene = CreateScene();
+        scene.Activate();
+        GameObject go = CreateGameObject();
+        TestLifecycleComponent comp = go.AddComponent<TestLifecycleComponent>();
+
+        scene.Add(go);
+
+        Assert.Equal(2, comp.Events.Count);
+        Assert.Equal("OnAddedToScene", comp.Events[0]);
+        Assert.Equal("OnEnable", comp.Events[1]);
+    }
+
+    /// <summary>
+    /// Test 4: Toggling Component Enabled State
+    /// Expected: OnDisable called when disabled, OnEnable called when re-enabled
+    /// </summary>
+    [Fact]
+    public void TogglingComponentEnabled_CallsOnDisableAndOnEnable()
+    {
+        SceneInstance scene = CreateScene();
+        scene.Activate();
+        GameObject go = CreateGameObject();
+        TestLifecycleComponent comp = go.AddComponent<TestLifecycleComponent>();
+        scene.Add(go);
+        comp.ClearEvents();
+
+        // Disable component
+        comp.Enabled = false;
+        Assert.Contains("OnDisable", comp.Events);
+
+        comp.ClearEvents();
+
+        // Re-enable component
+        comp.Enabled = true;
+        Assert.Contains("OnEnable", comp.Events);
+    }
+
+    /// <summary>
+    /// Test 7: Toggling States in DISABLED Scene
+    /// Expected: No OnDisable/OnEnable (scene disabled)
+    /// </summary>
+    [Fact]
+    public void TogglingStates_InDisabledScene_DoesNotCallOnEnableOrOnDisable()
+    {
+        SceneInstance scene = CreateScene();
+        GameObject go = CreateGameObject();
+        TestLifecycleComponent comp = go.AddComponent<TestLifecycleComponent>();
+        scene.Add(go);
+        comp.ClearEvents();
+
+        // Disable component in disabled scene
+        comp.Enabled = false;
+        Assert.DoesNotContain("OnDisable", comp.Events);
+
+        // Re-enable component in disabled scene
+        comp.Enabled = true;
+        Assert.DoesNotContain("OnEnable", comp.Events);
+    }
+
+    /// <summary>
+    /// Test 8: Re-enabling Scene
+    /// Expected: OnEnable called for all enabled components
+    /// </summary>
+    [Fact]
+    public void ReEnablingScene_CallsOnEnableForAllEnabledComponents()
+    {
+        SceneInstance scene = CreateScene();
+        scene.Activate();
+        GameObject go = CreateGameObject();
+        TestLifecycleComponent comp = go.AddComponent<TestLifecycleComponent>();
+        scene.Add(go);
+        scene.Deactivate();
+        comp.ClearEvents();
+
+        scene.Activate();
+
+        Assert.Contains("OnEnable", comp.Events);
+    }
+
+    /// <summary>
+    /// Test 9: Parent-Child Hierarchy Enabled State
+    /// Expected: Child components follow parent enabled state
+    /// </summary>
+    [Fact]
+    public void ParentChildHierarchy_ChildFollowsParentEnabledState()
+    {
+        SceneInstance scene = CreateScene();
+        scene.Activate();
+
+        GameObject parent = CreateGameObject("Parent");
+        TestLifecycleComponent parentComp = parent.AddComponent<TestLifecycleComponent>();
+        scene.Add(parent);
+
+        GameObject child = CreateGameObject("Child");
+        TestLifecycleComponent childComp = child.AddComponent<TestLifecycleComponent>();
+
+        // Parent child to parent object
+        child.SetParent(parent);
+
+        Assert.Contains("OnAddedToScene", childComp.Events);
+        Assert.Contains("OnEnable", childComp.Events);
+
+        parentComp.ClearEvents();
+        childComp.ClearEvents();
+
+        // Disable parent - both should get OnDisable
+        parent.Enabled = false;
+        Assert.Contains("OnDisable", parentComp.Events);
+        Assert.Contains("OnDisable", childComp.Events);
+
+        parentComp.ClearEvents();
+        childComp.ClearEvents();
+
+        // Re-enable parent - both should get OnEnable
+        parent.Enabled = true;
+        Assert.Contains("OnEnable", parentComp.Events);
+        Assert.Contains("OnEnable", childComp.Events);
+    }
+
+    /// <summary>
+    /// Test 10: Removing GameObject from Scene
+    /// Expected: OnDisable (if enabled), then OnRemovedFromScene
+    /// </summary>
+    [Fact]
+    public void RemovingGameObject_FromScene_CallsOnDisableAndOnRemovedFromScene()
+    {
+        SceneInstance scene = CreateScene();
+        scene.Activate();
+        GameObject go = CreateGameObject();
+        TestLifecycleComponent comp = go.AddComponent<TestLifecycleComponent>();
+        scene.Add(go);
+        comp.ClearEvents();
+
+        scene.Remove(go);
+
+        Assert.Equal(2, comp.Events.Count);
+        Assert.Equal("OnDisable", comp.Events[0]);
+        Assert.Equal("OnRemovedFromScene", comp.Events[1]);
+    }
+
+    /// <summary>
+    /// Test 11: Disposing GameObject
+    /// Expected: OnDisable (if enabled), OnDispose (if OnEnable was called)
+    /// Note: OnDispose is called if the component has previously had OnEnable called
+    /// </summary>
+    [Fact]
+    public void DisposingGameObject_CallsOnDisableAndOnDispose()
+    {
+        SceneInstance scene = CreateScene();
+        scene.Activate();
+        GameObject go = CreateGameObject();
+        TestLifecycleComponent comp = go.AddComponent<TestLifecycleComponent>();
+        scene.Add(go);
+        Assert.True(comp.HasBeenEnabled); // OnEnable was called when added to active scene
+        comp.ClearEvents();
+
+        go.Dispose();
+
+        Assert.Contains("OnDisable", comp.Events);
+        Assert.Contains("OnDispose", comp.Events);
+    }
+
+    /// <summary>
+    /// Test 11b: Disposing a GameObject whose component was never enabled.
+    /// Expected: no OnDisable (it was never enabled), but OnDispose still runs. A component can
+    /// acquire resources from its constructor or from a method called before it was ever enabled,
+    /// so disposal is not conditional on OnEnable having happened.
+    /// </summary>
+    [Fact]
+    public void DisposingGameObject_NeverEnabled_StillDisposes()
+    {
+        SceneInstance scene = CreateScene();
+        // Scene is NOT enabled
+        GameObject go = CreateGameObject();
+        TestLifecycleComponent comp = go.AddComponent<TestLifecycleComponent>();
+        scene.Add(go);
+        Assert.False(comp.HasBeenEnabled); // OnEnable was NOT called
+        comp.ClearEvents();
+
+        go.Dispose();
+
+        Assert.DoesNotContain("OnDisable", comp.Events);
+        Assert.Contains("OnDispose", comp.Events);
+        Assert.True(comp.IsDisposed);
+    }
+
+    /// <summary>
+    /// Test 12: Removing Component
+    /// Expected: OnDisable (if enabled), OnDispose (if OnEnable was called)
+    /// </summary>
+    [Fact]
+    public void RemovingComponent_CallsOnDisableAndOnDispose()
+    {
+        SceneInstance scene = CreateScene();
+        scene.Activate();
+        GameObject go = CreateGameObject();
+        TestLifecycleComponent comp = go.AddComponent<TestLifecycleComponent>();
+        scene.Add(go);
+        Assert.True(comp.HasBeenEnabled);
+        comp.ClearEvents();
+
+        go.RemoveComponent(comp);
+        Assert.Contains("OnDisable", comp.Events);
+
+        // The component is only disposed once the frame's destroy queue is drained.
+        EngineObject.ProcessDestroyed();
+        Assert.Contains("OnDispose", comp.Events);
+    }
+
+    /// <summary>
+    /// Test 12b: Removing a component that was never enabled.
+    /// Expected: no OnDisable, but it is still disposed. See
+    /// <see cref="DisposingGameObject_NeverEnabled_StillDisposes"/>.
+    /// </summary>
+    [Fact]
+    public void RemovingComponent_NeverEnabled_StillDisposes()
+    {
+        SceneInstance scene = CreateScene();
+        // Scene is NOT enabled
+        GameObject go = CreateGameObject();
+        TestLifecycleComponent comp = go.AddComponent<TestLifecycleComponent>();
+        scene.Add(go);
+        Assert.False(comp.HasBeenEnabled);
+        comp.ClearEvents();
+
+        go.RemoveComponent(comp);
+        EngineObject.ProcessDestroyed();
+
+        Assert.DoesNotContain("OnDisable", comp.Events);
+        Assert.Contains("OnDispose", comp.Events);
+        Assert.True(comp.IsDisposed);
+    }
+
+    // ---- Reentrancy from lifecycle callbacks ----
+
+    private sealed class AddsComponentOnEnable : Component
+    {
+        public override void OnEnable() => GameObject.AddComponent<PlainComponent>();
+    }
+
+    private sealed class RemovesComponentOnDisable : Component
+    {
+        public Component? Victim;
+        public override void OnDisable() => GameObject.RemoveComponent(Victim!);
+    }
+
+    // The hierarchy state walk used to enumerate the live component list, so a callback that
+    // touched the list threw "Collection was modified".
+    [Fact]
+    public void OnEnable_CanAddAComponent()
+    {
+        SceneInstance scene = CreateScene(enable: true);
+        GameObject go = CreateGameObject();
+        go.Enabled = false;
+        go.AddComponent<AddsComponentOnEnable>();
+        scene.Add(go);
+
+        go.Enabled = true;
+
+        Assert.Single(go.GetComponents<PlainComponent>());
+    }
+
+    [Fact]
+    public void OnDisable_CanRemoveAComponent()
+    {
+        SceneInstance scene = CreateScene(enable: true);
+        GameObject go = CreateGameObject();
+        RemovesComponentOnDisable driver = go.AddComponent<RemovesComponentOnDisable>();
+        driver.Victim = go.AddComponent<PlainComponent>();
+        scene.Add(go);
+
+        go.Enabled = false;
+
+        Assert.Empty(go.GetComponents<PlainComponent>());
+    }
+
+    [Fact]
+    public void Enabled_OnAComponentWithNoGameObject_DoesNotThrow()
+    {
+        var comp = new PlainComponent();
+
+        comp.Enabled = false;
+
+        Assert.False(comp.Enabled);
+        Assert.False(comp.EnabledInHierarchy);
+    }
+
+    /// <summary>
+    /// Test 13: Multiple Scene Management - Moving object between scenes
+    /// Expected: OnDisable (from source), OnRemovedFromScene, OnAddedToScene, OnEnable (to target)
+    /// </summary>
+    [Fact]
+    public void MovingObject_BetweenEnabledScenes_CallsProperLifecycleSequence()
+    {
+        SceneInstance scene1 = CreateScene();
+        SceneInstance scene2 = CreateScene();
+        scene1.Activate();
+        scene2.Activate();
+
+        GameObject go = CreateGameObject();
+        TestLifecycleComponent comp = go.AddComponent<TestLifecycleComponent>();
+        scene1.Add(go);
+        comp.ClearEvents();
+
+        // Move from scene1 to scene2
+        scene2.Add(go);
+
+        // Verify the sequence: OnDisable -> OnRemovedFromScene -> OnAddedToScene -> OnEnable
+        Assert.Equal(4, comp.Events.Count);
+        Assert.Equal("OnDisable", comp.Events[0]);
+        Assert.Equal("OnRemovedFromScene", comp.Events[1]);
+        Assert.Equal("OnAddedToScene", comp.Events[2]);
+        Assert.Equal("OnEnable", comp.Events[3]);
+    }
+
+    /// <summary>
+    /// Test 13b: Multiple Scene Management - Adding to disabled scene then enabling
+    /// Expected: OnAddedToScene (no OnEnable), then OnEnable when scene enabled
+    /// </summary>
+    [Fact]
+    public void AddingToDisabledScene_ThenEnabling_CallsCorrectSequence()
+    {
+        SceneInstance scene = CreateScene();
+        GameObject go = CreateGameObject();
+        TestLifecycleComponent comp = go.AddComponent<TestLifecycleComponent>();
+
+        scene.Add(go);
+        Assert.Contains("OnAddedToScene", comp.Events);
+        Assert.DoesNotContain("OnEnable", comp.Events);
+
+        comp.ClearEvents();
+        scene.Activate();
+        Assert.Contains("OnEnable", comp.Events);
+    }
+
+    /// <summary>
+    /// Test 14: Disabled GameObject Added to Enabled Scene
+    /// Expected: OnAddedToScene only, no OnEnable (GameObject disabled)
+    /// </summary>
+    [Fact]
+    public void DisabledGameObject_AddedToEnabledScene_CallsOnAddedToSceneOnly()
+    {
+        SceneInstance scene = CreateScene();
+        scene.Activate();
+        GameObject go = CreateGameObject();
+        go.Enabled = false;
+        TestLifecycleComponent comp = go.AddComponent<TestLifecycleComponent>();
+
+        scene.Add(go);
+
+        Assert.Contains("OnAddedToScene", comp.Events);
+        Assert.DoesNotContain("OnEnable", comp.Events);
+    }
+
+    /// <summary>
+    /// Test 14b: Enabling previously disabled GameObject in active scene
+    /// Expected: OnEnable called when GameObject is enabled
+    /// </summary>
+    [Fact]
+    public void EnablingDisabledGameObject_InActiveScene_CallsOnEnable()
+    {
+        SceneInstance scene = CreateScene();
+        scene.Activate();
+        GameObject go = CreateGameObject();
+        go.Enabled = false;
+        TestLifecycleComponent comp = go.AddComponent<TestLifecycleComponent>();
+        scene.Add(go);
+        comp.ClearEvents();
+
+        go.Enabled = true;
+
+        Assert.Contains("OnEnable", comp.Events);
+    }
+
+    /// <summary>
+    /// Test 15: Scene Cleanup - Disable and Dispose
+    /// Expected: OnDisable for all enabled components, OnDispose when scene disposed
+    /// </summary>
+    [Fact]
+    public void SceneCleanup_DisableAndDispose_CallsProperSequence()
+    {
+        SceneInstance scene = CreateScene();
+        scene.Activate();
+        GameObject go = CreateGameObject();
+        TestLifecycleComponent comp = go.AddComponent<TestLifecycleComponent>();
+        scene.Add(go);
+        Assert.True(comp.HasBeenEnabled);
+        comp.ClearEvents();
+
+        scene.Deactivate();
+        Assert.Contains("OnDisable", comp.Events);
+
+        comp.ClearEvents();
+        scene.Dispose();
+
+        Assert.Contains("OnDispose", comp.Events);
+    }
+
+    /// <summary>
+    /// Test 15b: Scene cleanup when components were never enabled.
+    /// Expected: no OnDisable, but they are still disposed.
+    /// </summary>
+    [Fact]
+    public void SceneCleanup_NeverEnabled_StillDisposes()
+    {
+        SceneInstance scene = CreateScene();
+        // Scene is NOT enabled
+        GameObject go = CreateGameObject();
+        TestLifecycleComponent comp = go.AddComponent<TestLifecycleComponent>();
+        scene.Add(go);
+        Assert.False(comp.HasBeenEnabled);
+        comp.ClearEvents();
+
+        scene.Dispose();
+
+        Assert.DoesNotContain("OnDisable", comp.Events);
+        Assert.Contains("OnDispose", comp.Events);
+    }
+
+    /// <summary>
+    /// Additional test: Disabled component on enabled GameObject in active scene
+    /// Expected: OnAddedToScene called, but not OnEnable (component disabled)
+    /// </summary>
+    [Fact]
+    public void DisabledComponent_OnEnabledGameObject_CallsOnAddedToSceneOnly()
+    {
+        SceneInstance scene = CreateScene();
+        scene.Activate();
+        GameObject go = CreateGameObject();
+        TestLifecycleComponent comp = go.AddComponent<TestLifecycleComponent>();
+        comp.Enabled = false;
+
+        scene.Add(go);
+
+        Assert.Contains("OnAddedToScene", comp.Events);
+        Assert.DoesNotContain("OnEnable", comp.Events);
+    }
+
+    /// <summary>
+    /// Additional test: Multiple components on same GameObject
+    /// Expected: All components receive lifecycle events
+    /// </summary>
+    [Fact]
+    public void MultipleComponents_AllReceiveLifecycleEvents()
+    {
+        SceneInstance scene = CreateScene();
+        scene.Activate();
+        GameObject go = CreateGameObject();
+        TestLifecycleComponent comp1 = go.AddComponent<TestLifecycleComponent>();
+        TestLifecycleComponent comp2 = go.AddComponent<TestLifecycleComponent>();
+
+        scene.Add(go);
+
+        Assert.Contains("OnAddedToScene", comp1.Events);
+        Assert.Contains("OnEnable", comp1.Events);
+        Assert.Contains("OnAddedToScene", comp2.Events);
+        Assert.Contains("OnEnable", comp2.Events);
+    }
+
+    /// <summary>
+    /// Additional test: Child unparented stays in scene
+    /// Expected: Child remains in scene when unparented (unparenting doesn't remove from scene)
+    /// </summary>
+    [Fact]
+    public void ChildUnparented_StaysInScene()
+    {
+        SceneInstance scene = CreateScene();
+        scene.Activate();
+
+        GameObject parent = CreateGameObject("Parent");
+        scene.Add(parent);
+
+        GameObject child = CreateGameObject("Child");
+        TestLifecycleComponent childComp = child.AddComponent<TestLifecycleComponent>();
+        child.SetParent(parent);
+        childComp.ClearEvents();
+
+        // Unparent child - it stays in the scene, just loses its parent
+        child.SetParent(null!);
+
+        // No lifecycle events are triggered - child stays in scene
+        Assert.DoesNotContain("OnDisable", childComp.Events);
+        Assert.DoesNotContain("OnRemovedFromScene", childComp.Events);
+        Assert.Equal(scene, child.Scene);
+    }
+
+    /// <summary>
+    /// Additional test: Child explicitly removed from scene
+    /// Expected: Child gets OnDisable and OnRemovedFromScene when scene.Remove() is called
+    /// </summary>
+    [Fact]
+    public void ChildExplicitlyRemoved_GetsOnDisableAndOnRemovedFromScene()
+    {
+        SceneInstance scene = CreateScene();
+        scene.Activate();
+
+        GameObject parent = CreateGameObject("Parent");
+        scene.Add(parent);
+
+        GameObject child = CreateGameObject("Child");
+        TestLifecycleComponent childComp = child.AddComponent<TestLifecycleComponent>();
+        child.SetParent(parent);
+        childComp.ClearEvents();
+
+        // Explicitly remove child from scene
+        scene.Remove(child);
+
+        Assert.Contains("OnDisable", childComp.Events);
+        Assert.Contains("OnRemovedFromScene", childComp.Events);
+        Assert.Null(child.Scene);
+    }
+
+    /// <summary>
+    /// Additional test: enabling an already enabled scene delivers nothing a second time.
+    /// Enable/Disable are idempotent, since Load has no way to know whether a scene handed to it
+    /// was enabled already.
+    /// </summary>
+    [Fact]
+    public void EnablingAlreadyEnabledScene_DoesNotRepeatOnEnable()
+    {
+        SceneInstance scene = CreateScene();
+        GameObject go = CreateGameObject();
+        TestLifecycleComponent comp = go.AddComponent<TestLifecycleComponent>();
+        scene.Add(go);
+        scene.Activate();
+        comp.ClearEvents();
+
+        scene.Activate();
+
+        Assert.Equal(SceneState.Running, scene.State);
+        Assert.DoesNotContain("OnEnable", comp.Events);
+    }
+
+    /// <summary>
+    /// Additional test: disabling an already disabled scene delivers nothing.
+    /// </summary>
+    [Fact]
+    public void DisablingAlreadyDisabledScene_DoesNotRepeatOnDisable()
+    {
+        SceneInstance scene = CreateScene();
+        GameObject go = CreateGameObject();
+        TestLifecycleComponent comp = go.AddComponent<TestLifecycleComponent>();
+        scene.Add(go);
+        comp.ClearEvents();
+
+        scene.Deactivate();
+
+        Assert.NotEqual(SceneState.Running, scene.State);
+        Assert.DoesNotContain("OnDisable", comp.Events);
+    }
+    private sealed class ParentProbe : Component
+    {
+        public GameObject? ParentAtEnable;
+        public override void OnEnable() => ParentAtEnable = GameObject.Parent;
+    }
+
+    // A detached object joining a scene under a parent must already have that parent when OnEnable runs.
+    [Fact]
+    public void SetParent_DetachedIntoScene_OnEnableSeesTheParent()
+    {
+        SceneInstance scene = CreateScene(enable: true);
+        GameObject parent = CreateGameObject("Parent");
+        scene.Add(parent);
+        GameObject child = CreateGameObject("Child");
+        ParentProbe probe = child.AddComponent<ParentProbe>();
+
+        child.SetParent(parent, worldPositionStays: false);
+
+        Assert.Same(parent, probe.ParentAtEnable);
+    }
+
+    // An enabled detached tree moved under a disabled parent must not be enabled on the way in.
+    [Fact]
+    public void SetParent_DetachedUnderDisabledParent_FiresNoOnEnable()
+    {
+        SceneInstance scene = CreateScene(enable: true);
+        GameObject parent = CreateGameObject("Parent");
+        scene.Add(parent);
+        parent.Enabled = false;
+        GameObject child = CreateGameObject("Child");
+        TestLifecycleComponent comp = child.AddComponent<TestLifecycleComponent>();
+        comp.ClearEvents();
+
+        child.SetParent(parent, worldPositionStays: false);
+
+        Assert.DoesNotContain("OnEnable", comp.Events);
+        Assert.DoesNotContain("OnDisable", comp.Events);
+        Assert.False(comp.EnabledInHierarchy);
+    }
+}

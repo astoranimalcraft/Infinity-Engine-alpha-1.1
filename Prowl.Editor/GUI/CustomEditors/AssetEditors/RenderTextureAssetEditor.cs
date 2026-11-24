@@ -1,0 +1,146 @@
+// This file is part of the Infinity Engine
+// Licensed under the MIT License. See the LICENSE file in the project root for details.
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+using Infinity.Echo;
+using Infinity.Editor.Core;
+using Infinity.Editor.GUI;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Theming;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Runtime;
+using Infinity.Runtime.Resources;
+using Infinity.Scribe;
+
+namespace Infinity.Editor.Inspector;
+
+/// <summary>
+/// Inspector for .rendertexture assets. Edits the description held in the file itself, then rewrites and
+/// reimports it - which rebuilds the GPU resources for every camera already pointing at this asset.
+/// </summary>
+[CustomAssetEditor(typeof(RenderTexture))]
+public class RenderTextureAssetEditor : AssetImporterEditor
+{
+    /// <summary>What the inspector is authoring. Serialized to Echo for the base class to diff against
+    /// the last written version, which is what decides whether anything needs applying.</summary>
+    private sealed class Description
+    {
+        public int Width = 1;
+        public int Height = 1;
+        public bool HasDepth;
+        public bool Srgb;
+        public List<TextureFormat> Formats = [];
+    }
+
+    /// <summary>Per asset, so edits survive looking at something else and coming back. Per-instance
+    /// state would be one slot that the next selection overwrites.</summary>
+    private static readonly Dictionary<Guid, Description> s_edits = [];
+
+    private Description Edits(AssetEntry entry, RenderTexture rt)
+    {
+        if (s_edits.TryGetValue(entry.Guid, out Description? existing)) return existing;
+
+        var seeded = new Description
+        {
+            Width = rt.Width,
+            Height = rt.Height,
+            HasDepth = rt.HasDepthAttachment,
+            Srgb = rt.Srgb,
+            Formats = [.. rt.TextureFormats],
+        };
+        s_edits[entry.Guid] = seeded;
+        Rebaseline(entry, rt); // what was imported is the clean state
+        return seeded;
+    }
+
+    protected override EchoObject? CaptureState(AssetEntry entry, EngineObject? asset)
+        => s_edits.TryGetValue(entry.Guid, out Description? d) ? Serializer.Serialize(typeof(Description), d) : null;
+
+    protected override bool ApplyState(AssetEntry entry, EngineObject? asset) => Save(entry);
+
+    protected override void RevertState(AssetEntry entry, EngineObject? asset, EchoObject baseline)
+    {
+        if (Serializer.Deserialize<Description>(baseline) is Description restored)
+            s_edits[entry.Guid] = restored;
+    }
+
+    public override void OnGUI(Paper paper, string id, AssetEntry entry, EngineObject? asset)
+    {
+        FontFile? font = EditorTheme.DefaultFont;
+        if (font == null || Project.Current == null) return;
+        if (asset is not RenderTexture rt) return;
+
+        Description edits = Edits(entry, rt);
+        Guid guid = entry.Guid;
+        void Record(string name) => Undo.RecordObject(() => s_edits.GetValueOrDefault(guid)!, UndoOwner.OfAssetFile(guid), name);
+
+        EditorGUI.SectionHeader(paper, $"{id}_hdr", "Render Texture", first: true);
+
+        EditorGUI.Row(paper, $"{id}_w", "Width", () =>
+            Origami.NumericField<int>(paper, $"{id}_w_v", edits.Width,
+                v => { Record("Width"); edits.Width = Math.Max(1, v); }).Show());
+
+        EditorGUI.Row(paper, $"{id}_h", "Height", () =>
+            Origami.NumericField<int>(paper, $"{id}_h_v", edits.Height,
+                v => { Record("Height"); edits.Height = Math.Max(1, v); }).Show());
+
+        Origami.Checkbox(paper, $"{id}_depth", edits.HasDepth,
+            v => { Record("Depth Attachment"); edits.HasDepth = v; })
+            .LabelRight("Depth Attachment").Show();
+
+        Origami.Checkbox(paper, $"{id}_srgb", edits.Srgb,
+            v => { Record("sRGB"); edits.Srgb = v; })
+            .LabelRight("sRGB (RGBA8 colour attachments)").Show();
+
+        Origami.Header(paper, $"{id}_fmt_hdr", "Color Attachments").Show();
+
+        for (int i = 0; i < edits.Formats.Count; i++)
+        {
+            int index = i;
+            EditorGUI.Row(paper, $"{id}_fmt{index}", $"Format {index}", () =>
+                Origami.EnumDropdown(paper, $"{id}_fmt{index}_v", edits.Formats[index],
+                    v => { Record("Color Format"); edits.Formats[index] = v; }).Show());
+        }
+
+        using (paper.Row($"{id}_fmt_btns").Height(UnitValue.Auto)
+            .Padding(Origami.Current.Metrics.PaddingLarge, Origami.Current.Metrics.PaddingLarge, 0, 0).Gap(Origami.Current.Metrics.Padding)
+            .Margin(0, 0, 0, Origami.Current.Metrics.SpacingLarge).Enter())
+        {
+            Origami.Button(paper, $"{id}_fmt_add", $"{EditorIcons.Plus}  Add",
+                () => { Record("Add Color Attachment"); edits.Formats.Add(TextureFormat.RGBA8); }).Width(90).Show();
+
+            if (edits.Formats.Count > 0)
+                Origami.Button(paper, $"{id}_fmt_rem", $"{EditorIcons.Minus}  Remove",
+                    () => { Record("Remove Color Attachment"); edits.Formats.RemoveAt(edits.Formats.Count - 1); }).Width(110).Show();
+        }
+
+        DrawApplyRevertBar(paper, id, entry, asset);
+    }
+
+    private bool Save(AssetEntry entry)
+    {
+        try
+        {
+            // Written as a fresh description rather than mutating the imported instance: the file is the
+            // source of truth, and the reimport is what rebuilds every camera's view of this asset.
+            var described = new RenderTexture();
+            Description edits = s_edits[entry.Guid];
+            described.Configure(edits.Width, edits.Height, edits.HasDepth, [.. edits.Formats], edits.Srgb);
+            described.Name = Path.GetFileNameWithoutExtension(entry.Path);
+
+            EchoObject echo = Serializer.Serialize(typeof(object), described);
+            described.Dispose();
+            return EditorAssetBackend.Instance?.SaveAsset(entry.Guid, echo) ?? false;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Failed to save render texture '{entry.Path}': {ex.Message}");
+            return false;
+        }
+    }
+}

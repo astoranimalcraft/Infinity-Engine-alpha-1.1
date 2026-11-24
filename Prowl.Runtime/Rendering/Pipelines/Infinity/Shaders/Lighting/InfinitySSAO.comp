@@ -1,0 +1,94 @@
+#version 450
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) uniform sampler2D uDepth;
+layout(set = 0, binding = 1) uniform sampler2D uViewNormals;
+layout(set = 0, binding = 2, r16f) writeonly uniform image2D uOcclusionOutput;
+
+layout(set = 0, binding = 3, std140) uniform SSAOSettings
+{
+    mat4 projection;
+    mat4 inverseProjection;
+    vec4 resolutionRadius; // xy = width/height, z = radius, w = bias
+    vec4 aoParameters;     // x = intensity, y = sample count, z = power, w = unused
+} settings;
+
+const vec3 SAMPLE_KERNEL[16] = vec3[](
+    vec3( 0.049,  0.012, 0.044), vec3(-0.062,  0.041, 0.072),
+    vec3( 0.018, -0.091, 0.109), vec3( 0.112,  0.077, 0.083),
+    vec3(-0.146, -0.066, 0.041), vec3( 0.081, -0.173, 0.061),
+    vec3(-0.025,  0.196, 0.075), vec3( 0.204, -0.104, 0.026),
+    vec3(-0.231,  0.112, 0.094), vec3( 0.145,  0.221, 0.053),
+    vec3(-0.098, -0.258, 0.133), vec3( 0.294,  0.038, 0.095),
+    vec3(-0.311, -0.104, 0.048), vec3( 0.063,  0.347, 0.124),
+    vec3( 0.351, -0.211, 0.076), vec3(-0.382,  0.223, 0.151)
+);
+
+float Hash12(vec2 p)
+{
+    vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
+}
+
+vec3 ReconstructViewPosition(vec2 uv, float depth)
+{
+    vec4 clip = vec4(uv * 2.0 - 1.0, depth, 1.0);
+    vec4 view = settings.inverseProjection * clip;
+    return view.xyz / max(abs(view.w), 1e-6);
+}
+
+void main()
+{
+    ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(uOcclusionOutput);
+    if (pixel.x >= size.x || pixel.y >= size.y)
+        return;
+
+    vec2 uv = (vec2(pixel) + 0.5) / vec2(size);
+    float depth = texture(uDepth, uv).r;
+    if (depth >= 0.999999)
+    {
+        imageStore(uOcclusionOutput, pixel, vec4(1.0));
+        return;
+    }
+
+    vec3 position = ReconstructViewPosition(uv, depth);
+    vec3 normal = normalize(texture(uViewNormals, uv).xyz * 2.0 - 1.0);
+
+    float angle = Hash12(vec2(pixel)) * 6.28318530718;
+    mat2 rotation = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
+    float radius = max(settings.resolutionRadius.z, 0.001);
+    float bias = max(settings.resolutionRadius.w, 0.0001);
+    int sampleCount = clamp(int(settings.aoParameters.y), 1, 16);
+
+    float occlusion = 0.0;
+    for (int i = 0; i < sampleCount; ++i)
+    {
+        vec3 kernel = SAMPLE_KERNEL[i];
+        kernel.xy = rotation * kernel.xy;
+        vec3 samplePosition = position + kernel * radius;
+
+        vec4 clip = settings.projection * vec4(samplePosition, 1.0);
+        vec2 sampleUV = clip.xy / max(abs(clip.w), 1e-6) * 0.5 + 0.5;
+        if (sampleUV.x <= 0.0 || sampleUV.x >= 1.0 || sampleUV.y <= 0.0 || sampleUV.y >= 1.0)
+            continue;
+
+        float sampledDepth = texture(uDepth, sampleUV).r;
+        if (sampledDepth >= 0.999999)
+            continue;
+
+        vec3 actualPosition = ReconstructViewPosition(sampleUV, sampledDepth);
+        float rangeWeight = smoothstep(0.0, 1.0, radius / max(abs(position.z - actualPosition.z), 1e-4));
+        float blocked = actualPosition.z > samplePosition.z + bias ? 1.0 : 0.0;
+        float hemisphere = max(dot(normal, normalize(samplePosition - position)), 0.0);
+        occlusion += blocked * rangeWeight * hemisphere;
+    }
+
+    float normalizedAO = 1.0 - occlusion / float(sampleCount);
+    normalizedAO = pow(clamp(normalizedAO, 0.0, 1.0), max(settings.aoParameters.z, 0.01));
+    normalizedAO = mix(1.0, normalizedAO, clamp(settings.aoParameters.x, 0.0, 4.0));
+
+    imageStore(uOcclusionOutput, pixel, vec4(clamp(normalizedAO, 0.0, 1.0)));
+}

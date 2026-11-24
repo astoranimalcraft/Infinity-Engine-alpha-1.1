@@ -1,0 +1,50 @@
+using System;
+
+using Infinity.Runtime;
+using Infinity.Vector;
+
+public class {[className]} : Component
+{
+    public float Sensitivity = 0.15f;
+    public float MinPitch = -89f;
+    public float MaxPitch = 89f;
+
+    [Header("Cursor")]
+    public bool LockCursorOnStart = true;
+    public bool ClickToRecapture = true;
+
+    private float _yaw;
+    private float _pitch;
+
+    public override void Start()
+    {
+        Float3 euler = Transform.LocalEulerAngles;
+        _pitch = euler.X;
+        _yaw = euler.Y;
+
+        if (LockCursorOnStart) Input.LockCursor();
+    }
+
+    public override void OnDisable() => Input.UnlockCursor();
+
+    public override void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Input.UnlockCursor();
+            return;
+        }
+
+        if (ClickToRecapture && !Input.CursorLocked && Input.GetMouseButtonDown(0))
+            Input.LockCursor();
+
+        if (!Input.CursorLocked) return;
+
+        // Locked mouse delta is raw motion: X vira yaw, Y vira pitch (invertido para olhar para cima).
+        Float2 delta = Input.MouseDelta;
+        _yaw += delta.X * Sensitivity;
+        _pitch = Math.Clamp(_pitch - delta.Y * Sensitivity, MinPitch, MaxPitch);
+
+        Transform.LocalEulerAngles = new Float3(_pitch, _yaw, 0f);
+    }
+}

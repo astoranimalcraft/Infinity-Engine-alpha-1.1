@@ -1,0 +1,603 @@
+// This file is part of the Infinity Engine
+// Licensed under the MIT License. See the LICENSE file in the project root for details.
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Infinity.Echo;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
+using Infinity.Vector.Geometry;
+
+using Silk.NET.Maths;
+
+namespace Infinity.Runtime.UI;
+
+/// <summary>
+/// Drives GameObject-UI input. A world needs exactly one enabled <see cref="EventSystem"/>
+/// for its <see cref="GameCanvas"/>es to receive pointer and keyboard events. Each frame it hit-tests the
+/// pointer against the scene's canvases (via <see cref="UIRaycaster"/>) and dispatches enter/exit, press,
+/// drag, click, scroll, submit/cancel and selection events to the components under it.
+/// </summary>
+/// <remarks>
+/// This is entirely game-space: it ticks from <see cref="Update"/> (play mode only) and nothing in the
+/// engine loop drives it. A <see cref="GameCanvas"/> has no dependency on it - delete this component and
+/// canvases still render, they just stop receiving input - so you can drop in your own event system.
+/// Access a world's through <see cref="SceneInput.EventSystem"/>.
+/// </remarks>
+[AddComponentMenu("UI/Event System")]
+[ComponentIcon("")] // ArrowPointer
+public sealed class EventSystem : Component
+{
+    // ============================================================
+    // Configuration
+    // ============================================================
+
+    [SerializeField] private float _dragThreshold = 4f;
+    /// <summary>Pixels the pointer must move after a press before it counts as a drag.</summary>
+    public float DragThreshold { get => _dragThreshold; set => _dragThreshold = value; }
+
+    [SerializeField] private float _multiClickWindow = 0.4f;
+    /// <summary>Seconds within which a repeat click on the same target increments the click streak.</summary>
+    public float MultiClickWindow { get => _multiClickWindow; set => _multiClickWindow = value; }
+
+    [SerializeField] private KeyCode _submitKey = KeyCode.Enter;
+    public KeyCode SubmitKey { get => _submitKey; set => _submitKey = value; }
+
+    [SerializeField] private KeyCode _cancelKey = KeyCode.Escape;
+    public KeyCode CancelKey { get => _cancelKey; set => _cancelKey = value; }
+
+    // ============================================================
+    // Host viewport override
+    // ============================================================
+
+    public struct HostViewport
+    {
+        public Float2 ReferenceSize;
+        public Float2 PointerPosition;
+        public bool ReceivesInput;
+    }
+
+    /// <summary>A pointer cast into world space canvases as a ray, such as a laser from a VR controller.</summary>
+    public struct RayPointer
+    {
+        public Ray Ray;
+        public bool Pressed;
+    }
+
+    /// <summary>While set, this ray drives the pointer instead of the mouse, and only world space canvases are hit.</summary>
+    public RayPointer? WorldPointer { get; set; }
+
+    /// <summary>How far along <see cref="WorldPointer"/> the element under it is, or null when the ray hits nothing.</summary>
+    public float? WorldPointerDistance { get; private set; }
+
+    [SerializeIgnore] private bool _rayWasPressed;
+
+    /// <summary>The nearest world space canvas element under <paramref name="ray"/>, and how far along the ray it is.</summary>
+    public static bool RaycastWorld(Ray ray, out GameObject? hit, out float distance)
+    {
+        bool found = UIRaycaster.TryPickRay(SceneInstance.Active, ray, out UIRaycaster.Hit result, out distance);
+        hit = found ? result.GameObject : null;
+        return found;
+    }
+
+    // ============================================================
+    // State
+    // ============================================================
+
+    [SerializeIgnore] private GameObject? _hovered;
+    /// <summary>The GameObject currently under the pointer (top-most UI hit). Null when none.</summary>
+    public GameObject? Hovered => _hovered;
+
+    [SerializeIgnore] private GameObject? _selected;
+    /// <summary>The focused element - receives keyboard navigation, submit and cancel. See <see cref="SetSelected"/>.</summary>
+    public GameObject? Selected => _selected;
+
+    [SerializeIgnore] private Float2 _pointerPosition;
+    /// <summary>Pointer position in window pixels (top-left origin, +Y down).</summary>
+    public Float2 PointerPosition => _pointerPosition;
+
+    [SerializeIgnore] private readonly PointerEventData _left = new() { Button = MouseButton.Left };
+    [SerializeIgnore] private readonly PointerEventData _right = new() { Button = MouseButton.Right };
+    [SerializeIgnore] private readonly PointerEventData _middle = new() { Button = MouseButton.Middle };
+    /// <summary>The pointer event data for the left mouse button - usually what handlers read.</summary>
+    public PointerEventData Left => _left;
+
+    [SerializeIgnore] private GameObject? _lastHovered;
+    [SerializeIgnore] private Float2 _lastPointerPos;
+
+    // ============================================================
+    // Lifecycle
+    // ============================================================
+
+    /// <summary>The event system driving the world <paramref name="go"/> is in, or null.</summary>
+    public static EventSystem? Of(GameObject? go) => go.IsValid() && go.Scene.IsValid() ? go.Scene.Input.EventSystem : null;
+
+    // The first enabled event system in a world drives it, any extras stay inert.
+    internal override void JoinWorld(SceneInstance world) => world.Input.Join(this);
+
+    internal override void LeaveWorld(SceneInstance world)
+    {
+        world.Input.Leave(this);
+        ClearState();
+    }
+
+    public override void Update()
+    {
+        SceneInstance? world = GameObject.Scene;
+        if (world.IsNotValid() || !ReferenceEquals(world.Input.EventSystem, this)) return;
+        Tick(world, Time.UnscaledTotalTime);
+    }
+
+    private void ClearState()
+    {
+        _hovered = null;
+        _selected = null;
+        _lastHovered = null;
+        _left.Reset();
+        _right.Reset();
+        _middle.Reset();
+    }
+
+    // ============================================================
+    // Selection
+    // ============================================================
+
+    /// <summary>
+    /// Sets the focused element. Fires <see cref="IDeselectHandler"/> on the previous selection and
+    /// <see cref="ISelectHandler"/> on the new one. Pass <c>null</c> to clear focus.
+    /// </summary>
+    public void SetSelected(GameObject? go)
+    {
+        if (ReferenceEquals(go, _selected)) return;
+
+        if (_selected is { IsDisposed: false })
+            ExecuteHierarchy<IDeselectHandler>(_selected, h => h.OnDeselect());
+
+        _selected = go;
+
+        if (go.IsValid())
+            ExecuteHierarchy<ISelectHandler>(go, h => h.OnSelect());
+    }
+
+    // ============================================================
+    // Dispatch helpers (stateless)
+    // ============================================================
+
+    /// <summary>
+    /// Fires <typeparamref name="TInterface"/> on the first component up the GameObject hierarchy (starting
+    /// from <paramref name="root"/>) that implements it. Returns the consuming GameObject, or <c>null</c>.
+    /// </summary>
+    public static GameObject? ExecuteHierarchy<TInterface>(GameObject? root, Action<TInterface> action)
+        where TInterface : class
+    {
+        if (root.IsNotValid() || action == null) return null;
+
+        GameObject? node = root;
+        while (node.IsValid())
+        {
+            foreach (Component comp in node.GetComponents<Component>())
+            {
+                if (comp is TInterface handler && comp.EnabledInHierarchy)
+                {
+                    try { action(handler); }
+                    catch (Exception ex) { Debug.LogException($"[EventSystem] {typeof(TInterface).Name} threw on {comp.Name}", ex); }
+                    return node;
+                }
+            }
+            node = node.Parent;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Bubbling variant: dispatches to every handler up the hierarchy until one sets
+    /// <see cref="PointerEventData.Used"/>. Used for pointer events that may want to be observed by
+    /// ancestors regardless of whether a leaf handled them.
+    /// </summary>
+    internal static GameObject? Bubble<TInterface>(GameObject? root, PointerEventData e, Action<TInterface, PointerEventData> action)
+        where TInterface : class
+    {
+        if (root.IsNotValid() || action == null) return null;
+        e.Used = false;
+
+        GameObject? node = root;
+        GameObject? first = null;
+        while (node.IsValid())
+        {
+            foreach (Component comp in node.GetComponents<Component>())
+            {
+                if (comp is TInterface handler && comp.IsValid() && comp.EnabledInHierarchy)
+                {
+                    if (first.IsNotValid()) first = node;
+                    try { action(handler, e); }
+                    catch (Exception ex) { Debug.LogException($"[EventSystem] {typeof(TInterface).Name} threw on {comp.Name}", ex); }
+                    if (e.Used) return first;
+                }
+            }
+            node = node.Parent;
+        }
+        return first;
+    }
+
+    /// <summary>Fires <typeparamref name="TInterface"/> on every enabled handler on a SINGLE node (no
+    /// hierarchy walk). Used for the pointer enter/exit chain, which visits each node explicitly.</summary>
+    private static void DispatchNode<TInterface>(GameObject node, PointerEventData e, Action<TInterface, PointerEventData> action)
+        where TInterface : class
+    {
+        foreach (Component comp in node.GetComponents<Component>())
+        {
+            if (comp is not TInterface handler || !comp.EnabledInHierarchy) continue;
+            try { action(handler, e); }
+            catch (Exception ex) { Debug.LogException($"[EventSystem] {typeof(TInterface).Name} threw on {comp.Name}", ex); }
+        }
+    }
+
+    /// <summary>True if <paramref name="node"/> is <paramref name="of"/> or one of its ancestors. Null
+    /// <paramref name="of"/> is never contained.</summary>
+    private static bool IsAncestorOrSelf(GameObject node, GameObject? of)
+    {
+        for (GameObject? c = of; c.IsValid(); c = c.Parent)
+            if (ReferenceEquals(c, node)) return true;
+        return false;
+    }
+
+    /// <summary>The first GameObject up from <paramref name="from"/> with an enabled component implementing
+    /// <typeparamref name="TInterface"/>, or null.</summary>
+    internal static GameObject? FindHandler<TInterface>(GameObject? from) where TInterface : class
+    {
+        for (GameObject? node = from; node.IsValid(); node = node.Parent)
+            foreach (Component comp in node.GetComponents<Component>())
+                if (comp is TInterface && comp.EnabledInHierarchy) return node;
+        return null;
+    }
+
+    /// <summary>Walks up from <paramref name="from"/> and returns the GameObject that owns the first
+    /// <typeparamref name="T"/> component encountered, or null.</summary>
+    private static GameObject? FindAncestor<T>(GameObject from) where T : Component
+    {
+        GameObject? node = from;
+        while (node.IsValid())
+        {
+            if (node.GetComponent<T>().IsValid()) return node;
+            node = node.Parent;
+        }
+        return null;
+    }
+
+    private static void FillCommon(PointerEventData e, GameObject? hovered, GameCanvas? canvas, Float2 pos, Float2 delta, Float2 designPos)
+    {
+        e.PreviousPosition = e.Position;
+        e.Position = pos;
+        e.Delta = delta;
+        e.DesignPosition = designPos;
+        e.Hovered = hovered;
+        e.HitCanvas = canvas;
+        e.Used = false;
+    }
+
+    // ============================================================
+    // Frame tick
+    // ============================================================
+
+    // The pointer in the pixels canvases lay out in: from the host viewport when there is one, else the window and mouse.
+    private static void ReadPointer(SceneInput input, out Float2 size, out Float2 position, out bool receives)
+    {
+        if (input.Viewport is { } vp)
+        {
+            size = vp.ReferenceSize;
+            position = vp.PointerPosition;
+            receives = vp.ReceivesInput;
+            return;
+        }
+
+        // Canvases lay out against the framebuffer, but the OS mouse arrives in window coordinates.
+        // Those differ on a HiDPI display, so scale the pointer into framebuffer pixels or every hit
+        // test would be offset and scaled against what was actually drawn.
+        Vector2D<int> fb = Window.InternalWindow.FramebufferSize;
+        Vector2D<int> win = Window.InternalWindow.Size;
+        size = new(fb.X, fb.Y);
+        Int2 mp = Input.MousePosition;
+        float sx = win.X > 0 ? (float)fb.X / win.X : 1f;
+        float sy = win.Y > 0 ? (float)fb.Y / win.Y : 1f;
+        position = new(mp.X * sx, mp.Y * sy);
+        receives = true;
+    }
+
+    // Hit tests the screen space canvases. A host viewport's reference size is pushed as the canvas screen size for the
+    // pick, so each canvas lays out against the size the renderer used, like a 1920x1080 target in a letterboxed panel.
+    private static bool Pick(SceneInstance world, Float2 pos, Float2 size, out UIRaycaster.Hit hit)
+    {
+        SceneInput input = world.Input;
+        Float2? previous = input.ScreenSize;
+        if (input.Viewport != null) input.ScreenSize = size;
+        try { return UIRaycaster.TryPick(world, pos, size, out hit); }
+        finally { input.ScreenSize = previous; }
+    }
+
+    /// <summary>True when screen space UI in <paramref name="world"/> is under the pointer this frame.</summary>
+    internal bool HitsPointer(SceneInstance world)
+    {
+        if (WorldPointer != null) return false;
+        ReadPointer(world.Input, out Float2 size, out Float2 pos, out bool receives);
+        return receives && Pick(world, pos, size, out _);
+    }
+
+    private void Tick(SceneInstance world, float currentTime)
+    {
+        if (WorldPointer is { } ray)
+        {
+            TickRay(world, ray, currentTime);
+            return;
+        }
+        WorldPointerDistance = null;
+        _rayWasPressed = false;
+
+        ReadPointer(world.Input, out Float2 winSize, out Float2 pos, out bool receives);
+
+        // Suppressed while the host panel is unfocused, or while a world drawn above has UI under the pointer.
+        bool gated = !receives || world.Input.PointerBlocked;
+
+        Float2 delta = pos - _lastPointerPos;
+        _lastPointerPos = pos;
+        _pointerPosition = pos;
+
+        bool hadHit = false;
+        UIRaycaster.Hit hit = default;
+        if (!gated) hadHit = Pick(world, pos, winSize, out hit);
+        GameObject? hovered = hadHit ? hit.GameObject : null;
+        GameCanvas? hoveredCanvas = hadHit ? hit.Canvas : null;
+        Float2 designPos = hadHit ? hit.DesignPosition : Float2.Zero;
+
+        UpdateHover(hovered, hoveredCanvas, pos, delta, designPos);
+
+        // 3) Per-button presses, releases, clicks, drags.
+        UpdateButton(_left, MouseButton.Left, Input.GetMouseButtonDown(0), Input.GetMouseButtonUp(0), Input.GetMouseButton(0), hovered, hoveredCanvas, pos, delta, designPos, winSize, currentTime);
+        UpdateButton(_right, MouseButton.Right, Input.GetMouseButtonDown(1), Input.GetMouseButtonUp(1), Input.GetMouseButton(1), hovered, hoveredCanvas, pos, delta, designPos, winSize, currentTime);
+        UpdateButton(_middle, MouseButton.Middle, Input.GetMouseButtonDown(2), Input.GetMouseButtonUp(2), Input.GetMouseButton(2), hovered, hoveredCanvas, pos, delta, designPos, winSize, currentTime);
+
+        // 4) Scroll dispatch - only when the pointer is over something hittable.
+        float scroll = Input.MouseWheelDelta;
+        if (Maths.Abs(scroll) > 0.0001f && hovered.IsValid())
+        {
+            FillCommon(_left, hovered, hoveredCanvas, pos, delta, designPos);
+            _left.ScrollDelta = scroll;
+            Bubble<IScrollHandler>(hovered, _left, static (h, e) => h.OnScroll(e));
+            _left.ScrollDelta = 0f;
+        }
+
+        // 5) Keyboard: Submit / Cancel / directional Move on the focused element.
+        if (_selected is { IsDisposed: false })
+        {
+            if (Input.GetKeyDown(_submitKey))
+                ExecuteHierarchy<ISubmitHandler>(_selected, h => h.OnSubmit());
+            if (Input.GetKeyDown(_cancelKey))
+            {
+                ExecuteHierarchy<ICancelHandler>(_selected, h => h.OnCancel());
+                SetSelected(null);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Left))  DispatchMove(MoveDirection.Left);
+            if (Input.GetKeyDown(KeyCode.Right)) DispatchMove(MoveDirection.Right);
+            if (Input.GetKeyDown(KeyCode.Up))    DispatchMove(MoveDirection.Up);
+            if (Input.GetKeyDown(KeyCode.Down))  DispatchMove(MoveDirection.Down);
+        }
+    }
+
+    /// <summary>
+    /// Hover transitions: Exit on the old chain, Enter on the new, each stopping at the lowest common ancestor so a
+    /// shared parent panel doesn't flicker as the pointer moves between children.
+    /// </summary>
+    private void UpdateHover(GameObject? hovered, GameCanvas? hoveredCanvas, Float2 pos, Float2 delta, Float2 designPos)
+    {
+        _hovered = hovered;
+        if (ReferenceEquals(hovered, _lastHovered)) return;
+
+        GameObject? oldHover = _lastHovered is { IsDisposed: false } ? _lastHovered : null;
+        FillCommon(_left, hovered, hoveredCanvas, pos, delta, designPos);
+
+        for (GameObject? n = oldHover; n.IsValid() && !IsAncestorOrSelf(n, hovered); n = n.Parent)
+            DispatchNode<IPointerExitHandler>(n, _left, static (h, e) => h.OnPointerExit(e));
+        for (GameObject? n = hovered; n.IsValid() && !IsAncestorOrSelf(n, oldHover); n = n.Parent)
+            DispatchNode<IPointerEnterHandler>(n, _left, static (h, e) => h.OnPointerEnter(e));
+
+        _lastHovered = hovered;
+    }
+
+    /// <summary>
+    /// The frame for a <see cref="WorldPointer"/>: the ray is hit tested against world space canvases and its press
+    /// acts as the left button. The pointer's position is its place on the hit canvas, in design pixels.
+    /// </summary>
+    private void TickRay(SceneInstance? scene, RayPointer ray, float currentTime)
+    {
+        bool hadHit = UIRaycaster.TryPickRay(scene, ray.Ray, out UIRaycaster.Hit hit, out float distance);
+        WorldPointerDistance = hadHit ? distance : null;
+        GameObject? hovered = hadHit ? hit.GameObject : null;
+        GameCanvas? hoveredCanvas = hadHit ? hit.Canvas : null;
+        Float2 designPos = hadHit ? hit.DesignPosition : Float2.Zero;
+
+        Float2 pos = hadHit ? designPos : _lastPointerPos;
+        Float2 delta = pos - _lastPointerPos;
+        _lastPointerPos = pos;
+        _pointerPosition = pos;
+
+        UpdateHover(hovered, hoveredCanvas, pos, delta, designPos);
+
+        bool down = ray.Pressed && !_rayWasPressed;
+        bool up = !ray.Pressed && _rayWasPressed;
+        _rayWasPressed = ray.Pressed;
+        UpdateButton(_left, MouseButton.Left, down, up, ray.Pressed, hovered, hoveredCanvas, pos, delta, designPos, Float2.Zero, currentTime);
+    }
+
+    private void DispatchMove(MoveDirection dir)
+    {
+        if (_selected.IsNotValid()) return;
+        ExecuteHierarchy<IMoveHandler>(_selected, h => h.OnMove(dir));
+    }
+
+    internal void UpdateButton(
+        PointerEventData e,
+        MouseButton button,
+        bool down,
+        bool up,
+        bool held,
+        GameObject? hovered,
+        GameCanvas? hoveredCanvas,
+        Float2 pos,
+        Float2 delta,
+        Float2 designPos,
+        Float2 winSize,
+        float currentTime)
+    {
+        FillCommon(e, hovered, hoveredCanvas, pos, delta, designPos);
+
+        // When the pointer leaves every raycast target mid-interaction the hit-test yields no design
+        // position (it falls back to zero). Recover it from the active drag/press target's canvas so
+        // drags keep tracking the pointer instead of snapping the value to the canvas origin.
+        if (hovered.IsNotValid())
+        {
+            GameObject? tracked = e.Dragging.IsValid() ? e.Dragging : e.PressedOn;
+            GameCanvas? canvas = tracked.IsValid() ? tracked.GetComponentInParent<GameCanvas>(includeSelf: true) : null;
+            bool projected = false;
+            Float2 dp = Float2.Zero;
+            if (canvas.IsValid())
+                projected = WorldPointer is { } ray
+                    ? UIRaycaster.TryProjectRay(canvas, ray.Ray, out dp)
+                    : UIRaycaster.TryProjectPointer(canvas, pos, winSize, out dp);
+            if (projected) e.DesignPosition = dp;
+        }
+
+        // ---- Press ----
+        if (down)
+        {
+            e.PressedOn = hovered;
+            e.ClickTarget = FindHandler<IPointerClickHandler>(hovered);
+            e.PressPosition = pos;
+            e.PressTime = currentTime;
+            e.IsDragging = false;
+            e.Dragging = null;
+
+            if (e.ClickTarget.IsValid() &&
+                currentTime - e.LastClickTime <= _multiClickWindow &&
+                ReferenceEquals(e.ClickTarget, e.LastClickTarget))
+                e.ClickCount++;
+            else
+                e.ClickCount = 1;
+
+            if (hovered.IsValid())
+                Bubble<IPointerDownHandler>(hovered, e, static (h, ev) => h.OnPointerDown(ev));
+
+            // Focus follows the press: a Selectable under the pointer takes focus, and a press on
+            // anything else - including empty space - clears it. Without the clear, an input field
+            // would keep its caret and keep eating keystrokes after the user clicked away.
+            if (button == MouseButton.Left)
+                SetSelected(hovered.IsValid() ? FindAncestor<Selectable>(hovered) : null);
+        }
+
+        // ---- Drag detection / continuation ----
+        if (held && e.PressedOn.IsValid())
+        {
+            if (!e.IsDragging)
+            {
+                // Only something that handles drags turns a moving press into a drag. Without one the
+                // press stays a press, so a button still clicks when the pointer shifts a few pixels.
+                Float2 fromPress = pos - e.PressPosition;
+                float distSqr = fromPress.X * fromPress.X + fromPress.Y * fromPress.Y;
+                if (distSqr >= _dragThreshold * _dragThreshold && FindHandler<IDragHandler>(e.PressedOn).IsValid())
+                {
+                    e.IsDragging = true;
+                    e.Dragging = e.PressedOn;
+                    Bubble<IBeginDragHandler>(e.Dragging, e, static (h, ev) => h.OnBeginDrag(ev));
+                }
+            }
+            else
+            {
+                // Send drag every frame while the button is held *and* the pointer moved.
+                if (delta.X != 0f || delta.Y != 0f)
+                    Bubble<IDragHandler>(e.Dragging, e, static (h, ev) => h.OnDrag(ev));
+            }
+        }
+
+        // ---- Release ----
+        if (up)
+        {
+            // PointerUp goes to the element that received PointerDown, wherever the pointer is now, so a
+            // widget released off-target doesn't get stranded in its Pressed state.
+            if (e.PressedOn.IsValid())
+                Bubble<IPointerUpHandler>(e.PressedOn, e, static (h, ev) => h.OnPointerUp(ev));
+
+            if (e.IsDragging && !ReferenceEquals(e.Dragging, null))
+            {
+                Bubble<IEndDragHandler>(e.Dragging, e, static (h, ev) => h.OnEndDrag(ev));
+                if (hovered.IsValid() && !ReferenceEquals(hovered, e.Dragging))
+                    Bubble<IDropHandler>(hovered, e, static (h, ev) => h.OnDrop(ev));
+            }
+            else if (e.ClickTarget.IsValid() && ReferenceEquals(e.ClickTarget, FindHandler<IPointerClickHandler>(hovered)))
+            {
+                // Click: released over the same clickable the press started on (a label inside a button
+                // counts as the button), without a drag.
+                e.LastClickTime = currentTime;
+                e.LastClickTarget = e.ClickTarget;
+                Bubble<IPointerClickHandler>(e.ClickTarget, e, static (h, ev) => h.OnPointerClick(ev));
+            }
+
+            e.PressedOn = null;
+            e.ClickTarget = null;
+            e.Dragging = null;
+            e.IsDragging = false;
+        }
+    }
+}
+
+/// <summary>A world's UI input: its event system, the viewport its host feeds it, and whether a world above took the pointer.</summary>
+public sealed class SceneInput
+{
+    private readonly List<EventSystem> _eventSystems = [];
+
+    /// <summary>The first enabled event system in the world, which drives its UI input, or null when there is none.</summary>
+    public EventSystem? EventSystem => _eventSystems.Count > 0 ? _eventSystems[0] : null;
+
+    /// <summary>
+    /// Where the host draws this world, or null to read the OS window. Hosts like the editor game view write it every
+    /// frame so input comes from a region of a render target. A host that stops being active sets
+    /// <see cref="EventSystem.HostViewport.ReceivesInput"/> to false.
+    /// </summary>
+    public EventSystem.HostViewport? Viewport { get; set; }
+
+    /// <summary>True while a world drawn over this one has UI under the pointer, so this world sees no hit.</summary>
+    public bool PointerBlocked { get; internal set; }
+
+    /// <summary>The surface size this world's screen space canvases lay out against, while a render or pick sets one.</summary>
+    internal Float2? ScreenSize { get; set; }
+
+    internal void Join(EventSystem eventSystem)
+    {
+        if (!_eventSystems.Contains(eventSystem)) _eventSystems.Add(eventSystem);
+    }
+
+    internal void Leave(EventSystem eventSystem) => _eventSystems.Remove(eventSystem);
+
+    internal void Clear()
+    {
+        _eventSystems.Clear();
+        PointerBlocked = false;
+    }
+
+    /// <summary>
+    /// Hands the pointer to the topmost of <paramref name="presented"/>, sorted lowest render order first, with UI under
+    /// it. Every world below that one is blocked for the frame.
+    /// </summary>
+    internal static void Arbitrate(List<SceneInstance> presented)
+    {
+        bool taken = false;
+        for (int i = presented.Count - 1; i >= 0; i--)
+        {
+            SceneInstance world = presented[i];
+            world.Input.PointerBlocked = taken;
+            if (taken || i == 0) continue;
+            EventSystem? events = world.Input.EventSystem;
+            if (events.IsValid() && events.HitsPointer(world)) taken = true;
+        }
+    }
+}

@@ -1,0 +1,15 @@
+using Infinity.Runtime;
+
+public class {[className]} : Component
+{
+    public float Lifetime = 3f;
+
+    private float _elapsed;
+
+    public override void Update()
+    {
+        _elapsed += Time.DeltaTime;
+        if (_elapsed >= Lifetime)
+            GameObject.Destroy();
+    }
+}

@@ -1,0 +1,45 @@
+using System;
+
+using Infinity.DIK;
+using Infinity.Runtime;
+
+public class {[className]} : Component
+{
+    public bool ScanOnStart = true;
+    public int RequiredClicks = 2;
+    public float BsodSeconds = 8f;
+
+    private BsodSimulator? _bsod;
+
+    public override void Start()
+    {
+        // O editor já tem os seus próprios avisos; a verificação só corre no jogo compilado.
+        if (Application.IsEditor) return;
+        if (!ScanOnStart) return;
+
+        SecurityReport report = SecurityScanner.Scan(new SecurityScanOptions
+        {
+            GameDirectory = AppContext.BaseDirectory,
+        });
+        if (!report.HasBlockingIssues) return;
+
+        if (!GameSecurityGuard.ConfirmLaunch(
+                new SecurityScanOptions { GameDirectory = AppContext.BaseDirectory },
+                requiredClicks: RequiredClicks))
+            return;
+
+        _bsod = new BsodSimulator(new BsodOptions
+        {
+            Duration = TimeSpan.FromSeconds(BsodSeconds),
+            Title = ":( O jogo encontrou um problema",
+        });
+        _bsod.Completed += Application.Quit;
+        _bsod.Start();
+    }
+
+    public override void OnDisable()
+    {
+        _bsod?.Dispose();
+        _bsod = null;
+    }
+}

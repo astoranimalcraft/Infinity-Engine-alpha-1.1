@@ -1,0 +1,769 @@
+using System;
+
+using Infinity.Editor.Core;
+using Infinity.Runtime;
+using Infinity.Runtime.Rendering;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
+
+namespace Infinity.Editor.GUI.SceneView;
+
+/// <summary>
+/// Editor camera controller with orbit, pan, zoom, and FPS navigation modes.
+/// Manages a hidden runtime Camera that renders the scene to a RenderTexture.
+/// </summary>
+public class EditorCamera
+{
+    private GameObject _cameraObject;
+    private Camera _camera;
+    private RenderTexture? _renderTarget;
+    private PanelLockContext _lockContext = new();
+
+    // Camera state
+    private Float3 _position = new Float3(0, 5, -15);
+    private float _yaw = 0f;
+    private float _pitch = 15f;
+    private float _moveSpeed = 5f;
+    private double _speedChangedTime;
+
+    /// <summary>Current fly speed.</summary>
+    public float MoveSpeed => _moveSpeed;
+
+    /// <summary>Time (UnscaledTotalTime) when move speed last changed via scroll. Used for HUD indicators.</summary>
+    public double SpeedChangedTime => _speedChangedTime;
+
+    // Orbit distance and the pivot captured at the start of an orbit gesture.
+    private float _orbitDistance = 10f;
+    private Float3 _orbitPivot;
+    private bool _wasOrbiting;
+
+    // Our lock context is on Input's stack while RMB flying, even if the hovered panel changes mid-gesture.
+    private bool _flying;
+
+    // Where WASD flight is heading; the camera damps toward it over MoveSmoothing seconds.
+    private Float3? _moveTarget;
+    private Float3 _moveVelocity;
+
+    // Toggles
+    public bool ShowGrid { get; set; } = true;
+    public bool ShowGizmos { get; set; } = true;
+
+    public Camera Camera => _camera;
+    public RenderTexture? RenderTarget => _renderTarget;
+    public Float3 Position => _position;
+
+    /// <summary>Where the camera comes to rest: the WASD flight target while gliding, otherwise its position.</summary>
+    public Float3 RestPosition => _moveTarget ?? _position;
+    public float Yaw => _yaw;
+    public float Pitch => _pitch;
+    public Float3 Forward => _cameraObject.Transform.Forward;
+
+    /// <summary>World rotation matching the camera's current yaw/pitch.</summary>
+    public Quaternion Rotation => _cameraObject.Transform.Rotation;
+
+    /// <summary>
+    /// The point the view is centred on: straight ahead of the camera at the current orbit/zoom
+    /// distance. "Move to View" drops objects here so they land in front of the camera instead of
+    /// inside it (where they'd be clipped away by the near plane).
+    /// </summary>
+    public Float3 ViewFocusPoint => _position + _cameraObject.Transform.Forward * _orbitDistance;
+
+    public bool IsOrthographic => _camera.IsOrthographic;
+
+    /// <summary>
+    /// Swaps between perspective and orthographic without changing what is on screen.
+    /// </summary>
+    /// <remarks>
+    /// The two are tied together through the focus point: an orthographic half-height of
+    /// <c>distance * tan(fov/2)</c> frames exactly what the perspective view framed at that distance,
+    /// so the switch reads as a change of projection rather than a jump to somewhere else.
+    /// </remarks>
+    public void ToggleProjection()
+    {
+        ClearMovementSmoothing();
+        Float3 focus = ViewFocusPoint;
+        float halfFov = MathF.Tan(Maths.ToRadians(_camera.FieldOfView) * 0.5f);
+
+        if (_camera.IsOrthographic)
+        {
+            _camera.ProjectionMode = Camera.ProjectionType.Perspective;
+            _camera.FarClipPlane = _perspectiveFarClip;
+            _orbitDistance = MathF.Max(0.1f, _camera.OrthographicSize / MathF.Max(1e-4f, halfFov));
+            UpdateTransform();
+            _position = focus - _cameraObject.Transform.Forward * _orbitDistance;
+            UpdateTransform();
+        }
+        else
+        {
+            _camera.ProjectionMode = Camera.ProjectionType.Orthographic;
+            _camera.OrthographicSize = MathF.Max(MinOrthographicSize, _orbitDistance * halfFov);
+            SyncOrthographicDepth();
+        }
+    }
+
+    private void SetOrthographicSize(float size)
+    {
+        _camera.OrthographicSize = Math.Clamp(size, MinOrthographicSize, MaxOrthographicSize);
+        SyncOrthographicDepth();
+    }
+
+    /// <summary>
+    /// Keeps the visible slab centred on the focus point and sized with the zoom.
+    /// </summary>
+    /// <remarks>
+    /// Where the camera sits along the view axis decides nothing about what an orthographic view
+    /// covers, so the depth range has to come from the zoom instead. Left alone it does not: zooming
+    /// out widens the box while the clip planes stay put, and once the camera has been pushed further
+    /// back than the far plane reaches, the focus point and everything around it fall outside the
+    /// frustum and are culled. Backing off with the box and reaching as far past the focus as behind
+    /// it makes the clip planes the only thing that stops the view, which is what an orthographic
+    /// camera should feel like.
+    /// </remarks>
+    private void SyncOrthographicDepth()
+    {
+        if (!_camera.IsOrthographic) return;
+        ClearMovementSmoothing();
+
+        // Captured first: both terms of it are about to move.
+        Float3 focus = ViewFocusPoint;
+
+        float backOff = MathF.Max(_camera.OrthographicSize * 4f, MinOrthographicDepth);
+        _orbitDistance = backOff;
+        _camera.FarClipPlane = backOff * 2f;
+        _position = focus - _cameraObject.Transform.Forward * backOff;
+        UpdateTransform();
+    }
+
+    private const float MinOrthographicSize = 0.01f;
+    private const float MaxOrthographicSize = 10000f;
+    private const float MinOrthographicDepth = 10f;
+
+    /// <summary>Far plane to put back when leaving orthographic, which moves it to suit the zoom.</summary>
+    private float _perspectiveFarClip;
+
+    public const float MinFieldOfView = 5f;
+    public const float MaxFieldOfView = 170f;
+
+    /// <summary>Vertical field of view in degrees, used by perspective views and by focus framing.</summary>
+    public float FieldOfView
+    {
+        get => _camera.FieldOfView;
+        set => _camera.FieldOfView = Math.Clamp(value, MinFieldOfView, MaxFieldOfView);
+    }
+
+    /// <summary>Distance to the near clip plane.</summary>
+    public float NearClip
+    {
+        get => _camera.NearClipPlane;
+        set => _camera.NearClipPlane = Math.Clamp(value, 0.001f, MathF.Max(0.002f, _camera.FarClipPlane - 0.001f));
+    }
+
+    /// <summary>Distance to the far clip plane. Orthographic views drive this from the zoom instead.</summary>
+    public float FarClip
+    {
+        get => _camera.IsOrthographic ? _perspectiveFarClip : _camera.FarClipPlane;
+        set
+        {
+            _perspectiveFarClip = MathF.Max(_camera.NearClipPlane + 0.001f, value);
+            if (!_camera.IsOrthographic) _camera.FarClipPlane = _perspectiveFarClip;
+        }
+    }
+
+    /// <summary>Half the height the orthographic view covers, in world units.</summary>
+    public float OrthographicSize
+    {
+        get => _camera.OrthographicSize;
+        set => SetOrthographicSize(value);
+    }
+
+    public const float DefaultMoveSmoothing = 0.08f;
+    public const float MaxMoveSmoothing = 0.25f;
+
+    /// <summary>Approximate seconds the camera takes to catch up with WASD flight (the smooth time of
+    /// <see cref="Maths.SmoothDamp(Float3, Float3, ref Float3, float, float, float)"/>). 0 moves instantly.</summary>
+    public float MoveSmoothing
+    {
+        get => _moveSmoothing;
+        set => _moveSmoothing = Math.Clamp(value, 0f, MaxMoveSmoothing);
+    }
+    private float _moveSmoothing = DefaultMoveSmoothing;
+
+    /// <summary>Fly speed in units per second.</summary>
+    public void SetMoveSpeed(float speed) => _moveSpeed = Math.Clamp(speed, 0.1f, 1000f);
+
+    /// <summary>Restores the lens to the defaults a fresh editor camera starts with.</summary>
+    public void ResetLens()
+    {
+        if (_camera.IsOrthographic) ToggleProjection();
+        _camera.FieldOfView = 60f;
+        _camera.NearClipPlane = 0.01f;
+        _perspectiveFarClip = 1000f;
+        _camera.FarClipPlane = _perspectiveFarClip;
+        _moveSpeed = 5f;
+        _moveSmoothing = DefaultMoveSmoothing;
+    }
+
+    /// <summary>Set the camera position directly.</summary>
+    public void SetPosition(Float3 position)
+    {
+        ClearMovementSmoothing();
+        _position = position;
+        UpdateTransform();
+    }
+
+    /// <summary>Restore full navigation state (position + yaw/pitch). Pitch is clamped.</summary>
+    public void SetPose(Float3 position, float yaw, float pitch)
+    {
+        ClearMovementSmoothing();
+        _position = position;
+        _yaw = yaw;
+        _pitch = MathF.Max(-89f, MathF.Min(89f, pitch));
+        UpdateTransform();
+    }
+
+    /// <summary> Creates a hidden GameObject with a Camera component configured for editor scene rendering. </summary>
+    public EditorCamera()
+    {
+        // Disabled, so joining the scene for each render does not count as enabling the camera, which would forget
+        // its motion history every frame and break every temporal effect in the scene view
+        _cameraObject = new GameObject("EditorCamera");
+        _cameraObject.Enabled = false;
+        _cameraObject.HideFlags = HideFlags.HideAndDontSave | HideFlags.NoGizmos;
+
+        _camera = _cameraObject.AddComponent<Camera>();
+        _camera.FieldOfView = 60f;
+        _camera.NearClipPlane = 0.01f;
+        _camera.FarClipPlane = 1000f;
+        _perspectiveFarClip = _camera.FarClipPlane;
+        _camera.Background = CameraBackground.Skybox;
+
+        UpdateTransform();
+    }
+
+    /// <summary>
+    /// Ensure the render target matches the given size.
+    /// </summary>
+    public void EnsureRenderTarget(uint width, uint height)
+    {
+        if (width == 0 || height == 0) return;
+
+        if (_renderTarget.IsNotValid() || _renderTarget.Width != width || _renderTarget.Height != height)
+        {
+            if (_renderTarget.IsValid()) _renderTarget.Dispose();
+            _renderTarget = new RenderTexture(
+                (int)width, (int)height, true,
+                [TextureFormat.RGBA8]);
+        }
+    }
+
+    /// <summary>Draws the volumes at the scene camera, under the base profile and anti aliasing of the scene's main camera.</summary>
+    public bool PostProcessing { get; set; } = true;
+
+    /// <summary>What the scene view shows in place of the lit scene. Post processing is off while it shows anything else.</summary>
+    public DebugViewMode DebugView { get; set; } = DebugViewMode.Lit;
+
+    /// <summary>
+    /// Render the scene from this camera's perspective.
+    /// </summary>
+    public void Render(SceneInstance scene, bool drawUI = true)
+    {
+        if (_renderTarget.IsNotValid()) return;
+
+        MirrorSceneCamera(scene);
+        if (DebugView != DebugViewMode.Lit) _camera.PostProcessing = false;
+
+        // Update camera pixel dimensions
+        _camera.UpdateRenderData(_renderTarget);
+
+        // Add camera object to scene temporarily if needed
+        bool wasInScene = _cameraObject.Scene.IsValid();
+        if (!wasInScene)
+            scene.Add(_cameraObject);
+
+        _camera.Render(new CameraRenderOptions
+        {
+            FallbackTarget = _renderTarget,
+            DisplayGizmos = ShowGizmos,
+            Kind = Infinity.Graphite.Rendering.ViewKind.SceneView,
+            Features = ShowGrid ? GridFeature.SceneList : null,
+            Keywords = DebugViews.Keywords(DebugView),
+        });
+
+        // Remove from scene if we added it
+        if (!wasInScene)
+            scene.Remove(_cameraObject);
+    }
+
+    /// <summary>Drops the scene camera's profile and the blended components, which can be user script types, before a script reload.</summary>
+    public void ReleaseSceneReferences()
+    {
+        _camera.Profile = null;
+        _camera.ReleaseVolumes();
+    }
+
+    private VolumeProfile? _defaultProfile;
+
+    // The scene view resolves volumes itself; only the main camera's base profile, volume layers, HDR and anti aliasing
+    // are borrowed, a new camera's default profile standing in without one
+    private void MirrorSceneCamera(SceneInstance scene)
+    {
+        _camera.PostProcessing = PostProcessing;
+        Camera? sceneCamera = FindSceneCamera(scene);
+        if (sceneCamera.IsNotValid() || sceneCamera == _camera)
+        {
+            if (_defaultProfile.IsNotValid()) _defaultProfile = VolumeProfile.CreateCameraDefault("Scene View Profile");
+            _camera.Profile = _defaultProfile;
+            _camera.VolumeMask = LayerMask.Everything;
+            _camera.HDR = true;
+            _camera.AntiAliasing = AntiAliasingMode.None;
+            return;
+        }
+
+        _camera.Profile = sceneCamera.Profile;
+        _camera.VolumeMask = sceneCamera.VolumeMask;
+        _camera.HDR = sceneCamera.HDR;
+        _camera.AntiAliasing = sceneCamera.AntiAliasing;
+        _camera.Fxaa = sceneCamera.Fxaa;
+        _camera.Smaa = sceneCamera.Smaa;
+        _camera.Taa = sceneCamera.Taa;
+    }
+
+    private static Camera? FindSceneCamera(SceneInstance scene)
+    {
+        // First try to find a camera tagged "Main Camera"
+        foreach (GameObject go in scene.Objects)
+        {
+            if (go.HideFlags.HasFlag(HideFlags.HideAndDontSave)) continue;
+            if (!go.CompareTag("Main Camera")) continue;
+
+            Camera? cam = go.GetComponent<Camera>();
+            if (cam.IsValid()) return cam;
+        }
+
+        // Fallback: first visible Camera in the scene
+        foreach (GameObject go in scene.Objects)
+        {
+            if (go.HideFlags.HasFlag(HideFlags.HideAndDontSave)) continue;
+
+            Camera? cam = go.GetComponent<Camera>();
+            if (cam.IsValid()) return cam;
+        }
+
+        return null;
+    }
+
+    // ================================================================
+    //  Camera Controls
+    // ================================================================
+
+    /// <summary>
+    /// Process input for the editor camera. Call each frame with delta time.
+    /// Right-click + mouse look, WASD to move, middle mouse to pan, scroll to zoom/speed.
+    /// </summary>
+    public bool ProcessInput(float dt, bool isHovered, Float2 mousePos, Float2 panelOrigin, Float2 panelSize)
+    {
+        // While flying the pointer is pinned at the lock center rather than under the panel, so hover
+        // cannot be trusted until the gesture ends and the lock context is back off the stack.
+        // Flight still settles toward its target once the pointer has left the view.
+        if (!isHovered && !_flying)
+        {
+            ApplyMovementSmoothing(dt);
+            return false;
+        }
+
+        bool consumed = false;
+        float scroll = Input.MouseWheelDelta;
+
+        // Scroll to dolly forward/back (also adjusts orbit distance)
+        if (scroll != 0 && !Input.GetMouseButton(1))
+        {
+            ClearMovementSmoothing();
+            if (_camera.IsOrthographic)
+            {
+                // Moving along the view direction changes nothing an orthographic projection can
+                // show, so the wheel has to resize the box instead of dollying.
+                SetOrthographicSize(_camera.OrthographicSize * MathF.Pow(0.9f, scroll));
+            }
+            else
+            {
+                Float3 forward = GetForwardFromAngles();
+                float dolly = scroll * _orbitDistance * 0.1f;
+                _position += forward * dolly;
+                _orbitDistance = MathF.Max(0.1f, _orbitDistance - dolly);
+                UpdateTransform();
+            }
+            consumed = true;
+        }
+
+        // Alt + Left mouse = orbit around a pivot captured when the gesture starts. Orbiting the
+        // selection (when present) keeps the thing you care about centered, otherwise a point ahead.
+        bool orbiting = Input.IsAltPressed && Input.GetMouseButton(0);
+        if (orbiting && !_wasOrbiting)
+        {
+            _orbitPivot = ComputeOrbitPivot();
+            _orbitDistance = MathF.Max(0.1f, Float3.Length(_orbitPivot - _position));
+        }
+        if (orbiting)
+        {
+            ClearMovementSmoothing();
+            Float2 delta = Input.MouseDelta;
+
+            _yaw += delta.X * 0.3f;
+            _pitch += delta.Y * 0.3f;
+            _pitch = MathF.Max(-89f, MathF.Min(89f, _pitch));
+
+            // Reposition so the pivot stays fixed and centered, using the transform's actual forward.
+            UpdateTransform();
+            _position = _orbitPivot - _cameraObject.Transform.Forward * _orbitDistance;
+            UpdateTransform();
+            consumed = true;
+        }
+        _wasOrbiting = orbiting;
+
+        // Alt + Right mouse = dolly zoom
+        if (Input.IsAltPressed && Input.GetMouseButton(1))
+        {
+            ClearMovementSmoothing();
+            Float2 delta = Input.MouseDelta;
+            if (_camera.IsOrthographic)
+            {
+                // Same reason as the wheel: there is nothing to dolly toward in an orthographic view.
+                SetOrthographicSize(_camera.OrthographicSize * (1f - (delta.X + delta.Y) * 0.02f));
+            }
+            else
+            {
+                float zoomDelta = (delta.X + delta.Y) * 0.02f * _orbitDistance;
+                Float3 forward = GetForwardFromAngles();
+                _position += forward * zoomDelta;
+                _orbitDistance = MathF.Max(0.1f, _orbitDistance - zoomDelta);
+                UpdateTransform();
+            }
+            consumed = true;
+        }
+
+        // Middle mouse = pan
+        if (Input.GetMouseButton(2))
+        {
+            ClearMovementSmoothing();
+            Float2 delta = Input.MouseDelta;
+            float panScale = 0.01f * _moveSpeed;
+            Float3 right = _cameraObject.Transform.Right;
+            Float3 up = _cameraObject.Transform.Up;
+            _position -= right * delta.X * panScale;
+            _position += up * delta.Y * panScale;
+            UpdateTransform();
+            consumed = true;
+        }
+
+        // Right mouse = look + WASD (with cursor lock)
+        if (Input.GetMouseButtonDown(1))
+        {
+            _lockContext.PanelOrigin = panelOrigin;
+            _lockContext.PanelSize = panelSize;
+            _flying = true;
+            Input.PushLockContext(_lockContext);
+            Input.LockCursor();
+        }
+
+        if (Input.GetMouseButton(1))
+        {
+            Float2 delta = Input.MouseDelta;
+
+            // Mouse look
+            _yaw += delta.X * 0.2f;
+            _pitch += delta.Y * 0.2f;
+            _pitch = MathF.Max(-89f, MathF.Min(89f, _pitch));
+
+            // WASD movement
+            Float3 forward = _cameraObject.Transform.Forward;
+            Float3 right = _cameraObject.Transform.Right;
+            Float3 move = Float3.Zero;
+
+            if (Input.GetKey(KeyCode.W)) move += forward;
+            if (Input.GetKey(KeyCode.S)) move -= forward;
+            if (Input.GetKey(KeyCode.D)) move += right;
+            if (Input.GetKey(KeyCode.A)) move -= right;
+            if (Input.GetKey(KeyCode.E) || Input.GetKey(KeyCode.Space)) move += Float3.UnitY;
+            if (Input.GetKey(KeyCode.Q)) move -= Float3.UnitY;
+
+            float speed = _moveSpeed * dt;
+            if (Input.IsShiftPressed) speed *= 3f;
+
+            if (Float3.LengthSquared(move) > 0)
+            {
+                move = Float3.Normalize(move) * speed;
+                _moveTarget = (_moveTarget ?? _position) + move;
+            }
+
+            // Scroll adjusts move speed while RMB held
+            if (scroll != 0)
+            {
+                _moveSpeed *= 1f + scroll * 0.15f;
+                _moveSpeed = MathF.Max(0.5f, MathF.Min(100f, _moveSpeed));
+                _speedChangedTime = Runtime.Time.UnscaledTotalTime;
+            }
+
+            // A glide updates the transform once it has moved, below.
+            if (_moveTarget == null) UpdateTransform();
+            consumed = true;
+        }
+
+        // The up edge can land in a frame before this runs, so flying also releases once the
+        // button is no longer held; a lock left engaged would strand the cursor at the lock center.
+        if (Input.GetMouseButtonUp(1) || (_flying && !Input.GetMouseButton(1)))
+        {
+            _flying = false;
+            Input.UnlockCursor();
+            Input.PopLockContext();
+        }
+
+        // F = focus on selection
+        if (ShortcutManager.IsPressed("Scene/Focus"))
+        {
+            FocusSelection();
+            consumed = true;
+        }
+
+        ApplyMovementSmoothing(dt);
+
+        return consumed;
+    }
+
+    /// <summary>Moves the camera toward the WASD flight target.</summary>
+    private void ApplyMovementSmoothing(float dt)
+    {
+        if (_moveTarget is not { } target) return;
+
+        _position = Maths.SmoothDamp(_position, target, ref _moveVelocity, _moveSmoothing, float.PositiveInfinity, dt);
+
+        if (Float3.LengthSquared(_position - target) < 1e-6f)
+        {
+            _position = target;
+            ClearMovementSmoothing();
+        }
+        UpdateTransform();
+    }
+
+    /// <summary>Drops the flight target, so the camera stops gliding once it is placed directly (orbit, pan, zoom, focus).</summary>
+    private void ClearMovementSmoothing()
+    {
+        _moveTarget = null;
+        _moveVelocity = Float3.Zero;
+    }
+
+    /// <summary>Releases a mid-gesture flight whose owning panel closed before RMB went up; without this
+    /// the lock context and locked cursor would stay stranded on Input's stacks.</summary>
+    public void ReleaseFlight()
+    {
+        if (!_flying) return;
+        _flying = false;
+        Input.UnlockCursor();
+        Input.PopLockContext();
+    }
+
+    /// <summary>
+    /// Pivot for an orbit gesture: the selection's bounds/position center when something is selected,
+    /// otherwise a point ahead of the camera at the current orbit distance.
+    /// </summary>
+    private Float3 ComputeOrbitPivot()
+    {
+        Float3 min = new(float.MaxValue);
+        Float3 max = new(float.MinValue);
+        bool anyBounds = false;
+        int count = 0;
+        Float3 positionSum = Float3.Zero;
+
+        Float3 pivotNormal = Float3.Zero;
+
+        foreach (GameObject go in Selection.GetSelected<GameObject>())
+        {
+            count++;
+            positionSum += go.Transform.Position;
+            AccumulateRendererBounds(go, ref min, ref max, ref anyBounds);
+            AccumulateUIBounds(go, ref min, ref max, ref anyBounds, ref pivotNormal);
+        }
+
+        if (anyBounds) return (min + max) * 0.5f;
+        if (count > 0) return positionSum / count;
+        return _position + _cameraObject.Transform.Forward * _orbitDistance;
+    }
+
+    /// <summary> Moves the camera to frame the currently selected objects, centering on their combined bounds or average position. </summary>
+    public void FocusSelection()
+    {
+        Float3 min = new(float.MaxValue);
+        Float3 max = new(float.MinValue);
+        bool anyBounds = false;
+        int goCount = 0;
+        Float3 positionSum = Float3.Zero;
+
+        bool anyRenderer = false;
+        Float3 uiNormal = Float3.Zero;
+        bool anyUI = false;
+
+        foreach (GameObject go in Selection.GetSelected<GameObject>())
+        {
+            goCount++;
+            positionSum += go.Transform.Position;
+            AccumulateRendererBounds(go, ref min, ref max, ref anyRenderer);
+            AccumulateUIBounds(go, ref min, ref max, ref anyUI, ref uiNormal);
+        }
+        if (goCount == 0) return;
+        anyBounds = anyRenderer || anyUI;
+
+        // Frame size is driven by renderer bounds when any are present; otherwise fall
+        // back to the Transform position(s) so even empty GOs (lights, cameras) focus.
+        Float3 target;
+        float radius;
+        if (anyBounds)
+        {
+            target = (min + max) * 0.5f;
+            Float3 size = max - min;
+            radius = MathF.Max(0.5f, Float3.Length(size) * 0.5f);
+        }
+        else
+        {
+            target = positionSum / goCount;
+            radius = 0.5f;
+        }
+
+        // Distance that fits the object in the vertical FOV, with a little padding.
+        float fovRad = _camera.FieldOfView * MathF.PI / 180f;
+        float dist = radius / MathF.Tan(fovRad * 0.5f) + radius;
+        dist = MathF.Max(dist, 0.5f);
+
+        // A UI-only selection is a flat rect, so the view swings around to face it from whichever side
+        // the camera is already on. Anything with geometry keeps the angle it was viewed from.
+        if (anyUI && !anyRenderer && Float3.LengthSquared(uiNormal) > 1e-8f)
+        {
+            Float3 facing = Float3.Normalize(uiNormal);
+            if (Float3.Dot(facing, _position - target) < 0f) facing = -facing;
+            FaceDirection(-facing);
+        }
+
+        // Set orbit distance and position camera to look at target
+        ClearMovementSmoothing();
+        _orbitDistance = dist;
+        _position = target - GetForwardFromAngles() * dist;
+        UpdateTransform();
+    }
+
+    private static void AccumulateRendererBounds(GameObject go, ref Float3 min, ref Float3 max, ref bool any)
+    {
+        MeshRenderer? mr = go.GetComponent<MeshRenderer>();
+        if (mr.IsValid() && mr.Mesh.IsValid())
+        {
+            AABB wb = mr.Mesh.bounds.TransformBy(go.Transform.LocalToWorldMatrix);
+            min = new Float3(MathF.Min(min.X, wb.Min.X), MathF.Min(min.Y, wb.Min.Y), MathF.Min(min.Z, wb.Min.Z));
+            max = new Float3(MathF.Max(max.X, wb.Max.X), MathF.Max(max.Y, wb.Max.Y), MathF.Max(max.Z, wb.Max.Z));
+            any = true;
+        }
+        SkinnedMeshRenderer? smr = go.GetComponent<SkinnedMeshRenderer>();
+        if (smr.IsValid() && smr.SharedMesh.IsValid())
+        {
+            AABB wb = smr.SharedMesh.bounds.TransformBy(go.Transform.LocalToWorldMatrix);
+            min = new Float3(MathF.Min(min.X, wb.Min.X), MathF.Min(min.Y, wb.Min.Y), MathF.Min(min.Z, wb.Min.Z));
+            max = new Float3(MathF.Max(max.X, wb.Max.X), MathF.Max(max.Y, wb.Max.Y), MathF.Max(max.Z, wb.Max.Z));
+            any = true;
+        }
+        foreach (GameObject child in go.Children)
+            AccumulateRendererBounds(child, ref min, ref max, ref any);
+    }
+
+    /// <summary>
+    /// Grows the bounds by the world rect of any canvas or UI element on this object or below it, and
+    /// reports the facing of the last rect seen so the view can be squared up to it.
+    /// </summary>
+    private static void AccumulateUIBounds(GameObject go, ref Float3 min, ref Float3 max, ref bool any, ref Float3 normal)
+    {
+        GameCanvas? canvas = go.GetComponent<GameCanvas>();
+        if (canvas.IsValid())
+        {
+            Rect root = canvas.RootRect;
+            Float4x4 toWorld = canvas.CanvasToWorld;
+            Include(Float4x4.TransformPoint(new Float3((float)root.Min.X, (float)root.Min.Y, 0f), toWorld), ref min, ref max, ref any);
+            Include(Float4x4.TransformPoint(new Float3((float)root.Min.X, (float)root.Max.Y, 0f), toWorld), ref min, ref max, ref any);
+            Include(Float4x4.TransformPoint(new Float3((float)root.Max.X, (float)root.Max.Y, 0f), toWorld), ref min, ref max, ref any);
+            Include(Float4x4.TransformPoint(new Float3((float)root.Max.X, (float)root.Min.Y, 0f), toWorld), ref min, ref max, ref any);
+            normal = new Float3(toWorld.c2.X, toWorld.c2.Y, toWorld.c2.Z);
+        }
+
+        if (go.RectTransform is { } rect)
+        {
+            rect.ForceUpdateRectTransforms();
+            Float3[] corners = new Float3[4];
+            rect.GetWorldCorners(corners);
+            if (corners[0] != corners[2])
+            {
+                foreach (Float3 corner in corners)
+                    Include(corner, ref min, ref max, ref any);
+
+                Float3 edgeX = corners[3] - corners[0];
+                Float3 edgeY = corners[1] - corners[0];
+                normal = Float3.Cross(edgeX, edgeY);
+            }
+        }
+
+        foreach (GameObject child in go.Children)
+            AccumulateUIBounds(child, ref min, ref max, ref any, ref normal);
+    }
+
+    private static void Include(Float3 point, ref Float3 min, ref Float3 max, ref bool any)
+    {
+        min = new Float3(MathF.Min(min.X, point.X), MathF.Min(min.Y, point.Y), MathF.Min(min.Z, point.Z));
+        max = new Float3(MathF.Max(max.X, point.X), MathF.Max(max.Y, point.Y), MathF.Max(max.Z, point.Z));
+        any = true;
+    }
+
+    /// <summary>Points the camera along <paramref name="forward"/> without moving it.</summary>
+    private void FaceDirection(Float3 forward)
+    {
+        if (Float3.LengthSquared(forward) < 1e-8f) return;
+
+        forward = Float3.Normalize(forward);
+        _yaw = Maths.ToDegrees(MathF.Atan2(forward.X, forward.Z));
+        _pitch = Math.Clamp(Maths.ToDegrees(MathF.Asin(-forward.Y)), -89f, 89f);
+        UpdateTransform();
+    }
+
+    /// <summary> Sets the camera's yaw and pitch without changing its position. Pitch is clamped to +/-89 degrees. </summary>
+    public void SetOrientation(float yaw, float pitch)
+    {
+        _yaw = yaw;
+        _pitch = MathF.Max(-89f, MathF.Min(89f, pitch));
+        UpdateTransform();
+    }
+
+    /// <summary> Converts a screen-space coordinate into a world-space ray using the editor camera's projection. </summary>
+    public Ray ScreenPointToRay(Float2 screenPos, Float2 panelSize)
+    {
+        return _camera.ScreenPointToRay(screenPos, panelSize);
+    }
+
+    /// <summary>Compute forward direction from yaw/pitch angles without reading the transform.</summary>
+    private Float3 GetForwardFromAngles()
+    {
+        float yawRad = _yaw * MathF.PI / 180f;
+        float pitchRad = _pitch * MathF.PI / 180f;
+        float cosPitch = MathF.Cos(pitchRad);
+        return new Float3(
+            MathF.Sin(yawRad) * cosPitch,
+            -MathF.Sin(pitchRad),
+            MathF.Cos(yawRad) * cosPitch
+        );
+    }
+
+    private void UpdateTransform()
+    {
+        _cameraObject.Transform.Position = _position;
+        _cameraObject.Transform.LocalEulerAngles = new Float3(_pitch, _yaw, 0);
+    }
+
+    /// <summary> Releases the camera's effect features and disposes the render target. </summary>
+    public void Dispose()
+    {
+        ReleaseSceneReferences();
+        if (_renderTarget.IsValid()) _renderTarget.Dispose();
+        _renderTarget = null;
+    }
+}

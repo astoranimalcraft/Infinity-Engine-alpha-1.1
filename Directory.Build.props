@@ -1,0 +1,26 @@
+<Project>
+  <!-- Local Anthology switch. Precedence: -p:ProwlLocalAnthology=true, then prowl.local.props (gitignored),
+       then the PROWL_LOCAL_ANTHOLOGY environment variable. Default is the NuGet packages. -->
+  <Import Project="$(MSBuildThisFileDirectory)prowl.local.props" Condition="Exists('$(MSBuildThisFileDirectory)prowl.local.props')" />
+
+  <PropertyGroup>
+    <ProwlLocalAnthology Condition="'$(ProwlLocalAnthology)' == ''">$(PROWL_LOCAL_ANTHOLOGY)</ProwlLocalAnthology>
+    <ProwlLocalAnthology Condition="'$(ProwlLocalAnthology)' == '1'">true</ProwlLocalAnthology>
+    <ProwlLocalAnthology Condition="'$(ProwlLocalAnthology)' != 'true'">false</ProwlLocalAnthology>
+    <AnthologyDir Condition="'$(AnthologyDir)' == ''">$(MSBuildThisFileDirectory)..\Anthology\</AnthologyDir>
+
+    <!-- A checkout that is not where the props file expects it must not fail the build with "project not found":
+         fall back to the packages and say why. -->
+    <ProwlLocalAnthologyRequested>$(ProwlLocalAnthology)</ProwlLocalAnthologyRequested>
+    <ProwlLocalAnthology Condition="'$(ProwlLocalAnthology)' == 'true' AND !Exists('$(AnthologyDir)Graphite\Graphite\Prowl.Graphite.csproj')">false</ProwlLocalAnthology>
+
+    <ProwlPackageVersion>3.9.3</ProwlPackageVersion>
+    <LangVersion>15</LangVersion>
+  </PropertyGroup>
+
+  <Target Name="ProwlAnthologyFallback" BeforeTargets="PrepareForBuild"
+          Condition="'$(ProwlLocalAnthologyRequested)' == 'true' AND '$(ProwlLocalAnthology)' != 'true'">
+    <Message Importance="high"
+             Text="Prowl: a local Anthology checkout was requested but $(AnthologyDir) has no Graphite\Graphite\Prowl.Graphite.csproj, so the Prowl.* $(ProwlPackageVersion) packages are used instead. Point AnthologyDir at your checkout to build from source." />
+  </Target>
+</Project>

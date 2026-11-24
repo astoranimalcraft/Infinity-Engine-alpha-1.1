@@ -1,0 +1,2614 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
+
+using Infinity.Echo;
+using Infinity.Editor.Core.Diagnostics;
+using Infinity.Editor.GUI;
+using Infinity.Editor.GUI.Panels;
+using Infinity.Editor.GUI.PropertyEditors;
+using Infinity.Editor.GUI.SceneView;
+using Infinity.Editor.Prefabs;
+using Infinity.Editor.Projects;
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Editor.Projects.Settings;
+using Infinity.Editor.Theming;
+using Infinity.Editor.Thumbnails;
+using Infinity.Graphite.Debugger.Viewer;
+using Infinity.Editor.Utils;
+using Infinity.OrigamiUI;
+using Infinity.PaperUI;
+using Infinity.PaperUI.LayoutEngine;
+using Infinity.Rosetta;
+using Infinity.Runtime;
+using Infinity.Runtime.Diagnostics;
+using Infinity.Runtime.Resources;
+using Infinity.Vector;
+
+using Silk.NET.Core.Contexts;
+using Silk.NET.Maths;
+
+namespace Infinity.Editor.Core;
+
+/// <summary> The editor application, the main entry point for the Prowl editor. Extends Game and manages the editor window, panels, play mode, asset pipeline, and UI lifecycle. </summary>
+public class EditorApplication : Game
+{
+    /// <summary> Gets the singleton EditorApplication instance. Set during Initialize(). </summary>
+    public static EditorApplication? Instance { get; private set; }
+
+    /// <summary>The editor's PropertyGrid configuration (drawers, handlers, callbacks).</summary>
+    public static OrigamiUI.PropertyGridConfig PropertyGridConfig { get; private set; } = null!;
+
+    private DockSpace _dockSpace = null!;
+    private bool _sceneGizmosDrawn;
+    private PanelMaximizer _panelMaximizer = null!;
+
+    /// <summary>Feeds the render profiler panels, null headless.</summary>
+    internal RenderProfilerSource? RenderProfiler { get; private set; }
+
+    /// <summary>Maximizes docked panels over the rest of the layout, and brings the layout back.</summary>
+    internal PanelMaximizer Maximizer => _panelMaximizer;
+
+    private GUI.NebulaBackground? _nebula;
+    private double _introTime = double.MaxValue;
+    private const double IntroCloseDuration = 1.6; // bars close over launcher
+    private const double IntroBrandStart = 0.4;    // logo starts spinning in while the bars close
+    private const double IntroOpenStart = 3.95;    // bars open once the logo animation has played
+    private const double IntroOpenDuration = 1.55; // bars open revealing editor
+    private const double IntroDuration = IntroOpenStart + IntroOpenDuration;
+    private bool _introClosing; // true = closing phase (bars sliding in)
+    private bool _launcherWasOpen = true;
+    private bool _wasFocused = true;
+    private bool _wasCliActive;
+    // A project's scene is queued here and opened by the frame loop once its scripts have been built.
+    private bool _sceneLoadPending;
+    private bool _quitRequested;
+    private bool _windowRevealed;
+    private double _loadingTime;
+    private IDisposable? _origamiScope;
+
+    private string? _curDefaultFont;
+    private string? _curDefaultBoldFont;
+    private string? _curMonoFont;
+
+    // Play mode state
+    private object? _savedEditUndo;
+    private List<(Asset Asset, MemoryCopy Copy)> _dirtyAssetCopies = [];
+    private int _lastFocusedElement;
+    private Selection.Snapshot? _savedSelection;
+    private int _savedActiveTabIndex = -1;
+    private DockNode? _savedActiveTabNode;
+    private bool _maximizedForPlay; // play mode maximized the Game view, so stopping restores the layout
+    private DockPanel? _maximizedBeforePlay; // the panel the user had maximized when play started, maximized again on stop
+
+
+    /// <summary> Initializes the editor window with the given title, width and height, restoring saved position and maximization state from EditorSettings. </summary>
+    public override void InitializeWindow(string title, int width, int height)
+    {
+        EditorSettings instance = EditorSettings.Instance;
+        Window.InitWindow(title, width, height, instance.WindowMaximized ? Silk.NET.Windowing.WindowState.Maximized : Silk.NET.Windowing.WindowState.Normal, false);
+
+        Window.Position = new Silk.NET.Maths.Vector2D<int>(
+            instance.WindowX > 0 ? instance.WindowX : Window.Position.X,
+            instance.WindowY > 0 ? instance.WindowY : Window.Position.Y);
+
+        // The swapchain is not ready until the first frame. Keeping the window hidden until then avoids the
+        // white flash every Vulkan host shows between window creation and its first present.
+        try { Window.InternalWindow.IsVisible = false; } catch { /* platform without visibility control */ }
+    }
+
+    /// <summary>The edit world, empty until a project's scene opens, so panels always have a world to show.</summary>
+    protected override SceneInstance CreateMainWorld()
+    {
+        SceneInstance edit = SceneInstance.Create("NewProject", SceneMode.Edit);
+        edit.Activate();
+        EditorSceneManager.EditWorld = edit;
+        return edit;
+    }
+
+    // The game view draws and feeds the presented worlds, never the editor window.
+    protected override bool PresentsWorlds => false;
+
+    protected override List<SceneInstance> InputWorlds() => GameViewPanel.HostedWorlds();
+
+    /// <summary> Initializes the editor: sets the singleton instance, loads fonts and settings, initializes the dock space, localization, registries, menus, and the PropertyGrid config. Opens a project if one was provided via --project, otherwise shows the project launcher. </summary>
+    public override void Initialize()
+    {
+        Instance = this;
+        Application.IsEditor = true;
+        Application.IsPlaying = false;
+
+        // Gameplay asking to quit stops play mode. Deferred to the GUI phase so the play scene is not torn down mid Update.
+        Application.QuitHandler = () => _quitRequested = true;
+
+        InitializeFont();
+
+        Resize(Window.Size.X, Window.Size.Y);
+
+        // Load Font Awesome as fallback fonts for icons. Keep the FontFile handles so icons can also
+        // be drawn in a chosen weight directly (e.g. an outline vs filled star), independent of the
+        // fallback resolution order.
+        EditorTheme.FontIconOutline = LoadFallbackFont("fa-regular-400.ttf");
+        EditorTheme.FontIconSolid = LoadFallbackFont("fa-solid-900.ttf");
+
+        // Load CJK/international fallback fonts from system for localization support
+        LoadSystemFallbackFonts();
+
+        // Load editor settings (global, persists across projects)
+        _ = EditorSettings.Instance; // triggers load + ApplyTheme
+        Preferences.WatchFiles();
+
+        ApplyFramePacing();
+
+        _dockSpace = new DockSpace(CreateDefaultLayout());
+        _panelMaximizer = new PanelMaximizer(_dockSpace);
+        if (!Graphics.IsHeadless)
+        {
+            RenderProfiler = new RenderProfilerSource();
+            RenderProfiler.Attach(_dockSpace);
+        }
+
+        // Open windows and the selection keep what they show loaded, through their fields like a scene's objects.
+        AssetDatabase.WalkingRoots += WalkEditorRoots;
+        AssetDatabase.WalkingRoots += Undo.VisitResidents;
+        Runtime.Resources.SceneInstance.Loaded += Undo.OnSectionLoaded;
+
+        // If launched with --project arg, open the project and load assemblies
+        // BEFORE registries scan so user types are visible to all registries
+        bool projectAlreadyInitialized = false;
+        bool outdatedStartupProject = false;
+        if (Program.StartupProjectPath != null)
+        {
+            try
+            {
+                var project = Project.Open(Program.StartupProjectPath);
+                outdatedStartupProject = project.NeedsMigration || project.IsFromNewerEngine;
+                if (!outdatedStartupProject)
+                {
+                    project.SetActive();
+
+                    // Load user script assemblies before registry scanning
+                    ScriptAssemblyManager.LoadAssemblies(project);
+
+                    // RequestStartupCompile skips the debounce time entirely and starts the compile process right away.
+                    // This is crucial since without assemblies correctly compiled the scene would load in with broken
+                    // references, which require correct script data to be in
+                    ScriptAssemblyManager.RequestRecompile(true);
+
+                    projectAlreadyInitialized = true;
+                    Window.InternalWindow.Title = $"Infinity Engine - {project.Name}";
+                    Window.SetProjectIcon();
+                    DiscordRichPresence.SetProject(project.Name);
+                }
+            }
+            catch (Exception ex)
+            {
+                Runtime.Debug.LogError($"Failed to open project from --project arg: {ex.Message}");
+            }
+        }
+
+        // Initialize localization
+        Infinity.Rosetta.Loc.Configure(cfg => cfg
+            .SetFallbackLocale("en")
+            .AddProvider(new EmbeddedResourceProvider(
+                System.Reflection.Assembly.GetExecutingAssembly(), ResourceRoot + "Locale"))
+            .SetLocale(EditorSettings.Instance.Locale)
+            .OnMissingKey(Infinity.Rosetta.MissingKeyBehavior.ReturnKey)
+        );
+
+        EditorRegistries.Initialize();
+        DiscordRichPresence.Start();
+
+        // Cursor lock toasts
+        Input.OnCursorLocked += () =>
+            Toasts.Show(Loc.Get("toast.cursor_locked"), Loc.Get("toast.cursor_locked_msg"), ToastType.Info, 3f);
+        Input.OnCursorLockFailed += () =>
+            Toasts.Show(Loc.Get("toast.cursor_lock_failed"), Loc.Get("toast.cursor_lock_failed_msg"), ToastType.Warning, 3f);
+
+        RegisterMenus();
+
+        if (projectAlreadyInitialized)
+        {
+            // Project settings load first, since some decide how assets import
+            EditorRegistries.Initialize();
+            EditorRegistries.OnProjectOpened();
+
+            // Initialize asset database for the already-opened project
+            var db = new EditorAssetBackend(Project.Current!);
+            db.Initialize();
+
+            // Restore layout
+            DockNode? savedLayout = LoadDockLayout();
+            if (savedLayout != null)
+                SetDockLayout(savedLayout);
+
+            // Rather than loading the scene here, we queue it: the frame loop opens it once the startup compile settles,
+            // so the scene is never read against types that have not been built yet.
+            _sceneLoadPending = true;
+            _loadingTime = 0;
+
+            // Skip launcher and intro animation entirely
+            ProjectLauncher.Close();
+            _launcherWasOpen = false;
+            _introClosing = false;
+            _introTime = IntroDuration + 1; // past the end no animation
+        }
+        else
+        {
+            // Start with the project launcher, which asks before migrating a project from another version
+            ProjectLauncher.Initialize();
+            if (outdatedStartupProject)
+                ProjectLauncher.TryOpenProject(Program.StartupProjectPath!);
+        }
+
+        // Initialize status bar log tracking
+        InitializeStatusBar();
+
+        // Build the editor's PropertyGrid config
+        PropertyGridConfig = new OrigamiUI.PropertyGridConfig();
+        OrigamiUI.BuiltInFieldDrawers.Register(PropertyGridConfig.Drawers);
+        RangeSliderDrawer.Register(PropertyGridConfig.Drawers); // wraps the built-in float/int drawers
+        BuiltInAttributeHandlers.Register(PropertyGridConfig.Handlers);
+        PropertyGridConfig.OnBeginRoot = Undo.InspectorBaseline;
+        PropertyGridConfig.OnFieldChanged = target =>
+        {
+            var eo = target as Runtime.EngineObject;
+            if (eo.IsValid())
+            {
+                try { eo.OnValidate(); }
+                catch (Exception ex) { Debug.LogException($"OnValidate threw on {eo.GetType().Name}", ex); }
+            }
+
+            // Record the edit against the prefab it belongs to as it happens, rather than relying on
+            // something drawing this object again later.
+            PrefabUtility.NotifyEdited(target);
+            Undo.InspectorChanged(target);
+        };
+        PropertyGridConfig.OnBeforeDrawField = (fieldType, value) =>
+        {
+            if (typeof(Runtime.EngineObject).IsAssignableFrom(fieldType))
+                EngineObjectPropertyEditor.SetFieldType(fieldType);
+            InspectorNameEnumDrawer.EnsureRegistered(PropertyGridConfig.Drawers, fieldType);
+        };
+        PropertyGridConfig.DrawTypePicker = (paper, id, baseType, currentValue, onChange) =>
+        {
+            Type[] types = [.. EditorUtils.GetAllTypes()
+                .Where(t => baseType.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface)
+                .Take(20)];
+
+            if (types.Length == 0) return;
+
+            Type? currentType = currentValue?.GetType();
+            int selectedIndex = currentType != null ? Array.IndexOf(types, currentType) + 1 : 0;
+            string[] names = [.. types.Select(t => t.Name).Prepend("(null)")];
+
+            OrigamiUI.Origami.Dropdown(paper, $"{id}_dd", selectedIndex,
+                idx =>
+                {
+                    if (idx == 0) onChange(null);
+                    else if (idx >= 1 && idx <= types.Length) onChange(Activator.CreateInstance(types[idx - 1]));
+                }, names).Show();
+        };
+        PropertyGridConfig.FallbackFieldDrawer = (paper, id, label, fieldType, value, onChange, depth) =>
+        {
+            if (typeof(Runtime.EngineObject).IsAssignableFrom(fieldType))
+                EngineObjectPropertyEditor.SetFieldType(fieldType);
+            PropertyEditor? editor = EditorRegistries.GetPropertyEditor(fieldType);
+            if (editor != null)
+            {
+                editor.OnGUI(paper, id, label, value, onChange, depth);
+                return true;
+            }
+            return false;
+        };
+        // A collection element is a "simple" (one-line object-picker row) rather than an expanded
+        // per-element foldout when the host has a single-control editor for it - the same set the
+        // FallbackFieldDrawer above handles: EngineObject-derived types (GameObject, Material, ...) and
+        // AssetRef<T>. Without this, e.g. GameObject[] renders each element's internal fields instead.
+        PropertyGridConfig.IsSimpleFieldType = fieldType => EditorRegistries.GetPropertyEditor(fieldType) != null;
+
+        // Register save handlers
+        EditorUtility.RegisterSaveHooks();
+        // The prefab being edited is written on every save, but only named in the toast when it had changes. Scenes are
+        // written when dirty, and an untitled one asks for a path, never during an auto save.
+        SaveManager.OnSave += () =>
+        {
+            if (Application.IsPlaying) return null;
+            if (PrefabEditingMode.IsEditing)
+            {
+                bool changed = PrefabEditingMode.IsDirty;
+                return PrefabEditingMode.Save() && changed ? PrefabEditingMode.SaveLabel : null;
+            }
+
+            List<string> saved = [];
+            OpenScene? untitled = null;
+            foreach (OpenScene scene in EditorSceneManager.OpenScenes.ToArray())
+            {
+                if (!scene.IsDirty || !scene.IsLoaded) continue;
+                if (scene.Path == null) untitled ??= scene;
+                else if (EditorSceneManager.Save(scene)) saved.Add(EditorSceneManager.LabelOf(scene));
+            }
+            // Every titled scene saves first, then the first untitled one asks for a path.
+            if (untitled != null && !SaveManager.IsAutoSave) PromptSaveAs(untitled, SaveManager.TakeAfterSaveAs());
+            return saved.Count == 0 ? null : string.Join(", ", saved);
+        };
+        Runtime.Debug.OnLog += PauseOnLog;
+        SaveManager.CollectUnsaved += unsaved =>
+        {
+            if (PrefabEditingMode.IsEditing && PrefabEditingMode.IsDirty) unsaved.Add(PrefabEditingMode.SaveLabel);
+            foreach (OpenScene scene in EditorSceneManager.OpenScenes)
+                if (scene.IsDirty) unsaved.Add(EditorSceneManager.LabelOf(scene));
+        };
+        Window.CloseRequested = () =>
+        {
+            if (SaveManager.Unsaved().Count == 0) return true;
+            SaveManager.ConfirmUnsaved(() => Window.Stop(force: true));
+            return false;
+        };
+        SaveManager.OnSave += () =>
+        {
+            if (Project.Current != null && !Application.IsPlaying) SaveProjectState();
+            return null;
+        };
+
+        // Set Windows title bar to match Darkest theme color
+        ApplyDarkTitleBar();
+
+        // Attach to the window events to save the position and state of the window
+        Window.InternalWindow.Move += (position) =>
+        {
+            EditorSettings.Instance.WindowX = position.X;
+            EditorSettings.Instance.WindowY = position.Y;
+
+            EditorSettings.Instance.Save();
+        };
+
+        Window.InternalWindow.Resize += (size) =>
+        {
+            EditorSettings.Instance.WindowWidth = size.X;
+            EditorSettings.Instance.WindowHeight = size.Y;
+            EditorSettings.Instance.Save();
+        };
+
+        Window.InternalWindow.StateChanged += (state) =>
+        {
+            EditorSettings.Instance.WindowMaximized = state == Silk.NET.Windowing.WindowState.Maximized;
+
+            EditorSettings.Instance.Save();
+        };
+
+        Window.InternalWindow.Closing += () =>
+        {
+            SceneToolManager.StoreSettings();
+            SaveEditorWindowState();
+        };
+
+        Window.FileDrop += ExternalAssetDrop.Enqueue;
+    }
+
+    [DllImport("dwmapi.dll", PreserveSig = true)]
+    private static extern int DwmSetWindowAttribute(nint hwnd, int attr, ref int value, int size);
+
+    /// <summary>The family name of the bundled UI font. Any other font name is a system font family or a font file path.</summary>
+    public const string BundledFontName = "Geist";
+
+    /// <summary>The regular, bold, italic and bold italic faces of a monospace font.</summary>
+    public readonly record struct MonoFontFaces(Scribe.FontFile? Regular, Scribe.FontFile? Bold, Scribe.FontFile? Italic, Scribe.FontFile? BoldItalic);
+
+    /// <summary>The family name of the bundled monospace font.</summary>
+    public const string BundledMonoFontName = "JetBrains Mono";
+
+    private Scribe.FontFile? _geistRegular, _geistMedium, _geistSemiBold, _geistBold, _jetBrainsMono, _jetBrainsMonoMedium;
+    private Scribe.FontFile[]? _systemFonts;
+    private readonly Dictionary<string, Scribe.FontFile?> _fileFonts = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Every font installed on this machine, read once on first use.</summary>
+    public IReadOnlyList<Scribe.FontFile> SystemFonts
+    {
+        get
+        {
+            if (_systemFonts != null) return _systemFonts;
+            try
+            {
+                _systemFonts = [.. PaperInstance.EnumerateSystemFonts()];
+            }
+            catch (Exception e)
+            {
+                // A broken or hostile font directory must not stop the editor from opening.
+                Runtime.Debug.LogWarning($"System fonts could not be enumerated: {e.Message}");
+                _systemFonts = [];
+            }
+            return _systemFonts;
+        }
+    }
+
+    /// <summary> Loads the editor fonts and resolves the UI, bold and mono fonts from the theme's font names, then syncs the Origami theme. Does nothing when the names have not changed. </summary>
+    public void InitializeFont()
+    {
+        if (_geistRegular == null)
+        {
+            _geistRegular = LoadBundledFont("Geist-Regular.ttf");
+            _geistMedium = LoadBundledFont("Geist-Medium.ttf");
+            _geistSemiBold = LoadBundledFont("Geist-SemiBold.ttf");
+            _geistBold = LoadBundledFont("Geist-Bold.ttf");
+            _jetBrainsMono = LoadBundledFont("JetBrainsMono-Regular.ttf");
+            _jetBrainsMonoMedium = LoadBundledFont("JetBrainsMono-Medium.ttf");
+            EditorTheme.FontDisplay = LoadBundledFont("SpaceGrotesk-Bold.ttf");
+            EditorTheme.FontLogo = LoadBundledFont("Audiowide-Regular.ttf");
+        }
+        else if (_curDefaultFont == EditorTheme.DefaultFontName && _curDefaultBoldFont == EditorTheme.DefaultBoldFontName
+                 && _curMonoFont == EditorTheme.MonoFontName)
+            return;
+
+        Scribe.FontFile? ui = FindFont(EditorTheme.DefaultFontName, BundledFontName, Scribe.FontStyle.Regular);
+        Scribe.FontFile? bold = FindFont(EditorTheme.DefaultBoldFontName, BundledFontName, Scribe.FontStyle.Bold);
+
+        EditorTheme.DefaultFont = ui ?? _geistRegular;
+        EditorTheme.FontMedium = ui ?? _geistMedium;
+        EditorTheme.DefaultBoldFont = bold ?? _geistBold;
+        EditorTheme.FontSemiBold = bold ?? _geistSemiBold;
+        MonoFontFaces mono = MonoFaces(EditorTheme.MonoFontName);
+        EditorTheme.FontMono = mono.Regular;
+        EditorTheme.FontMonoBold = mono.Bold;
+        EditorTheme.FontMonoItalic = mono.Italic;
+        EditorTheme.FontMonoBoldItalic = mono.BoldItalic;
+
+        _curDefaultFont = EditorTheme.DefaultFontName;
+        _curDefaultBoldFont = EditorTheme.DefaultBoldFontName;
+        _curMonoFont = EditorTheme.MonoFontName;
+
+        EditorTheme.SyncOrigami(0f);
+    }
+
+    // A font file path loads that file. A family name prefers the requested style and falls back to the family's regular face.
+    private Scribe.FontFile? FindFont(string family, string bundled, Scribe.FontStyle style)
+    {
+        if (string.IsNullOrEmpty(family) || family.Equals(bundled, StringComparison.OrdinalIgnoreCase)) return null;
+        if (IsFontFile(family)) return LoadFontFile(family);
+
+        Scribe.FontFile? regular = null;
+        foreach (Scribe.FontFile font in SystemFonts)
+        {
+            if (!font.FamilyName.Equals(family, StringComparison.OrdinalIgnoreCase)) continue;
+            if (font.Style == style) return font;
+            if (font.Style == Scribe.FontStyle.Regular) regular = font;
+        }
+        if (regular == null) Runtime.Debug.LogWarning($"Font '{family}' is not installed, using {bundled}.");
+        return regular;
+    }
+
+    /// <summary>The faces of a monospace font setting: the bundled font, an installed family or a font file. Faces it does not have are null.</summary>
+    public MonoFontFaces MonoFaces(string name)
+    {
+        Scribe.FontFile? regular = FindFont(name, BundledMonoFontName, Scribe.FontStyle.Regular);
+        if (regular == null) return new(_jetBrainsMono, _jetBrainsMonoMedium, null, null);
+        return new(regular, FindFace(name, Scribe.FontStyle.Bold), FindFace(name, Scribe.FontStyle.Italic), FindFace(name, Scribe.FontStyle.BoldItalic));
+    }
+
+    // Only the exact face, so a family without it gets no stand in.
+    private Scribe.FontFile? FindFace(string family, Scribe.FontStyle style)
+    {
+        if (IsFontFile(family)) return null;
+        foreach (Scribe.FontFile font in SystemFonts)
+            if (font.Style == style && font.FamilyName.Equals(family, StringComparison.OrdinalIgnoreCase)) return font;
+        return null;
+    }
+
+    /// <summary>Whether a font setting holds a path to a font file rather than a family name.</summary>
+    public static bool IsFontFile(string name)
+        => name.EndsWith(".ttf", StringComparison.OrdinalIgnoreCase) || name.EndsWith(".otf", StringComparison.OrdinalIgnoreCase);
+
+    private Scribe.FontFile? LoadFontFile(string path)
+    {
+        if (_fileFonts.TryGetValue(path, out Scribe.FontFile? cached)) return cached;
+        Scribe.FontFile? font = null;
+        try
+        {
+            using FileStream stream = File.OpenRead(path);
+            font = new Scribe.FontFile(stream);
+        }
+        catch (Exception ex)
+        {
+            Runtime.Debug.LogWarning($"Font file '{path}' could not be loaded: {ex.Message}");
+        }
+        _fileFonts[path] = font;
+        return font;
+    }
+
+    private static Infinity.Scribe.FontFile? LoadBundledFont(string fileName)
+    {
+        using Stream? stream = GetEmbeddedResource(fileName);
+        if (stream == null)
+        {
+            Runtime.Debug.LogWarning($"Missing bundled font: {fileName}");
+            return null;
+        }
+        return new Infinity.Scribe.FontFile(stream);
+    }
+
+    // The whole Paper frame is the editor's interface. The game's own UI, drawn inside the Game view, still counts as UI.
+    protected override FrameStat GuiFrameStat => EditorFrameStats.UI;
+
+    /// <summary> Sets the Paper resolution and framebuffer scale, accounting for content scale and user scale. </summary>
+    protected override void PreparePaperFrame()
+    {
+        Vector2D<int> fbSize = Window.InternalWindow.FramebufferSize;
+        float cs = Math.Max(0.01f, Window.ContentScale);
+        float us = Math.Max(0.01f, EditorTheme.UserScale);
+        PaperInstance.SetResolution(fbSize.X / (cs * us), fbSize.Y / (cs * us));
+        PaperInstance.DisplayFramebufferScale = new Float2(cs * us, cs * us);
+    }
+
+    /// <summary> Converts the raw mouse position into Paper-local coordinates, accounting for framebuffer size, window size, content scale, and user scale. </summary>
+    protected override Float2 GetPaperMousePosition()
+    {
+        Int2 p = Input.MousePosition;
+        Vector2D<int> fb = Window.InternalWindow.FramebufferSize;
+        Vector2D<int> win = Window.InternalWindow.Size;
+        float cs = Math.Max(0.01f, Window.ContentScale);
+        float csFbWin = win.X > 0 ? (float)fb.X / win.X : 1f;
+        float us = Math.Max(0.01f, EditorTheme.UserScale);
+        return new Float2(p.X * csFbWin / (cs * us), p.Y * csFbWin / (cs * us));
+    }
+
+    private void ApplyDarkTitleBar()
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
+
+        INativeWindow? native = Window.InternalWindow.Native;
+        nint hwnd = native?.Win32?.Hwnd ?? 0;
+        if (hwnd == 0) return;
+
+        // DWMWA_USE_IMMERSIVE_DARK_MODE = 20
+        int darkMode = 1;
+        DwmSetWindowAttribute(hwnd, 20, ref darkMode, sizeof(int));
+    }
+
+    // Panels act inside the world they edit, so Camera.Main, Physics and Debug.Draw reach it rather than Main.
+    protected override SceneInstance? GuiWorld => SceneInstance.HasMain ? EditorSceneManager.EditedWorld : null;
+
+    /// <summary> Begins the editor GUI frame: flushes the undo system, handles global keyboard shortcuts, pushes the Origami theme, processes asset changes, and draws the project launcher or editor backdrop and header. </summary>
+    public override void BeginGui(Paper paper)
+    {
+        (Input.Current as GameViewInputHandler)?.UpdateSuppressedKeys();
+
+        // Flush undo system FIRST Paper callbacks fired in the previous frame's EndFrame(),
+        // so mutations from OnValueChanged are now visible. FlushFrame compares the Snapshot
+        // (taken last frame) against the current state to detect changes.
+        using (FrameStats.Editor.Scope())
+        {
+            Undo.FlushFrame();
+            bool mouseDown = paper.IsPointerPressed(PaperMouseBtn.Left) || paper.IsPointerPressed(PaperMouseBtn.Right) || paper.IsPointerPressed(PaperMouseBtn.Middle);
+            bool mouseHeld = paper.IsPointerDown(PaperMouseBtn.Left) || paper.IsPointerDown(PaperMouseBtn.Right) || paper.IsPointerDown(PaperMouseBtn.Middle);
+            Undo.BeginFrameInput(mouseDown, mouseHeld, ShortcutManager.AnyPressedExcept("Global/Undo", "Global/Redo"));
+            if (paper.FocusedElementId != _lastFocusedElement)
+            {
+                _lastFocusedElement = paper.FocusedElementId;
+                Undo.FocusChanged();
+            }
+        }
+
+        // Escape always releases the cursor in editor.
+        if (Input.GetKeyDown(KeyCode.Escape) && (Input.CursorLockState != CursorLockMode.None || !Input.CursorVisible))
+        {
+            Input.UnlockCursor();
+            Input.CursorVisible = true;
+        }
+
+        // Global keyboard shortcuts
+        if (!ShortcutManager.IsRebinding)
+        {
+            if (ShortcutManager.IsPressed("Global/SaveAs"))
+            {
+                if (Application.IsPlaying)
+                    Toasts.Warning(Loc.Get("save.cant_play_mode"),
+                        Loc.Get("save.cant_play_mode_msg"));
+                else
+                    PromptSaveAs();
+            }
+            else if (ShortcutManager.IsPressed("Global/NewScene"))
+            {
+                EditorSceneManager.NewWithPrompt();
+            }
+            else if (ShortcutManager.IsPressed("Global/Undo") && !Undo.IgnoresUndoInput)
+            {
+                using (FrameStats.Editor.Scope())
+                    Undo.PerformUndo();
+            }
+            else if (ShortcutManager.IsPressed("Global/Redo") && !Undo.IgnoresUndoInput)
+            {
+                using (FrameStats.Editor.Scope())
+                    Undo.PerformRedo();
+            }
+        }
+
+        // Reset per-frame state
+        GameViewInputHandler.IsGameViewFocused = false;
+
+        // Keeps the editor view outside of UI input's reach, to prevent false positives when clicking around
+        foreach (SceneInstance world in GameViewPanel.HostedWorlds())
+            world.Input.Viewport = new Runtime.UI.EventSystem.HostViewport { ReceivesInput = false };
+
+        float w = paper.ScreenRect.Size.X;
+        float h = paper.ScreenRect.Size.Y;
+
+        TickPerfStats((float)Time.UnscaledDeltaTime);
+        Selection.UpdatePing((float)Time.UnscaledDeltaTime);
+        GUI.Panels.ProjectPanel.RevealPings();
+        EditorTheme.TickOrigami((float)Time.UnscaledDeltaTime);
+
+        // Push the editor's Origami theme and begin frame
+        _origamiScope?.Dispose();
+        _origamiScope = EditorTheme.PushOrigami();
+        OrigamiUI.Origami.BeginFrame(paper, (float)Time.UnscaledDeltaTime);
+
+        // Global visual-effect toggles (Preferences > Theme > Effects). Origami owns the drop-shadow /
+        // glow distinction and gates its DropShadow()/Glow() helpers on these; Paper just draws shadows.
+        OrigamiUI.Origami.DropShadowsEnabled = EditorTheme.DropShadows;
+        OrigamiUI.Origami.GlowsEnabled = EditorTheme.AccentGlow;
+        paper.Canvas.SetAntiAlias(EditorTheme.AntiAliasing);
+
+        // Save system update (Ctrl+S + auto-save) - after theme push so toasts get icons
+        using (FrameStats.Editor.Scope())
+        {
+            SaveManager.Update((float)Time.UnscaledDeltaTime);
+            Preferences.ApplyFileChanges();
+        }
+
+        // Detect project opened (launcher closed since last frame). The old Prowl bar animation is
+        // retired: opening a project goes straight to the Infinity loading card with the new logo.
+        if (!ProjectLauncher.IsOpen && !_introClosing && _launcherWasOpen)
+        {
+            _introTime = IntroDuration + 1;
+            _introClosing = false;
+            _launcherWasOpen = false;
+            if (Project.Current != null)
+            {
+                using FrameStatScope projectStats = FrameStats.Editor.Scope();
+                Window.InternalWindow.Title = $"Infinity Engine - {Project.Current.Name}";
+                DiscordRichPresence.SetProject(Project.Current.Name);
+
+                // Project settings load first, since some decide how assets import
+                EditorRegistries.Initialize();
+                EditorRegistries.OnProjectOpened();
+
+                // Initialize the asset database for the opened project
+                var db = new EditorAssetBackend(Project.Current);
+                db.Initialize();
+
+                // Load user script assemblies and re-register all types
+                ScriptAssemblyManager.LoadAssemblies(Project.Current);
+
+                // Compile before the scene is read - see the --project path above for why.
+                ScriptAssemblyManager.RequestRecompile(true);
+
+                // Rebuild the scan-based registries (mesh features, menu items) against the loaded assemblies.
+                ReinitializeRegistries();
+
+                // Restore layout from project (or use default)
+                SetDockLayout(LoadDockLayout() ?? CreateDefaultLayout());
+
+                // Ensure a scene is always loaded (once the startup compile has settled).
+                _sceneLoadPending = true;
+                _loadingTime = 0;
+            }
+        }
+
+        // Regaining focus is when external edits (a DCC app, a text editor, a branch switch) have most
+        // likely landed, and the watcher can miss those outright. Reconcile once on the rising edge
+        // rather than trusting whatever it happened to catch.
+        bool focused = Window.IsFocused;
+        if (focused && !_wasFocused)
+        {
+            using FrameStatScope assetStats = EditorFrameStats.Assets.Scope();
+            EditorAssetBackend.Instance?.Refresh();
+        }
+        bool cliActive = CliServer.IsActive;
+        if (focused != _wasFocused || cliActive != _wasCliActive)
+            ApplyFramePacing();
+        _wasFocused = focused;
+        _wasCliActive = cliActive;
+
+        using (EditorFrameStats.Assets.Scope())
+            ExternalAssetDrop.ProcessPending();
+        GUI.Panels.SceneViewPanel.SweepDropGhosts();
+        using (FrameStats.Editor.Scope())
+            CliServer.Update();
+
+        if (_quitRequested)
+        {
+            _quitRequested = false;
+            RequestExitPlayMode();
+        }
+
+        // Process file changes optionally only when window is focused
+        bool canProcessAssets = !EditorSettings.Instance.ReimportOnFocusOnly || focused || cliActive || ExternalAssetDrop.ForceProcessActive;
+        if (canProcessAssets)
+        {
+            using FrameStatScope assetStats = EditorFrameStats.Assets.Scope();
+            EditorAssetBackend.Instance?.ProcessFileChanges();
+
+            // Lazy thumbnail generation one per frame
+            ThumbnailGenerator.ProcessOne();
+        }
+
+        // Check for script recompilation. Not gated behind canProcessAssets while a startup compile is
+        // outstanding: the project's first scene load is waiting on that compile, and reimport gating
+        // (or an unfocused window) must not be able to strand the editor with no scene open.
+        if (canProcessAssets || ScriptAssemblyManager.AwaitingStartupCompile)
+        {
+            using FrameStatScope scriptStats = EditorFrameStats.Scripts.Scope();
+            ScriptAssemblyManager.Update();
+        }
+
+        // The project's scene opens only once its scripts have been built, so it is never deserialized
+        // against types that do not exist yet.
+        if (_sceneLoadPending && !ScriptAssemblyManager.AwaitingStartupCompile)
+        {
+            using FrameStatScope sceneStats = FrameStats.Editor.Scope();
+            _sceneLoadPending = false;
+            EditorSceneManager.EnsureSceneLoaded();
+        }
+
+        // Layout auto-save is handled by SaveManager's auto-save timer.
+
+        // Show project launcher or intro close phase
+        if (ProjectLauncher.IsOpen || _introClosing)
+        {
+            // Always draw the launcher background during close transition
+            ProjectLauncher.Draw(paper, (float)Time.UnscaledDeltaTime, forceDraw: _introClosing);
+
+            if (ProjectLauncher.IsOpen)
+                _launcherWasOpen = true;
+
+            // Block input during close animation
+            if (_introClosing)
+            {
+                paper.Box("intro_blocker")
+                    .PositionType(PositionType.SelfDirected).Position(0, 0)
+                    .Size(w, h)
+                    .Layer(Layer.Overlay)
+                    .OnClick(0, (_, _) => { }); // absorb all clicks
+
+                // Switch to editor once screen is fully covered (hold phase)
+                if (_introTime >= IntroCloseDuration)
+                    _introClosing = false; // next frame draws editor behind open phase
+                else
+                    return;
+            }
+            else
+            {
+                return; // launcher still active, don't draw editor
+            }
+        }
+
+        // Editor backdrop (behind the translucent glass panels) shared with the launcher.
+        _nebula ??= new GUI.NebulaBackground(paper);
+        GUI.NebulaBackground.DrawEditorBackground(paper, _nebula, "nebula_bg", w, h, (float)Time.UnscaledDeltaTime, showStarsAndComets: false);
+
+        HandlePlayModeShortcuts();
+        if (s_pauseRequested)
+        {
+            s_pauseRequested = false;
+            if (Application.IsPlaying && !IsPlayPaused)
+            {
+                SceneInstance.Main.Paused = true;
+                Toasts.Warning(Loc.Get("play.paused_on_error"), Loc.Get("play.paused_on_error_msg"));
+            }
+        }
+        DrawHeader(paper, w, h);
+
+        float pad = EditorTheme.DockPadding;
+        float dockY = EditorTheme.MenuBarHeight + pad;
+        float dockH = h - dockY - pad - EditorTheme.StatusBarHeight;
+        _panelMaximizer.Draw(paper, pad, dockY, w - pad * 2, dockH);
+
+        DrawStatusBar(paper, w, h);
+
+        if (Project.Current != null && !ProjectLauncher.IsOpen && _introTime >= IntroDuration)
+            GUI.EditorSetup.ShowOnFirstLaunch();
+    }
+
+    // Shared height for the header's interactive elements (menu bar + right-side status chips) so
+    // they line up. Centered within the taller band, which also holds the dock-padding gap.
+    private const float HeaderChipHeight = 30f;
+
+    private void DrawHeader(Paper paper, float w, float h)
+    {
+        Scribe.FontFile? font = EditorTheme.DefaultFont;
+        if (font == null) return;
+
+        // The full top band = menu bar height + the dock-padding gap above the dock. Everything lives
+        // inside this transparent container and vertically centers within it, so the menu bar, play
+        // pill and status cluster all sit centered in the available space.
+        float band = EditorTheme.MenuBarHeight + EditorTheme.DockPadding;
+
+        using (paper.Box("header").PositionType(PositionType.SelfDirected).Position(0, 0).Size(w, band).Enter())
+        {
+            DrawMenuBar(paper, w, band);
+            DrawPlayPill(paper, w, band, font);
+            DrawHeaderStatus(paper, w, band, font);
+        }
+    }
+
+    private void HandlePlayModeShortcuts()
+    {
+        if (ShortcutManager.TryConsume("Global/TogglePlay")) RequestTogglePlayMode();
+        else if (ShortcutManager.TryConsume("Global/TogglePause")) TogglePause();
+    }
+
+    /// <summary>Centered rounded "pill" holding the play / pause / step transport buttons.</summary>
+    private void DrawPlayPill(Paper paper, float w, float band, Infinity.Scribe.FontFile font)
+    {
+        using (paper.Row("play_pill").PositionType(PositionType.SelfDirected)
+            .Size(UnitValue.Auto).Rounded(EditorTheme.Roundness)
+            .Margin(UnitValue.StretchOne)
+            .BackdropBlur(EditorTheme.DockedBlur)
+            .BackgroundColor(EditorTheme.Glass).BorderColor(EditorTheme.BorderSoft).BorderWidth(1)
+            .Enter())
+        {
+            // Ghost buttons tint their icon by variant: green Play when stopped, red Stop while playing,
+            // amber Pause when paused; step stays neutral.
+            ButtonBuilder play = Origami.IconButton(paper, "btn_play", Application.IsPlaying ? EditorIcons.Stop_I : EditorIcons.Play_I)
+                .OnClick(() => { paper.ClearFocus(); RequestTogglePlayMode(); })
+                .Tooltip(ShortcutManager.GetTooltip(Loc.Get(Application.IsPlaying ? "game.stop" : "game.play"), "Global/TogglePlay"))
+                .Style(ButtonStyle.Ghost);
+            if (Application.IsPlaying) play.Danger(); else play.Success();
+            play.Show();
+
+            ButtonBuilder pause = Origami.IconButton(paper, "btn_pause", EditorIcons.Pause_I,
+                () => { paper.ClearFocus(); TogglePause(); })
+                .Tooltip(ShortcutManager.GetTooltip(Loc.Get(IsPlayPaused ? "game.resume" : "game.pause"), "Global/TogglePause"))
+                .Style(ButtonStyle.Ghost);
+            if (IsPlayPaused) pause.Warning();
+            pause.Show();
+
+            Origami.IconButton(paper, "btn_step", EditorIcons.ForwardStep_I,
+                () => { paper.ClearFocus(); StepOneFrame(); })
+                .Tooltip(Loc.Get("game.step"))
+                .Style(ButtonStyle.Ghost).Show();
+        }
+    }
+
+    // Smoothed perf readouts. FPS and frame time average the frames of the last few seconds, memory samples once a second.
+    private const float PerfAverageSeconds = 2.5f;
+    private static readonly Queue<float> _frameTimes = new();
+    private static double _frameTimeSum;
+    private static double _perfWindow;
+    private static int _dispFps;
+    private static float _dispMs;
+    private static long _dispMemMb;
+
+    private static void TickPerfStats(float dt)
+    {
+        if (dt <= 0f) return;
+
+        _frameTimes.Enqueue(dt);
+        _frameTimeSum += dt;
+        while (_frameTimes.Count > 1 && _frameTimeSum - _frameTimes.Peek() >= PerfAverageSeconds)
+            _frameTimeSum -= _frameTimes.Dequeue();
+
+        float averageMs = (float)(_frameTimeSum * 1000.0 / _frameTimes.Count);
+        _dispMs = averageMs;
+        _dispFps = Math.Min(9999, (int)MathF.Round(1000f / averageMs));
+
+        _perfWindow += dt;
+        if (_perfWindow >= 1.0 || _dispMemMb == 0)
+        {
+            _dispMemMb = GC.GetTotalMemory(false) / (1024 * 1024);
+            _perfWindow = 0.0;
+        }
+    }
+
+    /// <summary>Right-side status cluster: FPS, editor version and project name as themed chips,
+    /// then a ghost cog that opens Project Settings.</summary>
+    private void DrawHeaderStatus(Paper paper, float w, float band, Infinity.Scribe.FontFile font)
+    {
+        float clH = HeaderChipHeight;
+        float pad = EditorTheme.DockPadding;
+        float blur = EditorTheme.DockedBlur;
+        float rectPadX = 10f, dot = 8f;
+
+        int fps = _dispFps;
+        string fpsNum = fps.ToString();
+        string msText = $"{_dispMs:F1}ms";
+        System.Drawing.Color dotColor = fps >= 50 ? EditorTheme.Green400 : (fps >= 25 ? EditorTheme.Amber400 : EditorTheme.Red400);
+
+        string version = Assembly.GetExecutingAssembly()
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+            ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.0.1";
+        int plus = version.IndexOf('+');
+        if (plus >= 0) version = version[..plus];
+        string versionText = $"v{version}";
+        string projectText = Project.Current?.Name ?? Loc.Get("editor.no_project");
+
+        // Cluster pinned to the right edge and vertically centered by margins; every child auto-sizes to
+        // its text, so there's no width math or MeasureText.
+        using (paper.Row("hdr_status").PositionType(PositionType.SelfDirected)
+            .Width(UnitValue.Auto).Height(clH)
+            .Margin(UnitValue.StretchOne, UnitValue.Pixels(pad), UnitValue.StretchOne, UnitValue.StretchOne).Gap(6).Enter())
+        {
+            // FPS chip: [status dot + count] left-anchored, [FPS + X.Xms] right-anchored, spacer between.
+            // Auto width with a 120px floor lets the count grow into the spacer without moving anything.
+            using (paper.Row("hs_fps").Width(UnitValue.Auto).MinWidth(UnitValue.Pixels(120)).Height(clH).Rounded(Origami.Current.Metrics.ContainerRounding)
+                .Padding(rectPadX, rectPadX, 0, 0).BackdropBlur(blur)
+                .BackgroundColor(EditorTheme.Glass).BorderColor(EditorTheme.BorderSoft).BorderWidth(1).Enter())
+            {
+                paper.Box("hs_fps_dot").Width(dot).Height(dot).Margin(0, 7, UnitValue.StretchOne, UnitValue.StretchOne).Rounded(dot / 2f)
+                    .BackgroundColor(dotColor).IsNotInteractable();
+                paper.Box("hs_fps_num").Width(UnitValue.Auto).Height(clH).Margin(0, 0, UnitValue.StretchOne, UnitValue.StretchOne).IsNotInteractable()
+                    .Text(fpsNum, font).TextColor(EditorTheme.Ink500).FontSize(EditorTheme.FontSize)
+                    .Alignment(TextAlignment.MiddleLeft);
+                paper.Box("hs_fps_sp").Height(1).IsNotInteractable();
+                paper.Box("hs_fps_lbl").Width(UnitValue.Auto).Height(clH).Margin(0, 4, UnitValue.StretchOne, UnitValue.StretchOne).IsNotInteractable()
+                    .Text("FPS", font).TextColor(EditorTheme.Ink300).FontSize(EditorTheme.FontSizeSmall)
+                    .Alignment(TextAlignment.MiddleRight);
+                paper.Box("hs_fps_ms").Width(UnitValue.Auto).MinWidth(UnitValue.Pixels(33)).Height(clH).Margin(0, 0, UnitValue.StretchOne, UnitValue.StretchOne).IsNotInteractable()
+                    .Text(msText, font).TextColor(EditorTheme.Ink300).FontSize(EditorTheme.FontSizeSmall)
+                    .Alignment(TextAlignment.MiddleRight);
+            }
+
+            StatusChip(paper, "hs_ver", clH, versionText, font);
+            StatusChip(paper, "hs_proj", clH, projectText, font);
+
+            Origami.IconButton(paper, "hs_cog", EditorIcons.Gear_I, () => OpenPanel<ProjectSettingsPanel>())
+                .Width(clH).Height(clH).Ghost().Show();
+        }
+    }
+
+    // A themed glass chip that auto-sizes to its text (horizontal padding + Auto width, no MeasureText).
+    private static void StatusChip(Paper paper, string id, float hRect, string text, Infinity.Scribe.FontFile font)
+    {
+        using (paper.Row(id).Width(UnitValue.Auto).Height(hRect).Padding(10, 10, 0, 0).Rounded(Origami.Current.Metrics.ContainerRounding)
+            .BackdropBlur(EditorTheme.DockedBlur)
+            .BackgroundColor(EditorTheme.Glass).BorderColor(EditorTheme.BorderSoft).BorderWidth(1)
+            .IsNotInteractable().Enter())
+        {
+            paper.Box(id + "_t").Width(UnitValue.Auto).Height(hRect).Margin(0, 0, UnitValue.StretchOne, UnitValue.StretchOne).IsNotInteractable()
+                .Text(text, font).TextColor(EditorTheme.Ink400).FontSize(EditorTheme.FontSizeSmall)
+                .Alignment(TextAlignment.MiddleCenter);
+        }
+    }
+
+    /// <summary> Ends the editor GUI frame: draws the on-boarding guide overlay, renders Origami overlay systems (drag-drop, context menus, modals, toasts, tooltips), plays the intro animation, and pops the Origami theme. </summary>
+    public override void EndGui(Paper paper)
+    {
+        // Play mode spotlight on the Game view (above panels, below popups/toasts).
+        if (Project.Current != null && !ProjectLauncher.IsOpen)
+        {
+            // The docked window's own rect, tab bar included, so the ring sits on the window's edge.
+            Vector.Rect? gameRect = _dockSpace.TryGetPanelRect(typeof(GameViewPanel), out Vector.Rect r) ? r : null;
+            GUI.PlayModeSpotlight.Draw(paper, (float)Time.UnscaledDeltaTime, gameRect, EditorTheme.MenuBarHeight + EditorTheme.DockPadding);
+        }
+
+        GUI.Popups.RenameOverlay.EndFrame();
+
+        // Render all Origami overlay systems (drag-drop, context menus, modals, toasts, tooltips)
+        OrigamiUI.Origami.EndFrame(paper);
+        Undo.EndFrame(OrigamiUI.TextFieldCommits.AnyFocused);
+
+        // The intro bar animation was the old Prowl startup. Infinity opens projects with the
+        // dedicated loading card below instead of replaying that animation.
+
+        // The startup loading card covers the gap between the intro bars and the first editor frame: the
+        // project's scripts compile and its scene opens on this thread, and without it the window shows the
+        // last launcher frame (or black) with no sign of progress.
+        bool loading = Project.Current != null && !ProjectLauncher.IsOpen
+            && (_sceneLoadPending || ScriptAssemblyManager.AwaitingStartupCompile);
+        if (loading)
+        {
+            _loadingTime += Math.Min(Time.UnscaledDeltaTime, 0.05);
+            DrawLoadingOverlay(paper);
+        }
+
+        // Cycling tip strip drawn last so it sits on top of both the launcher card
+        // and the intro animation bars, giving the user something to read while the
+        // project loads. The strip fades out as the bars slide away to reveal the
+        // editor so it never lingers over a loaded project.
+        if (ProjectLauncher.IsOpen || _introTime < IntroDuration)
+        {
+            float tipAlpha = 1f;
+            // Only run the fade while the intro is actually playing. Before any project
+            // is opened _introTime sits at double.MaxValue, which would otherwise read
+            // as "past the open phase" and zero the tip out on the launcher.
+            if (_introTime < IntroDuration)
+            {
+                const double fadeOutDuration = 0.8;
+                if (_introTime >= IntroOpenStart)
+                {
+                    float t = (float)((_introTime - IntroOpenStart) / fadeOutDuration);
+                    tipAlpha = 1f - Math.Clamp(t, 0f, 1f);
+                }
+            }
+
+            ProjectLauncher.DrawTipStrip(paper, (float)Time.UnscaledDeltaTime, tipAlpha);
+        }
+
+        if (!_windowRevealed)
+        {
+            try { Window.InternalWindow.IsVisible = true; } catch { /* platform without visibility control */ }
+            _windowRevealed = true;
+        }
+
+        // Pop the editor Origami theme now that all rendering (including overlays) is done.
+        _origamiScope?.Dispose();
+        _origamiScope = null;
+    }
+
+    // ================================================================
+    //  Menu Bar (Origami AppBar)
+    // ================================================================
+
+    private void DrawMenuBar(Paper paper, float w, float band)
+    {
+        float pad = EditorTheme.DockPadding;
+        float barH = HeaderChipHeight;
+        Scribe.FontFile? font = EditorTheme.DefaultFont;
+        // Menu labels + a Theme quick-access button, pinned to the left edge and vertically centered by
+        // margins; auto width hugs the menus.
+        using (paper.Row("menubar_host").PositionType(PositionType.SelfDirected)
+            .Width(UnitValue.Auto).Height(barH)
+            .Margin(UnitValue.Pixels(pad), UnitValue.StretchOne, UnitValue.StretchOne, UnitValue.StretchOne).Gap(4).Enter())
+        {
+            MenuBarBuilder bar = Origami.MenuBar(paper, "menubar").Height(barH);
+            foreach (AppMenuItem root in MenuRegistry.RootMenus)
+                if (root.HasSubItems)
+                    bar.Menu(root.Label, ctx =>
+                    {
+                        // A menu-bar dropdown has no object of its own to act on, so drop any pin a
+                        // panel's right-click menu left behind; GameObject/... then creates under the
+                        // active selection instead of wherever that menu was last opened.
+                        MenuContext.Clear();
+                        BuildMenu(ctx, root.SubItems);
+                    });
+            bar.Show();
+
+            // Quick-access to Preferences > Theme (theming is a big part of the editor now).
+            paper.Box("hdr_theme_btn").Width(barH).Height(barH)
+                .Margin(0, 0, UnitValue.Stretch(), UnitValue.Stretch()).Rounded(EditorTheme.Roundness)
+                .Hovered.BackgroundColor(EditorTheme.Hover).End()
+                .Text(EditorIcons.Palette, font).TextColor(EditorTheme.Ink400)
+                .Hovered.TextColor(EditorTheme.Ink500).End()
+                .FontSize(EditorTheme.FontSizeSmall).Alignment(TextAlignment.MiddleCenter)
+                .Tooltip(Loc.Get("header.theme_settings"))
+                .OnClick(0, (_, _) => OpenPanel<PreferencesPanel>().ShowTheme());
+
+            paper.Box("hdr_quick_div").Width(1).Height(18)
+                .Margin(4, 4, UnitValue.Stretch(), UnitValue.Stretch())
+                .BackgroundColor(EditorTheme.BorderSoft).IsNotInteractable();
+
+            if (w >= 1120)
+            {
+                Origami.Button(paper, "hdr_codes", Loc.Get("header.api_docs"), () => OpenPanel<ApiDocsPanel>())
+                    .Ghost().Small().LeadingIcon(EditorIcons.Code_I)
+                    .Tooltip(Loc.Get("header.api_docs_tip")).Show();
+            }
+
+            if (w >= 1420)
+            {
+                Origami.IconButton(paper, "hdr_console", EditorIcons.Terminal_I, () => OpenPanel<ConsolePanel>())
+                    .Ghost().Small().Tooltip(Loc.Get("panel.console")).Show();
+                Origami.IconButton(paper, "hdr_build", EditorIcons.Hammer_I, () => OpenPanel<BuildSettingsPanel>())
+                    .Ghost().Small().Tooltip(Loc.Get("panel.build")).Show();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Translates a registered <see cref="AppMenuItem"/> subtree into Origami's ContextBuilder,
+    /// which is how MenuBar dropdowns are populated. Dynamic label/enabled/checked funcs are
+    /// evaluated here since the dropdown is rebuilt each frame it is open.
+    /// </summary>
+    private static void BuildMenu(ContextBuilder ctx, IReadOnlyList<AppMenuItem> items)
+    {
+        foreach (AppMenuItem item in items)
+        {
+            if (item.IsSeparator)
+            {
+                ctx.Separator();
+                continue;
+            }
+
+            string label = item.DynamicLabelFunc?.Invoke() ?? item.Label;
+            bool enabled = item.IsEnabledFunc?.Invoke() ?? item.IsEnabled;
+
+            if (item.HasSubItems)
+            {
+                List<AppMenuItem> sub = item.SubItems;
+                ctx.Submenu(label, c => BuildMenu(c, sub), item.Icon);
+            }
+            else
+            {
+                ctx.Item(label, item.OnClick ?? (() => { }), enabled, icon: item.Icon, on: item.IsCheckedFunc?.Invoke() ?? false);
+            }
+        }
+    }
+
+    // ================================================================
+    //  Status Bar (Origami AppBar at bottom)
+    // ================================================================
+
+    // The status bar sources its log data from the shared ConsolePanel store; this just ensures
+    // that store is subscribed to Debug.OnLog even before the Console panel is opened.
+    private static void InitializeStatusBar() => ConsolePanel.EnsureSubscribed();
+
+
+    private void DrawStatusBar(Paper paper, float w, float h)
+    {
+        Scribe.FontFile? font = EditorTheme.DefaultFont;
+        if (font == null) return;
+
+        float sh = EditorTheme.StatusBarHeight;
+        float fs = EditorTheme.FontSizeSmall;
+        System.Drawing.Color dim = EditorTheme.Ink300;
+        Scribe.FontFile mono = EditorTheme.FontMono ?? font;
+
+        // Glyph-icon (EditorIcons/FontAwesome) + text cell.
+        void GlyphCell(string id, string glyph, System.Drawing.Color glyphColor, string text,
+            System.Drawing.Color textColor, string? tooltip = null)
+        {
+            ElementBuilder row = paper.Row(id).Width(UnitValue.Auto).Height(sh).Margin(0, 8, UnitValue.StretchOne, UnitValue.StretchOne);
+            if (tooltip != null) row.Tooltip(tooltip);
+            using (row.Enter())
+            {
+                paper.Box(id + "_i").Width(14).Height(sh).Margin(0, 4, UnitValue.StretchOne, UnitValue.StretchOne).IsNotInteractable()
+                    .Text(glyph, font).TextColor(glyphColor).FontSize(fs).Alignment(PaperUI.TextAlignment.MiddleCenter);
+                paper.Box(id + "_t").Width(UnitValue.Auto).Height(sh).IsNotInteractable()
+                    .Text(text, font).TextColor(textColor).FontSize(fs).Alignment(PaperUI.TextAlignment.MiddleLeft);
+            }
+        }
+
+        // Console severity icon (Origami icon) + number, for the log counters.
+        void CounterCell(string id, LogSeverity sev, int n)
+        {
+            (IOrigamiIcon? icon, System.Drawing.Color color) = ConsolePanel.SeverityStyle(sev);
+            using (paper.Row(id).Width(UnitValue.Auto).Height(sh).Margin(0, 8, UnitValue.StretchOne, UnitValue.StretchOne).Enter())
+            {
+                paper.Box(id + "_i").Width(14).Height(sh).Margin(0, 3, UnitValue.StretchOne, UnitValue.StretchOne).IsNotInteractable()
+                    .Icon(paper, icon, color, size: 12f);
+                paper.Box(id + "_t").Width(UnitValue.Auto).Height(sh).IsNotInteractable()
+                    .Text(n.ToString(), font).TextColor(dim).FontSize(fs).Alignment(PaperUI.TextAlignment.MiddleLeft);
+            }
+        }
+
+        void Divider(string id) => paper.Box(id).Width(1).Height(sh).Margin(0, 0, 5, 5)
+            .BackgroundColor(EditorTheme.BorderSoft).IsNotInteractable();
+
+        // Uniform edge padding: the footer's left/right edges and both sides of every divider
+        // all use this, so the columns are evenly spaced and the dividers sit centered in the gap.
+        float pad = 10f;
+
+        using (paper.Row("statusbar").PositionType(PositionType.SelfDirected)
+            .Position(0, h - sh).Size(w, sh)
+            .BackgroundColor(EditorTheme.Neutral200).Enter())
+        {
+            // ---------- Column 1: console (last log on the left, counters on the right) ----------
+            using (paper.Row("sb_console").Width(UnitValue.StretchOne).Height(sh).Padding(pad, pad, 0, 0).Enter())
+            {
+                (LogSeverity severity, string message, string? source, int count)? last = ConsolePanel.LastLog();
+                if (last.HasValue)
+                {
+                    (LogSeverity sev, string? msg, string? src, int cnt) = last.Value;
+                    (IOrigamiIcon? icon, System.Drawing.Color color) = ConsolePanel.SeverityStyle(sev);
+                    paper.Box("sb_log_i").Width(16).Height(sh).Margin(0, 5, UnitValue.StretchOne, UnitValue.StretchOne).IsNotInteractable()
+                        .Icon(paper, icon, color, size: 13f);
+                    paper.Box("sb_log_m").Width(UnitValue.StretchOne).Height(sh).Margin(0, 6, UnitValue.StretchOne, UnitValue.StretchOne).IsNotInteractable()
+                        .Text(msg, font).TextTruncate().TextColor(EditorTheme.Ink400).FontSize(fs)
+                        .Alignment(PaperUI.TextAlignment.MiddleLeft).TextTruncate();
+                    if (!string.IsNullOrEmpty(src))
+                        paper.Box("sb_log_s").Width(UnitValue.Auto).Height(sh).Margin(0, 6, UnitValue.StretchOne, UnitValue.StretchOne).IsNotInteractable()
+                            .Text($"[{src}]", mono).TextColor(EditorTheme.InkDim).FontSize(fs - 1)
+                            .Alignment(PaperUI.TextAlignment.MiddleLeft);
+                    if (cnt > 1)
+                        paper.Box("sb_log_c").Width(UnitValue.Auto).Height(sh).IsNotInteractable()
+                            .Text($"x{cnt}", font).TextColor(EditorTheme.InkDim).FontSize(fs - 1)
+                            .Alignment(PaperUI.TextAlignment.MiddleLeft);
+                }
+
+                //paper.Box("sb_console_spacer");
+
+                (int info, int warn, int err) = ConsolePanel.LogCounts();
+                CounterCell("sb_cnt_info", LogSeverity.Normal, info);
+                CounterCell("sb_cnt_warn", LogSeverity.Warning, warn);
+                CounterCell("sb_cnt_err", LogSeverity.Error, err);
+            }
+
+            Divider("sb_div1");
+
+            // ---------- Column 2: current scene ----------
+            string sceneName = EditorSceneManager.OpenScenes.Count == 0
+                ? Loc.Get("hierarchy.no_scene_loaded")
+                : string.Join(", ", EditorSceneManager.OpenScenes.Where(o => o.IsLoaded).Select(o => o.IsDirty ? o.Name + "*" : o.Name));
+            using (paper.Row("sb_scene").Width(UnitValue.Auto).Height(sh).Padding(pad, pad, 0, 0).Enter())
+                GlyphCell("sb_scene_cell", EditorIcons.Shapes, EditorTheme.Ink300, sceneName, EditorTheme.Ink400);
+
+            Divider("sb_div2");
+
+            // ---------- Column 3: editor stats on the left, graphics backend + Git on the right ----------
+            using (paper.Row("sb_stats").Height(sh).Padding(pad, pad, 0, 0).Enter())
+            {
+                long memMb = _dispMemMb;
+                GlyphCell("sb_sel", EditorIcons.ArrowPointer, EditorTheme.Ink300, Selection.Count.ToString(), dim, Loc.Get("editor.stat_selected"));
+                GlyphCell("sb_mem", EditorIcons.Microchip, EditorTheme.Ink300, $"{memMb} MB", dim, Loc.Get("editor.stat_memory"));
+
+                paper.Box("sb_stats_spacer");
+
+                GlyphCell("sb_gfx", EditorIcons.Display, EditorTheme.Ink300, Graphics.BackendName, EditorTheme.Ink400);
+
+                Divider("sb_div3");
+                DrawGitCell();
+            }
+        }
+
+        // Git status for the open project (branch + dirty/clean colour), far right of the footer.
+        void DrawGitCell()
+        {
+            GitInfo.Poll();
+
+            System.Drawing.Color iconColor = EditorTheme.InkDim;
+            System.Drawing.Color textColor = EditorTheme.InkDim;
+            string text, tip;
+            if (!GitInfo.GitInstalled)
+            {
+                text = Loc.Get("editor.git_not_installed");
+                tip = Loc.Get("editor.git_not_installed_tip");
+            }
+            else if (!GitInfo.IsRepository)
+            {
+                text = Loc.Get("editor.git_no_repo");
+                tip = Loc.Get("editor.git_no_repo_tip");
+            }
+            else
+            {
+                text = GitInfo.Branch;
+                iconColor = GitInfo.HasChanges ? EditorTheme.Amber400 : EditorTheme.Green400;
+                textColor = EditorTheme.Ink400;
+                tip = GitInfo.HasChanges
+                    ? Loc.Get("editor.git_dirty", new { branch = GitInfo.Branch })
+                    : Loc.Get("editor.git_clean", new { branch = GitInfo.Branch });
+            }
+
+            GlyphCell("sb_git", EditorIcons.CodeBranch, iconColor, text, textColor, tip);
+        }
+    }
+
+    // ================================================================
+    //  Editor File Dialog Helper
+    // ================================================================
+
+    private static OrigamiUI.FileDialogConfig? s_fileDialogConfig;
+
+    /// <summary> Gets the file dialog configuration used by the editor, providing icons, quick-access directories, and drive enumeration. </summary>
+    public static OrigamiUI.FileDialogConfig FileDialogConfig
+    {
+        get
+        {
+            s_fileDialogConfig ??= new OrigamiUI.FileDialogConfig
+            {
+                GetIcon = (ext, isDir) => isDir ? EditorIcons.Folder : EditorRegistries.GetFileIcon("file" + ext),
+                QuickAccess =
+                [
+                    (Loc.Get("editor.dir_desktop"), EditorIcons.Desktop, Environment.GetFolderPath(Environment.SpecialFolder.Desktop)),
+                    (Loc.Get("editor.dir_documents"), EditorIcons.FolderOpen, Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)),
+                    (Loc.Get("editor.dir_downloads"), EditorIcons.Download, System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads")),
+                    (Loc.Get("editor.dir_user"), EditorIcons.User, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)),
+                ],
+                GetDrives = () => [.. System.IO.DriveInfo.GetDrives()
+                    .Where(d => d.IsReady).Select(d => (d.Name, d.Name))],
+            };
+            return s_fileDialogConfig;
+        }
+    }
+
+    /// <summary>Open a file dialog with editor config (icons, quick access, drives).</summary>
+    public static void OpenFileDialog(FileDialogMode mode, Action<string?> onComplete,
+        string? startPath = null, string[]? filters = null, string[]? filterLabels = null)
+        => OrigamiUI.FileDialog.Open(mode, onComplete, startPath ?? Project.Current?.RootPath, filters, filterLabels, FileDialogConfig);
+
+    private const int BarCount = 10;
+
+    /// <summary> Reads an embedded resource file and returns its content as a string. </summary>
+    public static string GetEmbeddedResourceText(string resource)
+    {
+        Stream? stream = GetEmbeddedResource(resource);
+
+        string data = "";
+        using (StreamReader reader = new StreamReader(stream))
+        {
+            data = reader.ReadToEnd();
+        }
+
+        return data;
+    }
+
+    /// <summary>
+    /// The prefix of this assembly's embedded resources. Manifest names start with the project's root namespace, which
+    /// is the assembly name and so stays Prowl.Editor even though the engine is Infinity, so it is read from the
+    /// assembly rather than written out.
+    /// </summary>
+    private static readonly string ResourceRoot = FindResourceRoot();
+
+    private static string FindResourceRoot()
+    {
+        Assembly assembly = Assembly.GetExecutingAssembly();
+        foreach (string name in assembly.GetManifestResourceNames())
+        {
+            int at = name.IndexOf(".Resources.", StringComparison.Ordinal);
+            if (at > 0) return name[..(at + ".Resources.".Length)];
+        }
+        return (assembly.GetName().Name ?? "Prowl.Editor") + ".Resources.";
+    }
+
+    /// <summary> Opens a stream to an embedded resource in the editor's Resources folder. </summary>
+    public static Stream? GetEmbeddedResource(string resource)
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+
+        string resourceName = ResourceRoot + resource;
+
+        Stream? stream = assembly.GetManifestResourceStream(resourceName);
+        return stream;
+    }
+
+    /// <summary> Extracts an embedded resource to a temporary file on disk and returns a FileStream to it. </summary>
+    public static FileStream? GetResource(string resource)
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+
+        string resourceName = ResourceRoot + resource;
+
+        string pathToFile = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) +
+                          resourceName;
+
+        using (Stream? stream = assembly.GetManifestResourceStream(resourceName))
+        {
+            using (FileStream fileStream = File.Create(pathToFile))
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+                stream.CopyTo(fileStream);
+            }
+        }
+        return File.OpenRead(pathToFile);
+    }
+
+    private void DrawIntro(Paper paper)
+    {
+        float w = paper.ScreenRect.Size.X;
+        float h = paper.ScreenRect.Size.Y;
+
+        paper.Box("intro_overlay")
+            .PositionType(PositionType.SelfDirected).Position(0, 0).Size(w, h)
+            .IsNotInteractable()
+            .OnPostLayout((handle, rect) => paper.Draw(ref handle, (canvas, r) =>
+            {
+                Scribe.FontFile? font = EditorTheme.FontLogo ?? EditorTheme.DefaultBoldFont;
+                Vector.Color black = Infinity.Vector.Color32.FromArgb(255, 8, 8, 10);
+                DrawStartupBackdrop(canvas, w, h);
+                float barH = (float)h / BarCount;
+                double time = _introTime;
+                float brandFade = 1f;
+
+                // -- CLOSE PHASE: Bars slide IN --
+                if (time < IntroCloseDuration)
+                {
+                    float t = (float)(time / IntroCloseDuration);
+                    for (int i = 0; i < BarCount; i++)
+                    {
+                        float barPhase = Math.Clamp((t - i * 0.04f) / 0.5f, 0f, 1f);
+                        float eased = EaseInOutQuart(barPhase);
+                        float slideX = (i % 2 == 0) ? -(1f - eased) * w : (1f - eased) * w;
+                        canvas.RectFilled(slideX, i * barH, w, barH + 1, black);
+                    }
+                }
+                // -- HOLD PHASE: the logo animation plays out --
+                else if (time < IntroOpenStart)
+                {
+                    canvas.RectFilled(0, 0, w, h, black);
+                }
+                // -- OPEN PHASE: Bars slide OUT, brand fades out --
+                else
+                {
+                    float t = Math.Clamp((float)((time - IntroOpenStart) / IntroOpenDuration), 0f, 1f);
+                    for (int i = 0; i < BarCount; i++)
+                    {
+                        float barPhase = Math.Clamp((t - i * 0.05f) / 0.5f, 0f, 1f);
+                        float eased = EaseInOutQuart(barPhase);
+                        float slideX = (i % 2 == 0) ? -eased * w : eased * w;
+                        canvas.RectFilled(slideX, i * barH, w, barH + 1, black);
+                    }
+                    brandFade = EaseOutQuart(1f - Math.Clamp(t / 0.3f, 0f, 1f));
+                }
+
+                if (time >= IntroBrandStart && brandFade > 0f)
+                    DrawIntroBrand(canvas, w / 2f, h / 2f, (float)(time - IntroBrandStart), brandFade, font);
+
+                if (time >= IntroBrandStart)
+                    DrawSplashDetails(canvas, w, h, time, font, brandFade, loading: false);
+            }));
+    }
+
+    /// <summary>Logo, project name and progress under the intro brand, and the same card on its own while a project loads.</summary>
+    private static void DrawSplashDetails(Infinity.Quill.Canvas canvas, float w, float h, double time, Scribe.FontFile? font,
+        float alpha, bool loading)
+    {
+        if (font == null || alpha <= 0.01f) return;
+
+        float cx = w * 0.5f;
+        float baseY = h * 0.5f + 90f;
+        string project = Project.Current?.Name ?? "Infinity Engine";
+        Vector.Color ink = Infinity.Vector.Color32.FromArgb((byte)(alpha * 255), 235, 232, 245);
+        Vector.Color dim = Infinity.Vector.Color32.FromArgb((byte)(alpha * 185), 172, 162, 198);
+
+        canvas.DrawText("INFINITY ENGINE", cx, baseY, ink, 20f, font,
+            4f, new Float2(0.5f, 0.5f), quality: Scribe.FontQuality.Ultra);
+        canvas.DrawText(project, cx, baseY + 28f, dim, 13f, font,
+            1f, new Float2(0.5f, 0.5f), quality: Scribe.FontQuality.Ultra);
+
+        float progress = loading
+            ? Math.Clamp((float)(0.15 + 0.8 * (1.0 - Math.Exp(-time * 0.65))), 0f, 0.96f)
+            : Math.Clamp((float)(time / (IntroOpenStart + 0.2)), 0f, 1f);
+        string status = loading
+            ? (ScriptAssemblyManager.AwaitingStartupCompile ? "Compilando scripts..." : "Abrindo a cena...")
+            : (progress < 0.55f ? "Carregando projeto..." : "Preparando o editor...");
+
+        const float barW = 320f, barH = 6f;
+        float bx = cx - barW * 0.5f, by = baseY + 58f;
+        canvas.RectFilled(bx, by, barW, barH, Infinity.Vector.Color32.FromArgb((byte)(alpha * 120), 42, 36, 62));
+        canvas.RectFilled(bx, by, barW * progress, barH,
+            Infinity.Vector.Color32.FromArgb((byte)(alpha * 255), 145, 110, 255));
+
+        canvas.DrawText(status, cx, by + 20f, dim, 12f, font,
+            0.5f, new Float2(0.5f, 0.5f), quality: Scribe.FontQuality.Ultra);
+    }
+
+    private void DrawLoadingOverlay(Paper paper)
+    {
+        float w = paper.ScreenRect.Size.X, h = paper.ScreenRect.Size.Y;
+        Scribe.FontFile? font = EditorTheme.FontLogo ?? EditorTheme.DefaultBoldFont;
+        paper.Box("loading_overlay")
+            .PositionType(PositionType.SelfDirected).Position(0, 0).Size(w, h)
+            .Layer(Layer.Overlay)
+            .OnClick(0, (_, _) => { })
+            .OnPostLayout((handle, rect) => paper.Draw(ref handle, (canvas, r) =>
+            {
+                DrawStartupBackdrop(canvas, w, h);
+                float logo = MathF.Min(w, h) * 0.16f;
+                EditorIcons.InfinityLogoTransparent.Draw(canvas,
+                    new Rect(w / 2f - logo / 2f, h / 2f - logo / 2f, w / 2f + logo / 2f, h / 2f + logo / 2f),
+                    System.Drawing.Color.White, 1f);
+                DrawSplashDetails(canvas, w, h, _loadingTime, font, 1f, loading: true);
+            }));
+    }
+
+    /// <summary>A quiet starfield and violet horizon, shared by the intro bars and the loading card.</summary>
+    private static void DrawStartupBackdrop(Infinity.Quill.Canvas canvas, float w, float h)
+    {
+        Vector.Color top = Infinity.Vector.Color32.FromArgb(255, 10, 9, 16);
+        Vector.Color bottom = Infinity.Vector.Color32.FromArgb(255, 24, 18, 42);
+        for (int i = 0; i < 48; i++)
+        {
+            float t = i / 47f;
+            canvas.RectFilled(0, h * t, w, h / 48f + 1, Infinity.Vector.Color32.FromArgb(255,
+                (byte)(top.R + (bottom.R - top.R) * t),
+                (byte)(top.G + (bottom.G - top.G) * t),
+                (byte)(top.B + (bottom.B - top.B) * t)));
+        }
+
+        for (int i = 0; i < 90; i++)
+        {
+            float x = ((i * 73) % 1000) / 1000f * w;
+            float y = ((i * 137) % 1000) / 1000f * h;
+            byte a = (byte)(40 + (i * 37) % 120);
+            float size = i % 11 == 0 ? 2f : 1f;
+            canvas.RectFilled(x, y, size, size, Infinity.Vector.Color32.FromArgb(a, 220, 210, 255));
+        }
+    }
+
+    // Brand animation timeline, in seconds from IntroBrandStart.
+    private const float SpinInEnd = 1.0f;      // edge on to facing, slowing but never stopping
+    private const float SpinOutEnd = 2.25f;    // one more full turn while shrinking, settling facing
+    private const float MoveStart = 1.95f;     // logo slides aside into the lockup
+    private const float MoveEnd = 2.75f;
+    private const float TextStart = 2.2f;      // wordmark fades in and unblurs
+    private const float TextEnd = 3.2f;
+    private const float SpinStartScale = 1.8f; // logo size while spinning, relative to its lockup size
+    private const float TextStartBlur = 18f;
+
+    // The intro brand lockup: the Infinity logo to the LEFT of the wordmark, the pair centered on (cx, cy).
+    // The logo spins in about its vertical axis at the screen center, shrinks, then slides aside while the
+    // wordmark fades in under a clearing blur that sits between the text and the logo.
+    private static void DrawIntroBrand(Infinity.Quill.Canvas canvas, float cx, float cy, float time, float fade, Scribe.FontFile? font)
+    {
+        const string word = "Infinity Engine";
+        const float letterSpacing = 10f, gap = 8f;
+
+        // Size the logo to the wordmark's height and measure the text (with its spacing) so the
+        // [logo | gap | text] lockup can be centered horizontally as a whole.
+        float textW = 0f, lockupH = 88f;
+        if (font != null)
+        {
+            Float2 m = canvas.MeasureText(word, EditorTheme.FontSizeLogo, font, letterSpacing);
+            textW = (float)m.X;
+            lockupH = (float)m.Y;
+        }
+        float logoH = lockupH * 1.375f;        // logo drawn ~38% larger than the wordmark height
+        float logoW = logoH;   // the Infinity mark is square
+        float totalW = logoW + (textW > 0f ? gap + textW : 0f);
+        float left = cx - totalW / 2f;
+        float textX = left + logoW + gap;
+
+        if (font != null && time > TextStart)
+        {
+            float t = EaseOutCubic(Math.Clamp((time - TextStart) / (TextEnd - TextStart), 0f, 1f));
+            float drift = (1f - t) * 16f;
+            Vector.Color textColor = Infinity.Vector.Color32.FromArgb((byte)(t * fade * 255), 230, 230, 230);
+            canvas.DrawText(word, textX + drift, cy, textColor, EditorTheme.FontSizeLogo, font,
+                letterSpacing, new Float2(0f, 0.5f), quality: Scribe.FontQuality.Ultra);
+
+            float blur = TextStartBlur * MathF.Pow(1f - t, 1.5f);
+            if (blur > 0.5f)
+            {
+                float pad = blur * 2f + 4f;
+                canvas.SetBackdropBlur(blur);
+                canvas.RectFilled(textX - pad, cy - lockupH / 2f - pad, textW + drift + pad * 2f, lockupH + pad * 2f,
+                    Infinity.Vector.Color32.FromArgb(0, 0, 0, 0));
+                canvas.ClearBackdropBlur();
+            }
+        }
+
+        float angle = SpinAngle(time);
+        float facing = MathF.Cos(angle * MathF.PI / 180f);
+        float width = MathF.Abs(facing);
+        if (width < 0.01f) return;
+
+        float shrink = SmoothStep(Math.Clamp((time - SpinInEnd) / (SpinOutEnd - SpinInEnd), 0f, 1f));
+        float scale = SpinStartScale + (1f - SpinStartScale) * shrink;
+        float move = EaseInOutCubic(Math.Clamp((time - MoveStart) / (MoveEnd - MoveStart), 0f, 1f));
+        float logoX = cx + (left + logoW / 2f - cx) * move;
+
+        // The back face reads darker, and both faces dim as they turn edge on.
+        float shade = (facing >= 0f ? 230f : 120f) * (0.55f + 0.45f * width);
+        float appear = Math.Clamp(time / 0.2f, 0f, 1f);
+        byte alpha = (byte)(appear * fade * 255f * (shade / 255f));
+        var tint = System.Drawing.Color.FromArgb(alpha, 255, 255, 255);
+
+        canvas.SaveState();
+        canvas.TransformBy(Infinity.Vector.Spatial.Transform2D.CreateTranslation(logoX, cy));
+        canvas.TransformBy(Infinity.Vector.Spatial.Transform2D.CreateScale(scale * width, scale));
+        EditorIcons.InfinityLogoTransparent.Draw(canvas, new Rect(-logoW / 2f, -logoH / 2f, logoW / 2f, logoH / 2f), tint, 1f);
+        canvas.RestoreState();
+    }
+
+    // Degrees about the vertical axis, 90 is edge on and multiples of 360 face the viewer. Two hermite
+    // segments: fast in from edge on and slow through facing, then a faster full turn that settles facing.
+    private static float SpinAngle(float time)
+    {
+        if (time < SpinInEnd)
+            return Hermite(90f, 600f, 360f, 45f, SpinInEnd, time / SpinInEnd);
+        if (time < SpinOutEnd)
+            return Hermite(360f, 45f, 720f, 0f, SpinOutEnd - SpinInEnd, (time - SpinInEnd) / (SpinOutEnd - SpinInEnd));
+        return 720f;
+    }
+
+    // Cubic hermite from p0 to p1 over duration seconds, with start and end speeds m0 and m1 per second.
+    private static float Hermite(float p0, float m0, float p1, float m1, float duration, float s)
+    {
+        float s2 = s * s, s3 = s2 * s;
+        return (2f * s3 - 3f * s2 + 1f) * p0 + (s3 - 2f * s2 + s) * duration * m0
+            + (-2f * s3 + 3f * s2) * p1 + (s3 - s2) * duration * m1;
+    }
+
+    private static float SmoothStep(float x) => x * x * (3f - 2f * x);
+    private static float EaseOutCubic(float x) => 1f - MathF.Pow(1f - x, 3f);
+    private static float EaseInOutCubic(float x) => x < 0.5f ? 4f * x * x * x : 1f - MathF.Pow(-2f * x + 2f, 3f) / 2f;
+    private static float EaseOutQuart(float x) => 1f - MathF.Pow(1f - x, 4f);
+    private static float EaseInOutQuart(float x) => x < 0.5f ? 8f * x * x * x * x : 1f - MathF.Pow(-2f * x + 2f, 4f) / 2f;
+
+    private Scribe.FontFile? LoadFallbackFont(string fileName)
+    {
+        string resourceName = ResourceRoot + fileName;
+        using Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
+        if (stream == null) { Runtime.Debug.LogWarning($"Could not load font resource: {resourceName}"); return null; }
+        Runtime.Debug.Log($"Loaded fallback font: {resourceName} ({stream.Length} bytes)");
+        var fontFile = new Scribe.FontFile(stream);
+        PaperInstance.AddFallbackFont(fontFile);
+        return fontFile;
+    }
+
+    private void LoadSystemFallbackFonts()
+    {
+        // CJK and international font fallback chain. Tries common system fonts
+        // in priority order. These cover Japanese, Chinese, Korean, Cyrillic,
+        // Arabic, Thai, and other scripts not in the primary Latin font.
+        string[] fallbackFamilies =
+        [
+            // Japanese
+            "Yu Gothic UI",        // Windows 10+
+            "Meiryo",              // Windows Vista+
+            "Hiragino Sans",       // macOS
+
+            // Chinese (Simplified)
+            "Microsoft YaHei",     // Windows
+            "PingFang SC",         // macOS
+
+            // Chinese (Traditional)
+            "Microsoft JhengHei",  // Windows
+            "PingFang TC",         // macOS
+
+            // Korean
+            "Malgun Gothic",       // Windows
+            "Apple SD Gothic Neo", // macOS
+
+            // Universal CJK fallback
+            "Noto Sans CJK SC",    // Linux / installed
+            "Noto Sans CJK",       // Linux / installed
+
+            // Cyrillic/Greek (usually covered by primary font, but just in case)
+            "Noto Sans",           // Linux
+        ];
+
+        int loaded = 0;
+
+        foreach (string family in fallbackFamilies)
+        {
+            Scribe.FontFile? font = SystemFonts.FirstOrDefault(f =>
+                f.FamilyName.Equals(family, StringComparison.OrdinalIgnoreCase)
+                && f.Style == Infinity.Scribe.FontStyle.Regular);
+
+            if (font != null)
+            {
+                PaperInstance.AddFallbackFont(font);
+                loaded++;
+            }
+        }
+
+        if (loaded > 0)
+            Runtime.Debug.Log($"Loaded {loaded} system fallback font(s) for international text.");
+    }
+
+    /// <summary>
+    /// Find an open panel of the given type across all docked and floating nodes, including docked panels
+    /// hidden behind a maximized one.
+    /// </summary>
+    public TPanel? FindOpenPanel<TPanel>() where TPanel : DockPanel
+    {
+        return (TPanel?)FindOpenPanel(typeof(TPanel));
+    }
+
+    /// <summary>
+    /// Find an open panel of the given type across all docked and floating nodes, including docked panels
+    /// hidden behind a maximized one.
+    /// </summary>
+    public DockPanel? FindOpenPanel(Type panelType)
+    {
+        return FindInNode(_panelMaximizer.LayoutRoot, panelType)
+            ?? _dockSpace.FloatingWindows
+                .Select(fw => FindInNode(fw.Node, panelType))
+                .FirstOrDefault(p => p != null);
+    }
+
+    private static DockPanel? FindInNode(DockNode? node, Type panelType)
+    {
+        if (node == null) return null;
+        if (node.IsLeaf)
+            return node.Tabs?.FirstOrDefault(t => t.GetType() == panelType);
+        return FindInNode(node.ChildA, panelType) ?? FindInNode(node.ChildB, panelType);
+    }
+
+    private void WalkEditorRoots(AssetWalker walker)
+    {
+        foreach (DockPanel panel in EnumerateAllPanels())
+            walker.Visit(panel);
+
+        foreach (object selected in Selection.Selected)
+            walker.Visit(selected is ContentItem { Guid: var guid } && guid != Guid.Empty ? AssetDatabase.Get(guid) : selected);
+    }
+
+    /// <summary>Enumerate every open panel across the docked tree and all floating windows.</summary>
+    private IEnumerable<DockPanel> EnumerateAllPanels()
+    {
+        foreach (DockPanel p in EnumerateNodePanels(_panelMaximizer.LayoutRoot))
+            yield return p;
+        foreach (FloatingWindow fw in _dockSpace.FloatingWindows)
+            foreach (DockPanel p in EnumerateNodePanels(fw.Node))
+                yield return p;
+    }
+
+    private static IEnumerable<DockPanel> EnumerateNodePanels(DockNode? node)
+    {
+        if (node == null) yield break;
+        if (node.IsLeaf)
+        {
+            if (node.Tabs != null)
+                foreach (DockPanel tab in node.Tabs)
+                    yield return tab;
+            yield break;
+        }
+        foreach (DockPanel p in EnumerateNodePanels(node.ChildA)) yield return p;
+        foreach (DockPanel p in EnumerateNodePanels(node.ChildB)) yield return p;
+    }
+
+    /// <summary>
+    /// Open a panel. If it's already open, focus it. Otherwise create a new instance as a floating window.
+    /// </summary>
+    /// <returns>The open panel, or the new one.</returns>
+    public TPanel OpenPanel<TPanel>() where TPanel : DockPanel, new()
+    {
+        // Check if already open
+        TPanel? existing = FindOpenPanel<TPanel>();
+        if (existing != null)
+        {
+            // Asking for a panel the maximized one is hiding brings the full layout back to show it.
+            if (_panelMaximizer.IsHidden(existing))
+                _panelMaximizer.Restore();
+            FocusPanel(typeof(TPanel));
+            return existing;
+        }
+
+        // Create new instance
+        var newPanel = Activator.CreateInstance<TPanel>();
+        OpenPanelInstance(newPanel);
+        return newPanel;
+    }
+
+    /// <summary>Open a pre-created panel instance as a floating window.</summary>
+    public void OpenPanelInstance(DockPanel panel, float width = 800, float height = 560)
+    {
+        var node = DockNode.Leaf(panel);
+        _dockSpace.FloatingWindows.Add(new FloatingWindow(node,
+            new Float2(200, 200),
+            new Float2(width, height)));
+    }
+
+    /// <summary>
+    /// Check if a panel of the given type is currently open.
+    /// </summary>
+    public bool IsPanelOpen(Type panelType) => FindOpenPanel(panelType) != null;
+
+    /// <summary>
+    /// Check if a panel of the given type is currently open.
+    /// </summary>
+    public bool IsPanelOpen<TPanel>() where TPanel : DockPanel => FindOpenPanel<TPanel>() != null;
+
+    /// <summary>
+    /// Prompt for a scene file path and save <paramref name="scene"/>, the active scene by default, there.
+    /// <paramref name="onSaved"/> runs only if the save succeeds.
+    /// </summary>
+    public static void PromptSaveAs(OpenScene? scene = null, Action? onSaved = null)
+    {
+        if (Project.Current == null || EditorSceneManager.OpenScenes.Count == 0) return;
+        scene ??= EditorSceneManager.ActiveScene;
+        OpenFileDialog(FileDialogMode.Save, path =>
+        {
+            if (path == null || Project.Current == null) return;
+            string rel = EditorAssetBackend.NormalizePath(
+                System.IO.Path.GetRelativePath(Project.Current.AssetsPath, path));
+            if (!rel.EndsWith(".scene")) rel += ".scene";
+
+            if (EditorSceneManager.SaveAs(scene, rel))
+            {
+                Toasts.Success(Loc.Get("save.saved"), EditorSceneManager.LabelOf(scene));
+                onSaved?.Invoke();
+            }
+        }, Project.Current.AssetsPath,
+           ["*.scene"], [Loc.Get("editor.filter_scene")]);
+    }
+
+    /// <summary>
+    /// Closes the current project and returns to the project launcher. Unsaved scenes go through the same
+    /// save/discard prompt used when closing a scene, so nothing is lost without asking.
+    /// </summary>
+    public void CloseProject()
+    {
+        if (Project.Current == null) return;
+
+        if (Application.IsPlaying)
+        {
+            Toasts.Warning(Loc.Get("apidocs.close_project_play_title"), Loc.Get("apidocs.close_project_play"));
+            return;
+        }
+
+        if (PrefabEditingMode.IsEditing)
+        {
+            Toasts.Warning(Loc.Get("apidocs.close_project_prefab_title"), Loc.Get("apidocs.close_project_prefab"));
+            return;
+        }
+
+        if (ScriptAssemblyManager.IsCompiling)
+        {
+            Toasts.Warning(Loc.Get("apidocs.close_project_compiling_title"), Loc.Get("apidocs.close_project_compiling"));
+            return;
+        }
+
+        EditorSceneManager.ConfirmClosing(CloseProjectNow);
+    }
+
+    private void CloseProjectNow()
+    {
+        try
+        {
+            SaveProjectState();
+            EditorSceneManager.ResetForProjectSwitch();
+            EditorAssetBackend.Instance?.Dispose();
+            ScriptAssemblyManager.UnloadProject();
+            EditorRegistries.ClearAll();
+            RegisterMenus();
+            Infinity.Editor.GUI.ApiDocs.ApiDocsCatalog.Invalidate();
+            Project.CloseCurrent();
+            DiscordRichPresence.SetProject(null);
+
+            Window.InternalWindow.Title = "Infinity Engine";
+            Window.SetEngineIcon();
+            ProjectLauncher.Initialize();
+            _launcherWasOpen = true;
+            _introClosing = false;
+            _introTime = IntroDuration + 1;
+            _sceneLoadPending = false;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException("[Project] Closing the project failed", ex);
+            Toasts.Error(Loc.Get("apidocs.close_project_failed"), ex.Message);
+        }
+    }
+
+    // ================================================================
+    //  Menu Registration
+    // ================================================================
+
+    private void RegisterMenus()
+    {
+        string file = Loc.Get("menu.file");
+        string edit = Loc.Get("menu.edit");
+
+        // File menu
+        MenuRegistry.Register($"{file}/{Loc.Get("menu.file.new_scene")}", EditorSceneManager.NewWithPrompt);
+        MenuRegistry.Register($"{file}/{Loc.Get("menu.file.open_scene")}", () =>
+        {
+            EditorApplication.OpenFileDialog(FileDialogMode.Open, path =>
+            {
+                if (path == null || Project.Current == null) return;
+                string rel = EditorAssetBackend.NormalizePath(
+                    System.IO.Path.GetRelativePath(Project.Current.AssetsPath, path));
+                EditorSceneManager.OpenWithPrompt(rel);
+            }, Project.Current?.AssetsPath,
+               ["*.scene"], [Loc.Get("editor.filter_scene")]);
+        });
+        MenuRegistry.RegisterSeparator(file);
+        MenuRegistry.Register($"{file}/{Loc.Get("menu.file.save_scene")}", () =>
+        {
+            if (EditorSceneManager.OpenScenes.Count > 0 && !EditorSceneManager.Save(EditorSceneManager.ActiveScene))
+                PromptSaveAs();
+        });
+        MenuRegistry.Register($"{file}/{Loc.Get("menu.file.save_scene_as")}", () => PromptSaveAs());
+        MenuRegistry.RegisterSeparator(file);
+        MenuRegistry.Register($"{file}/{Loc.Get("menu.file.close_project")}", CloseProject,
+            isEnabled: () => Project.Current != null);
+        MenuRegistry.RegisterSeparator(file);
+        MenuRegistry.Register($"{file}/{Loc.Get("menu.file.build_project")}", () => OpenPanel<BuildSettingsPanel>());
+        MenuRegistry.RegisterSeparator(file);
+        MenuRegistry.Register($"{file}/{Loc.Get("menu.file.exit")}", () => Game.Quit());
+
+        // Edit menu
+        MenuRegistry.Register($"{edit}/{Loc.Get("menu.edit.undo")}", () => Undo.PerformUndo(),
+            isEnabled: () => Undo.CanUndo,
+            dynamicLabel: () => Undo.UndoDescription);
+        MenuRegistry.Register($"{edit}/{Loc.Get("menu.edit.redo")}", () => Undo.PerformRedo(),
+            isEnabled: () => Undo.CanRedo,
+            dynamicLabel: () => Undo.RedoDescription);
+        MenuRegistry.RegisterSeparator(edit);
+        MenuRegistry.Register($"{edit}/{Loc.Get("menu.edit.project_settings")}", () => OpenPanel<ProjectSettingsPanel>());
+        MenuRegistry.Register($"{edit}/{Loc.Get("menu.edit.save_layout")}", () => SaveProjectState());
+        MenuRegistry.RegisterSeparator(edit);
+        MenuRegistry.Register($"{edit}/{Loc.Get("menu.edit.preferences")}", () => OpenPanel<PreferencesPanel>());
+
+        // All [MenuItem] methods: populates Assets/Create/*, Window/*, GameObject/*, and any custom roots
+        MenuItemAttribute.PopulateMenuRegistry();
+
+        // Remaining Assets menu items that live here due to needing OpenFileDialog or db access
+        string assets = Loc.Get("menu.assets");
+        MenuRegistry.RegisterSeparator(assets);
+        MenuRegistry.Register($"{assets}/{Loc.Get("menu.assets.refresh")}", () =>
+        {
+            if (Project.Current != null)
+            {
+                EditorAssetBackend.Instance?.Dispose();
+                var db = new EditorAssetBackend(Project.Current);
+                db.Initialize();
+            }
+        });
+        MenuRegistry.Register($"{assets}/{Loc.Get("menu.assets.reimport_all")}", () =>
+        {
+            EditorAssetBackend? db = EditorAssetBackend.Instance;
+            if (db == null) return;
+            foreach (AssetEntry? entry in db.GetAllEntries().ToList())
+                db.Reimport(entry.Guid);
+            Runtime.Debug.Log("[AssetDatabase] Reimported all assets.");
+        });
+        MenuRegistry.RegisterSeparator(assets);
+        MenuRegistry.Register($"{assets}/{Loc.Get("menu.assets.import_package")}", () =>
+        {
+            EditorApplication.OpenFileDialog(FileDialogMode.Open, path =>
+            {
+                if (path != null && System.IO.File.Exists(path))
+                    GUI.Popups.PackageImportDialog.Open(path);
+            },
+            startPath: Project.Current?.PackagesPath,
+            filters: ["*.prowlpackage"],
+            filterLabels: [Loc.Get("editor.filter_package")]);
+        });
+    }
+
+    // ================================================================
+    //  Script Compilation
+    // ================================================================
+
+    /// <summary>
+    /// Called by <see cref="ScriptAssemblyManager"/> right after the new script assemblies are
+    /// loaded. Re-scans every registry against the fresh assemblies and reloads project settings.
+    /// </summary>
+    public void ReinitializeAfterReload()
+    {
+        ReinitializeRegistries();
+
+        // New code, so anything reported once against the old assemblies gets to report again.
+        Debug.ClearReportedOnce();
+    }
+
+    /// <summary>Transient toast shown while a script recompile is in progress.</summary>
+    public void NotifyCompiling() => Toasts.Show("Compiling", "Compiling scripts...", ToastType.Info, 2f);
+
+    /// <summary>Toast shown when scripts recompiled and hot reloaded successfully.</summary>
+    public void NotifyScriptsReloaded(string detail) => Toasts.Success("Scripts Reloaded", detail);
+
+    /// <summary>Toast shown when a script recompile failed; the errors are in the console.</summary>
+    public void NotifyCompileFailed() => Toasts.Error("Compile Failed", "See the console for the errors.");
+
+    /// <summary>Toast shown when a live hot reload failed; the old code keeps running until the next reload.</summary>
+    public void NotifyReloadFailed() => Toasts.Error("Hot Reload Failed", "Kept the old code running. Fix the error and save to retry.");
+
+    private void ReinitializeRegistries()
+    {
+        // Scan-based registries and type caches the hot-reload walk can't re-derive: reset them so they
+        // re-scan the new assemblies (picking up newly-compiled types and dropping removed ones). Runs on
+        // both the migrate and initial-load paths.
+        Infinity.Runtime.MeshFeatures.MeshFeatureRegistry.ClearCache();
+        AnimationNodeRegistry.Reset();
+        Infinity.Editor.GUI.ApiDocs.ApiDocsCatalog.Invalidate();
+        EditorRegistries.Reinitialize();
+        Inspector.GameObjectInspector.ClearAddComponentCache();
+        GizmoTypes.ClearCache();
+        MenuRegistry.Clear();
+        RegisterMenus();
+    }
+
+    // ================================================================
+    //  Project Switching
+    // ================================================================
+
+    /// <summary>
+    /// Saves the editor window position, size and maximization state.
+    /// </summary>
+    public void SaveEditorWindowState()
+    {
+        EditorSettings.Instance.WindowX = Window.Position.X;
+        EditorSettings.Instance.WindowY = Window.Position.Y;
+
+        EditorSettings.Instance.WindowWidth = Window.Size.X;
+        EditorSettings.Instance.WindowHeight = Window.Size.Y;
+
+        EditorSettings.Instance.WindowMaximized = Window.InternalWindow.WindowState == Silk.NET.Windowing.WindowState.Maximized;
+
+        EditorSettings.Instance.Save();
+    }
+
+    /// <summary>Clear editor caches: cached thumbnails, the saved dock layout (reset to default), and more.</summary>
+    public void ClearEditorCache()
+    {
+        try { Thumbnails.ThumbnailGenerator.DeleteAll(); } catch { }
+        EditorAssetBackend.Instance?.ClearThumbnailTextureCache();
+        try
+        {
+            if (Project.Current != null && System.IO.File.Exists(Project.Current.EditorStatePath))
+                System.IO.File.Delete(Project.Current.EditorStatePath);
+        }
+        catch (Exception ex) { Runtime.Debug.LogWarning($"Failed to clear layout: {ex.Message}"); }
+        SetDockLayout(CreateDefaultLayout());
+
+    }
+
+    /// <summary>Replace the whole docked layout, dropping any maximized panel along with the old one.</summary>
+    private void SetDockLayout(DockNode root)
+    {
+        _panelMaximizer.Discard();
+        _dockSpace.Root = root;
+    }
+
+    internal void SaveDockLayout()
+    {
+        if (Project.Current == null) return;
+        try
+        {
+            // Save the layout as the user arranged it, which a maximized panel only covers for the moment.
+            var layout = new DockSpace(_panelMaximizer.LayoutRoot);
+            layout.FloatingWindows.AddRange(_dockSpace.FloatingWindows);
+            string json = DockSerializer.Serialize(layout);
+            System.IO.File.WriteAllText(Project.Current.EditorStatePath, json);
+        }
+        catch (Exception ex) { Runtime.Debug.LogError($"Failed to save layout: {ex.Message}"); }
+    }
+
+    private DockNode? LoadDockLayout()
+    {
+        if (Project.Current == null) return null;
+        string path = Project.Current.EditorStatePath;
+        if (!System.IO.File.Exists(path)) return null;
+        try
+        {
+            string json = System.IO.File.ReadAllText(path);
+            return DockSerializer.Deserialize(json, _dockSpace.FloatingWindows, (typeName, state) =>
+            {
+                // The profiler's panels hold its views, so they come from it rather than a default constructor.
+                if (RenderProfiler?.Windows is { } profiler)
+                {
+                    if (typeName == typeof(LiveProfilerPanel).FullName) return profiler.Live;
+                    if (typeName == typeof(SnapshotViewerPanel).FullName) return profiler.Snapshots;
+                    if (typeName == typeof(ResourcePreviewPanel).FullName) return null;
+                }
+                Type? type = null;
+                foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    type = asm.GetType(typeName);
+                    if (type != null && typeof(DockPanel).IsAssignableFrom(type)) break;
+                    type = null;
+                }
+                if (type == null) return null;
+                var panel = Activator.CreateInstance(type) as DockPanel;
+                if (panel != null && state != null)
+                    try { panel.RestoreState(state); } catch { }
+                return panel;
+            });
+        }
+        catch (Exception ex)
+        {
+            Runtime.Debug.LogError($"Failed to load layout: {ex.Message}");
+            return null;
+        }
+    }
+
+    /// <summary>Save layout and settings for the current project.</summary>
+    public void SaveProjectState()
+    {
+        if (Project.Current == null) return;
+        SaveEditorWindowState();
+
+        // Skip layout persistence while the game is running panel state snapshots
+        // (selection, scene-view camera) would capture the transient playmode state
+        // and overwrite authoring state on next open.
+        if (!Application.IsPlaying)
+            SaveDockLayout();
+
+        EditorRegistries.SaveSettings();
+    }
+
+    // ================================================================
+    //  Play Mode
+    // ================================================================
+
+    /// <summary>
+    /// Raised when something asks to start or stop play mode, before any of it happens. A handler with
+    /// work the user has to resolve first holds the transition with
+    /// <see cref="PlayModeRequest.Defer"/> and asks again once they have.
+    /// </summary>
+    public static event Action<PlayModeRequest> PlayModeRequested;
+
+    /// <summary>Asks to start play mode. Held if any handler has something outstanding.</summary>
+    public static void RequestPlayMode()
+    {
+        if (Application.IsPlaying || Instance == null) return;
+
+        if (Held(entering: true)) return;
+
+        Instance.EnterPlayMode();
+    }
+
+    /// <summary>Asks to stop play mode. Held if any handler has something outstanding.</summary>
+    public static void RequestExitPlayMode()
+    {
+        if (!Application.IsPlaying || Instance == null) return;
+
+        if (Held(entering: false)) return;
+
+        Instance.ExitPlayMode();
+    }
+
+    /// <summary>Asks for whichever of the two is the opposite of now, which is what the play button does.</summary>
+    public static void RequestTogglePlayMode()
+    {
+        if (Application.IsPlaying) RequestExitPlayMode();
+        else RequestPlayMode();
+    }
+
+    private static bool Held(bool entering)
+    {
+        var request = new PlayModeRequest(entering);
+
+        try
+        {
+            PlayModeRequested?.Invoke(request);
+        }
+        catch (Exception ex)
+        {
+            // A handler that throws must not leave the play button dead. Letting the transition
+            // through is the safer failure: the alternative is an editor that cannot be played in
+            // and does not say why.
+            Runtime.Debug.LogException($"A play mode handler threw, so the transition went ahead anyway", ex);
+            return false;
+        }
+
+        if (!request.IsDeferred) return false;
+
+        Runtime.Debug.Log($"{(entering ? "Entering" : "Exiting")} play mode is waiting on {request.DeferredBy}.");
+        return true;
+    }
+
+    /// <summary>
+    /// Puts the editor's vsync and frame rate preferences back in charge. Does nothing while the
+    /// game is playing, which is what leaves play mode free to pace itself.
+    /// </summary>
+    internal static void ApplyFramePacing()
+    {
+        if (Application.IsPlaying) return;
+
+        EditorSettings settings = EditorSettings.Instance;
+        Application.VSync = settings.VSync;
+
+        int limit = settings.TargetFrameRate;
+        int unfocused = settings.UnfocusedFrameRate;
+        if (!Window.IsFocused && !CliServer.IsActive && unfocused > 0 && (limit == 0 || unfocused < limit))
+            limit = unfocused;
+        Application.TargetFrameRate = limit;
+    }
+
+    // Logs can come from any thread, so the pause itself waits for the next frame.
+    private static volatile bool s_pauseRequested;
+
+    private static void PauseOnLog(LogEvent e)
+    {
+        if (!Application.IsPlaying || IsPlayPaused) return;
+        PauseOnLog mode = Preferences.Get<PlayModePreferences>().PauseOn;
+        if (mode == GUI.Panels.PauseOnLog.ErrorsAndExceptions && e.Severity is LogSeverity.Error or LogSeverity.Exception
+            || mode == GUI.Panels.PauseOnLog.ExceptionsOnly && e.Severity == LogSeverity.Exception)
+            s_pauseRequested = true;
+    }
+
+    private void EnterPlayMode()
+    {
+        if (Application.IsPlaying) return;
+
+        // Play copies the edit world, which is dormant under prefab editing.
+        if (PrefabEditingMode.IsEditing)
+        {
+            Runtime.Debug.LogWarning("Exit prefab editing mode before entering play mode.");
+            return;
+        }
+
+        PlayModePreferences prefs = Preferences.Get<PlayModePreferences>();
+        if (prefs.SaveSceneOnPlay && EditorSceneManager.HasDirtyScenes)
+            EditorSceneManager.SaveAll();
+        if (prefs.ClearConsoleOnPlay) ConsolePanel.Clear();
+
+        // Save active tab (to restore on stop)
+        SaveActiveTab();
+
+        // Scene changes queued this frame land before the copy is made.
+        EditorSceneManager.ApplyPendingNow();
+
+        // An edit the inspector never saw is only a raw value on the objects. Record it as an override first, so the
+        // play copy carries it as one.
+        PrefabUtility.ReconcileOpenScene();
+
+        // Built before anything else changes, so a failure leaves the edit world awake and the editor usable.
+        SceneInstance playWorld;
+        try { playWorld = EditorSceneManager.PreparePlayWorld(); }
+        catch (Exception e)
+        {
+            Runtime.Debug.LogException("[Play] Building the play world threw, so play mode did not start", e);
+            return;
+        }
+
+        try { StartPlayMode(playWorld); }
+        catch (Exception e)
+        {
+            Runtime.Debug.LogException("[Play] Starting play mode threw, so the editor went back to edit mode", e);
+            AbandonPlayMode(playWorld);
+            return;
+        }
+
+        if (prefs.GameViewOnPlay != GameViewOnPlay.Nothing)
+            FocusPanel(typeof(GameViewPanel));
+        // A maximized panel would hide the focused Game view behind it, so the Game view takes its place.
+        // Reset first, so nothing a previous session left behind (an exit that threw) carries into this one.
+        _maximizedForPlay = false;
+        _maximizedBeforePlay = null;
+        DockPanel? maximizedBefore = _panelMaximizer.MaximizedPanel;
+        bool maximize = prefs.GameViewOnPlay == GameViewOnPlay.Maximize ||
+            (prefs.GameViewOnPlay == GameViewOnPlay.Focus && maximizedBefore != null);
+        if (maximize && FindOpenPanel<GameViewPanel>() is GameViewPanel gameView && _panelMaximizer.Maximize(gameView))
+        {
+            _maximizedForPlay = true;
+            _maximizedBeforePlay = maximizedBefore;
+        }
+
+        // The editor's vsync and frame limit are its preference, not the game's, so play starts
+        // unpaced and whatever the game's own code sets from here is what it runs at.
+        Application.VSync = false;
+        Application.TargetFrameRate = 0;
+
+        Runtime.Debug.Log("Entered play mode.");
+    }
+
+    private void StartPlayMode(SceneInstance playWorld)
+    {
+        // An edit made this frame, typed or flushed, belongs to the edit history set aside here.
+        _savedEditUndo = Undo.PushContext();
+        _dirtyAssetCopies = EditorUtility.CopyDirtyAssets();
+
+        // The edit world sleeps untouched through play, so its selection comes back on exit.
+        _savedSelection = Selection.TakeSnapshot();
+        Selection.Clear();
+
+        // Set play mode flags BEFORE loading so OnEnable/Start gates pass
+        Application.IsPlaying = true;
+
+        // Push play-mode input handler (only forwards input when Game View focused)
+        Input.PushHandler(new GameViewInputHandler(Input.Current));
+
+        // Before the scene loads, so components choosing between a headset and a desktop setup in OnEnable see it running.
+        XRSettings xr = EditorRegistries.GetSettings<XRSettings>();
+        xr.Apply();
+        if (xr.StartInPlayMode) XR.Start(xr.TrackingOrigin);
+
+        // The edit world goes dormant and the play world starts in a fresh session, with OnEnable and Start.
+        EditorSceneManager.EnterPlayWorld(playWorld);
+    }
+
+    // Puts everything a failed StartPlayMode may have set up back the way edit mode had it.
+    private void AbandonPlayMode(SceneInstance playWorld)
+    {
+        Application.IsPlaying = false;
+        Guarded("Stopping XR", XR.Stop);
+        if (Input.Current is GameViewInputHandler) Input.PopHandler();
+        Guarded("Destroying the play world", () => EditorSceneManager.AbandonPlayWorld(playWorld));
+        Guarded("Reverting assets play changed", RevertAssetsAfterPlay);
+        Guarded("Restoring dirty assets", () => EditorUtility.RestoreDirtyAssets(_dirtyAssetCopies));
+        _dirtyAssetCopies = [];
+        EditorSceneManager.ReturnToEditWorld();
+        if (_savedEditUndo != null) Undo.PopContext(_savedEditUndo);
+        _savedEditUndo = null;
+        if (_savedSelection is { } selection) Selection.RestoreSnapshot(selection);
+        _savedSelection = null;
+    }
+
+    private void ExitPlayMode()
+    {
+        if (!Application.IsPlaying) return;
+
+        // Clear flags first
+        Application.IsPlaying = false;
+
+        // A session the game started belongs to play mode, just like everything else it set up, and so do the
+        // handlers its code added, which would otherwise fire into the next play session.
+        XR.Stop();
+        XR.ForgetHandlers();
+
+        // Play objects go with the play world. The edit selection comes back once the edit world is bound again.
+        Selection.Clear();
+
+        // The play history goes with the play scene, and the edit history comes back unless the preference drops it.
+        OrigamiUI.TextFieldCommits.DiscardAll();
+        PaperInstance?.ClearFocus();
+        Undo.ClearPending();
+        Undo.PopContext(_savedEditUndo);
+        _savedEditUndo = null;
+        if (!Preferences.Get<PlayModePreferences>().KeepUndoHistory) Undo.Clear();
+
+        // The play world tears down in its own session, which then ends, so nothing still awaiting resumes against
+        // the edit world. Assets go back to what they were before the edit world wakes again.
+        // Each step guarded, so one that throws never keeps the edit world from coming back.
+        Guarded("Destroying the play world", EditorSceneManager.DestroyPlayWorld);
+        Guarded("Reverting assets play changed", RevertAssetsAfterPlay);
+        Guarded("Restoring dirty assets", () => EditorUtility.RestoreDirtyAssets(_dirtyAssetCopies));
+        _dirtyAssetCopies = [];
+        EditorSceneManager.ReturnToEditWorld();
+        if (_savedSelection is { } selection) Selection.RestoreSnapshot(selection);
+        _savedSelection = null;
+
+        // Don't inherit cursor state the game left behind
+        Input.CursorLockState = CursorLockMode.None;
+        Input.CursorVisible = true;
+
+        // Pop play-mode input handler
+        if (Input.Current is GameViewInputHandler)
+            Input.PopHandler();
+        GameViewInputHandler.ClearSuppressedKeys();
+
+        // Undo play mode's swap: end the Game view maximize it made, then maximize again whatever the user had
+        // maximized before play. Any change the user made to the maximize during play (F3, a double-click) is kept.
+        bool undoSwap = _maximizedForPlay && _panelMaximizer.MaximizedPanel is GameViewPanel;
+        DockPanel? maximizedBefore = _maximizedBeforePlay;
+        _maximizedForPlay = false;
+        _maximizedBeforePlay = null;
+        if (undoSwap)
+            _panelMaximizer.Restore();
+
+        // Restore the previously active tab
+        RestoreActiveTab();
+
+        if (undoSwap && maximizedBefore != null)
+            _panelMaximizer.Maximize(maximizedBefore);
+
+        ApplyFramePacing();
+
+        Runtime.Debug.Log("Exited play mode.");
+    }
+
+    private static void Guarded(string what, Action step)
+    {
+        try { step(); }
+        catch (Exception e) { Runtime.Debug.LogException($"[Play] {what} threw", e); }
+    }
+
+    // Nothing a play session does to a project asset outlives it, so every loaded one is unloaded and read again. Built-in
+    // assets stay, since the editor draws with them.
+    private void RevertAssetsAfterPlay()
+    {
+        foreach (Asset asset in AssetDatabase.All.ToList())
+            if (asset.IsLoaded && !AssetDatabase.IsBuiltIn(asset))
+                AssetDatabase.Reload(asset);
+        AssetDatabase.Walk();
+    }
+
+    /// <summary>Whether play mode is on and its world is paused.</summary>
+    internal static bool IsPlayPaused => Application.IsPlaying && SceneInstance.HasMain && SceneInstance.Main.Paused;
+
+    internal static void TogglePause()
+    {
+        if (!Application.IsPlaying || !SceneInstance.HasMain) return;
+        SceneInstance.Main.Paused = !SceneInstance.Main.Paused;
+    }
+
+    /// <summary>Pauses the play world and runs exactly one frame of it.</summary>
+    internal static void StepOneFrame()
+    {
+        if (!Application.IsPlaying || !SceneInstance.HasMain) return;
+        SceneInstance.Main.Paused = true;
+        SceneInstance.Main.RequestStep();
+    }
+
+    // ================================================================
+    //  Tab Focus Helpers
+    // ================================================================
+
+    private void SaveActiveTab()
+    {
+        _savedActiveTabNode = FindNodeContainingPanel(_panelMaximizer.LayoutRoot, typeof(GameViewPanel));
+        if (_savedActiveTabNode == null)
+        {
+            foreach (FloatingWindow fw in _dockSpace.FloatingWindows)
+            {
+                _savedActiveTabNode = FindNodeContainingPanel(fw.Node, typeof(GameViewPanel));
+                if (_savedActiveTabNode != null) break;
+            }
+        }
+        _savedActiveTabIndex = _savedActiveTabNode?.ActiveTabIndex ?? -1;
+    }
+
+    private void RestoreActiveTab()
+    {
+        if (_savedActiveTabNode?.Tabs != null && _savedActiveTabIndex >= 0
+            && _savedActiveTabIndex < _savedActiveTabNode.Tabs.Count)
+        {
+            _savedActiveTabNode.ActiveTabIndex = _savedActiveTabIndex;
+        }
+        _savedActiveTabNode = null;
+        _savedActiveTabIndex = -1;
+    }
+
+    private void FocusPanel(Type panelType)
+    {
+        // Behind a maximized panel this only picks the tab its leaf will show once the layout is back.
+        DockNode? node = FindNodeContainingPanel(_panelMaximizer.LayoutRoot, panelType);
+        if (node == null)
+        {
+            foreach (FloatingWindow fw in _dockSpace.FloatingWindows)
+            {
+                node = FindNodeContainingPanel(fw.Node, panelType);
+                if (node != null) break;
+            }
+        }
+
+        if (node?.Tabs != null)
+        {
+            for (int i = 0; i < node.Tabs.Count; i++)
+            {
+                if (node.Tabs[i].GetType() == panelType)
+                {
+                    node.ActiveTabIndex = i;
+                    return;
+                }
+            }
+        }
+    }
+
+    /// <summary>Brings one particular panel to the front of whatever leaf holds it.</summary>
+    public void FocusPanelInstance(DockPanel panel)
+    {
+        DockNode? node = FindNodeContainingInstance(_dockSpace.Root, panel);
+        if (node == null)
+            foreach (FloatingWindow fw in _dockSpace.FloatingWindows)
+            {
+                node = FindNodeContainingInstance(fw.Node, panel);
+                if (node != null) break;
+            }
+
+        if (node?.Tabs == null) return;
+
+        int index = node.Tabs.IndexOf(panel);
+        if (index >= 0) node.ActiveTabIndex = index;
+    }
+
+    private static DockNode? FindNodeContainingInstance(DockNode? node, DockPanel panel)
+    {
+        if (node == null) return null;
+        if (node.IsLeaf) return node.Tabs != null && node.Tabs.Contains(panel) ? node : null;
+        return FindNodeContainingInstance(node.ChildA, panel) ?? FindNodeContainingInstance(node.ChildB, panel);
+    }
+
+    private static DockNode? FindNodeContainingPanel(DockNode? node, Type panelType)
+    {
+        if (node == null) return null;
+        if (node.IsLeaf && node.Tabs != null)
+        {
+            foreach (DockPanel tab in node.Tabs)
+                if (tab.GetType() == panelType)
+                    return node;
+            return null;
+        }
+        return FindNodeContainingPanel(node.ChildA, panelType)
+            ?? FindNodeContainingPanel(node.ChildB, panelType);
+    }
+
+    // ================================================================
+    //  Scene Control Editor overrides Game's default scene lifecycle
+    // ================================================================
+
+    /// <summary>
+    /// Editor does NOT auto-update the scene. SceneView handles it.
+    /// </summary>
+    /// <summary>
+    /// Runs work on the main thread and waits for it, for a background task that has to touch the open scene or the
+    /// asset database. Runs it at once on the main thread, or where no editor frame loop runs, such as a command line
+    /// build or a test.
+    /// </summary>
+    public static void RunOnMainThread(Action work)
+    {
+        if (Program.BuildMode || Instance == null) work();
+        else if (s_closing) throw new OperationCanceledException("The editor is closing, so the main thread no longer takes work.");
+        else GameTask.Run(work);
+    }
+
+    private static volatile bool s_closing;
+
+    public override void Closing()
+    {
+        s_closing = true;
+        DiscordRichPresence.Stop();
+        Infinity.Editor.MultiProgram.MultiProgramSession.Disconnect();
+        CliServer.Shutdown();
+        base.Closing();
+    }
+
+    public override void OnUpdate()
+    {
+        using FrameStatScope stats = FrameStats.Editor.Scope();
+        Infinity.Editor.MultiProgram.MultiProgramSession.Tick();
+
+        Tasks.EditorTask.Poll();
+        PreviewWidget.ReleaseUndrawn();
+
+        // The engine ticks the play world. The edit and prefab worlds are the editor's to tick, where only
+        // [ExecuteAlways] components run.
+        if (SceneInstance.HasMain && EditorSceneManager.EditedWorld is { Mode: SceneMode.Edit, State: SceneState.Running } edited)
+            edited.Tick(Runtime.Time.UnscaledDeltaTime);
+
+        using (FrameStats.Navigation.Scope())
+            Navigation.NavMeshBakeService.Instance.Poll();
+    }
+
+    public override void BeginRender()
+    {
+        _sceneGizmosDrawn = false;
+    }
+
+    /// <summary>Queues component gizmos once per rendered frame, on demand from a visible Scene view.</summary>
+    internal void DrawSceneGizmos(Runtime.Resources.SceneInstance scene)
+    {
+        if (_sceneGizmosDrawn || !scene.IsValid()) return;
+        _sceneGizmosDrawn = true;
+
+        // Editor gizmos are a scene-view concept, and the scene view edits UI in world space, so queue
+        // them with the world-space canvas override active - otherwise the canvas wireframe would be
+        // laid out at the screen/RT size and disagree with the world-space UI it's drawn around.
+        bool prevWorldSpace = GameCanvas.EditorWorldSpaceOverride;
+        GameCanvas.EditorWorldSpaceOverride = true;
+        // The scene view picks gizmos, so this pass records what each one can be clicked by.
+        bool prevRecord = GizmoBuilder.RecordHitboxes;
+        GizmoBuilder.RecordHitboxes = true;
+        try
+        {
+            using FrameStatScope gizmoStats = EditorFrameStats.Gizmos.Scope();
+            // Visible Scene views keep their gizmos while playing as well as while editing.
+            scene.DrawGizmos();
+
+            using SceneInstance.SceneScope active = scene.Enter();
+            if (Selection.Count > 0)
+            {
+                // Selected gizmos draw for the selection and everything below it, each GameObject once
+                // even when a parent and its child are both selected.
+                s_selectedGizmoObjects.Clear();
+                foreach (GameObject go in Selection.GetSelected<GameObject>())
+                    CollectSelectedGizmoObjects(go);
+                foreach (GameObject go in s_selectedGizmoObjects)
+                {
+                    if (go.Section is { HiddenInSceneView: true }) continue;
+                    foreach (Component comp in go.GetComponents())
+                    {
+                        if (!GizmoFilter.IsEnabled(comp.GetType())) continue;
+                        using GizmoBuilder.OwnerScope owner = GizmoBuilder.Owner(comp);
+                        comp.DrawGizmosSelected();
+                    }
+                }
+            }
+        }
+        finally
+        {
+            GameCanvas.EditorWorldSpaceOverride = prevWorldSpace;
+            GizmoBuilder.RecordHitboxes = prevRecord;
+        }
+    }
+
+    private static readonly HashSet<GameObject> s_selectedGizmoObjects = [];
+
+    private static void CollectSelectedGizmoObjects(GameObject go)
+    {
+        if (go.IsNotValid() || !s_selectedGizmoObjects.Add(go)) return;
+        foreach (GameObject child in go.Children)
+            CollectSelectedGizmoObjects(child);
+    }
+
+    // ================================================================
+    //  Default Layout
+    // ================================================================
+
+    private static DockNode CreateDefaultLayout()
+    {
+        // Unity-style: Inspector down the right, Hierarchy beside the viewport, Project and Console tabbed along the bottom.
+        return DockNode.Split(SplitDirection.Horizontal, 0.78f,
+            DockNode.Split(SplitDirection.Vertical, 0.65f,
+                // Top: Hierarchy (20%) | Scene and Game tabs.
+                DockNode.Split(SplitDirection.Horizontal, 0.2f,
+                    DockNode.Leaf(new HierarchyPanel()),
+                    DockNode.Leaf(new SceneViewPanel(), new GameViewPanel())
+                ),
+                // Bottom: Project and Console tabs.
+                DockNode.Leaf(new ProjectPanel(), new ConsolePanel())
+            ),
+            // Right column: Inspector, full height.
+            DockNode.Leaf(new InspectorPanel())
+        );
+    }
+}

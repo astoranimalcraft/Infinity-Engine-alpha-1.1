@@ -1,0 +1,80 @@
+// This file is part of the Infinity Engine
+// Licensed under the MIT License. See the LICENSE file in the project root for details.
+
+using System.IO;
+using System.Linq;
+
+using Infinity.Editor.Projects.Scripting;
+using Infinity.Ember.Analyzers;
+
+using Xunit;
+
+namespace Infinity.Editor.Test;
+
+/// <summary>Verifies the hot-reload-safety analyzer surfaces (and can be suppressed) during the script compile.</summary>
+[Trait("Category", "Build")]
+public class HotReloadAnalyzerTests : EditorTestHarness
+{
+    [Fact]
+    public void Analyzer_WarnsOnStaticFieldOfGenericType()
+    {
+        WriteScript("Gen.cs", "public class Box<T> { public static int Count; }");
+
+        ScriptCompiler.CompileResult result = ScriptCompiler.CompileAll(Project);
+
+        Assert.True(result.Success, result.Errors);                 // it's a warning, not an error
+        Assert.Contains(ReloadDiagnosticAnalyzer.StaticOnGenericType.Id, result.Output);
+    }
+
+    [Fact]
+    public void Analyzer_WarnsOnStaticAutoPropertyOfGenericType()
+    {
+        WriteScript("Gen.cs", "public class Box<T> { public static int Count { get; set; } }");
+
+        ScriptCompiler.CompileResult result = ScriptCompiler.CompileAll(Project);
+
+        Assert.True(result.Success, result.Errors);
+        Assert.Contains(ReloadDiagnosticAnalyzer.StaticOnGenericType.Id, result.Output);
+    }
+
+    [Fact]
+    public void Analyzer_ReloadIgnoreSuppressesTheWarning()
+    {
+        WriteScript("Gen.cs", "public class Box<T> { [Infinity.Ember.ReloadIgnore] public static int Count; }");
+
+        ScriptCompiler.CompileResult result = ScriptCompiler.CompileAll(Project);
+
+        Assert.True(result.Success, result.Errors);
+        Assert.DoesNotContain(ReloadDiagnosticAnalyzer.StaticOnGenericType.Id, result.Output);
+    }
+
+    [Fact]
+    public void Analyzer_IgnoresStaticFieldOfNonGenericType()
+    {
+        WriteScript("Plain.cs", "public class Box { public static int Count; }");
+
+        ScriptCompiler.CompileResult result = ScriptCompiler.CompileAll(Project);
+
+        Assert.True(result.Success, result.Errors);
+        Assert.DoesNotContain(ReloadDiagnosticAnalyzer.StaticOnGenericType.Id, result.Output);
+    }
+
+    // The generated csproj registers the analyzer as an <Analyzer>, so the IDE surfaces the warning too.
+    [Fact]
+    public void GeneratedCsproj_RegistersTheAnalyzer()
+    {
+        WriteScript("Gen.cs", "public class Box<T> { public static int Count; }");
+
+        ScriptCompiler.CompileAll(Project);
+
+        string? csproj = Directory.EnumerateFiles(Project.RootPath, "*.csproj")
+            .Select(File.ReadAllText)
+            .FirstOrDefault(t => t.Contains("<Compile"));
+        Assert.NotNull(csproj);
+        Assert.Contains("<Analyzer Include=", csproj);
+        string analyzer = Directory.EnumerateFiles(AppContext.BaseDirectory, "*.Analyzers.dll")
+            .Select(Path.GetFileName)
+            .First(n => n!.Contains("Ember", StringComparison.OrdinalIgnoreCase))!;
+        Assert.Contains(analyzer, csproj);
+    }
+}
